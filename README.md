@@ -18,7 +18,6 @@ Project ini adalah website penjualan produk digital bernama **Digital Cell**.
 
 Website harus mobile-first tetapi tetap responsive untuk tablet dan desktop.
 
----
 
 # Teknologi
 
@@ -32,11 +31,11 @@ Website harus mobile-first tetapi tetap responsive untuk tablet dan desktop.
 - React Hook Form
 - Zod
 
----
+
 
 # Struktur Folder
 
-```
+
 src/
 │
 ├── app/
@@ -130,7 +129,7 @@ src/
 
 /admin/settings
 
----
+
 
 # Design System
 
@@ -150,7 +149,7 @@ Buat folder khusus untuk:
 - Animation
 - Theme
 
----
+
 
 # Ketentuan
 
