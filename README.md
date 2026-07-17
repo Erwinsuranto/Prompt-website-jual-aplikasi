@@ -9,6 +9,66 @@
 
 
 
+# Prompt berikutnya (Prompt 11)
+```
+
+
+Continue the project following SPEC.md and ROADMAP.md.
+
+Use the same Digital Cell reference image already provided.
+Do not change the design language.
+
+Task:
+Build the Payment Page UI only.
+
+Requirements:
+
+Create a complete payment page containing:
+
+- Order ID
+- Countdown timer
+- Payment status badge
+- QRIS payment card
+- Click to enlarge QRIS
+- Copy payment amount button
+- Copy account number button
+- Bank Transfer section
+- E-Wallet section
+- Upload payment proof area
+- Payment instructions
+- Frequently Asked Questions
+- Contact Customer Service button
+- Cancel Order button
+
+Use Framer Motion animations.
+
+Responsive:
+- Mobile
+- Tablet
+- Desktop
+
+Reuse existing components.
+
+No backend.
+No API.
+Use mock data only.
+
+Rules:
+- No duplicated code.
+- No hardcoded colors.
+- No any type.
+- Follow existing folder structure.
+
+After completing:
+- Update ROADMAP.md.
+- Mark only this Payment UI task as completed.
+- Update progress percentage.
+- Update CHANGELOG.md.
+- Commit changes.
+
+
+
+```
 
 # Prompt 10 — Checkout Page (UI Only)
 ```
