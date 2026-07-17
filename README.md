@@ -3,7 +3,62 @@
 
 
 
+# Prompt 6 — Feature Cards (4 Keunggulan)
+```
 
+
+
+Task: Implement Home Page - Features section only.
+
+Reference:
+Use the attached Digital Cell homepage screenshot.
+
+Requirements:
+
+Build only the Features section located below the Promo Banner.
+
+Create a reusable FeaturesSection component.
+
+Include exactly four feature cards:
+
+- Aman & Terpercaya
+- Proses Cepat
+- Layanan 24/7
+- Harga Terbaik
+
+Each card must contain:
+- Icon
+- Title
+- Short description
+
+Requirements:
+- Match spacing, radius, shadows and layout from the reference.
+- Mobile-first responsive.
+- Desktop responsive.
+- Reusable FeatureCard component.
+- Use only Tailwind design tokens.
+- No hardcoded hex colours.
+- No backend.
+- No API.
+- UI only.
+
+Do not modify:
+- Header
+- Hero
+- Search
+- Categories
+- Featured Products
+- Promo Banner
+
+After completion:
+1. Verify there are no TypeScript/build errors if possible.
+2. Update ROADMAP.md by marking only this Features section task completed.
+3. Update CHANGELOG.md.
+4. Commit changes.
+5. Stop and wait for my approval.
+
+
+```
 
 # Prompt 5 — Promo Banner
 ```
