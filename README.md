@@ -1,9 +1,55 @@
-# Prompt-website-jual-aplikasi
+⁶# Prompt-website-jual-aplikasi
 
 
 
 
 
+
+
+# Prompt 8 — Halaman Kategori
+```
+
+
+Task: Implement Category Page UI only.
+
+Requirements:
+
+Create the Category page using the same design system as the Home Page.
+
+Include:
+
+- Header
+- Search Bar
+- Category title
+- Filter chips
+- Product Grid
+- Product Card (reuse existing component)
+- Empty State component
+- Responsive layout
+- Mobile-first
+- Desktop responsive
+
+Reuse existing components whenever possible.
+
+Do not duplicate ProductCard.
+
+Do not implement backend.
+
+Do not implement API.
+
+UI only.
+
+After completion:
+
+1. Verify TypeScript/build if possible.
+2. Update ROADMAP.md by marking only this Category Page task completed.
+3. Update CHANGELOG.md.
+4. Commit changes.
+5. Stop and wait for my approval.
+
+
+
+```
 # Prompt 7 — Bottom Navigation
 ```
 
