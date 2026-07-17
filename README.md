@@ -9,6 +9,78 @@
 
 
 
+
+
+# Prompt 12 — Invoice / Order Success UI
+```
+
+Continue the project following SPEC.md and ROADMAP.md.
+
+Use the same Digital Cell reference image already provided.
+Maintain the exact same design language.
+
+Task:
+Build the Invoice / Order Success page UI only.
+
+Requirements:
+
+Create a modern invoice page containing:
+
+• Success animation
+• Payment status badge
+• Order ID
+• Transaction date
+• Product information
+• Buyer information
+• Payment method
+• Total payment
+• Download Invoice button
+• Copy Order ID button
+• Share Order button
+• Back to Home button
+• Continue Shopping button
+• Contact Customer Service button
+
+Create an Order Timeline:
+
+- Order Created
+- Waiting Payment
+- Payment Received
+- Processing
+- Completed
+
+Responsive:
+- Mobile
+- Tablet
+- Desktop
+
+Use Framer Motion.
+
+Reuse existing components.
+
+No backend.
+No API.
+Mock data only.
+
+Rules:
+- No duplicated code.
+- No any type.
+- No hardcoded colors.
+- Follow existing folder structure.
+- Commit changes.
+
+After completion:
+
+- Update ROADMAP.md
+- Mark only Invoice UI task completed
+- Update progress percentage
+- Update CHANGELOG.md
+- Commit changes
+
+
+
+
+```
 # Prompt berikutnya (Prompt 11)
 ```
 
