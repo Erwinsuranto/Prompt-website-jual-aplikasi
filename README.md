@@ -8,6 +8,80 @@
 
 
 
+
+
+# Prompt 10 — Checkout Page (UI Only)
+```
+
+
+Continue the project following SPEC.md and ROADMAP.md.
+
+Use the Digital Cell design reference image I already provided earlier. Keep the exact same design language, spacing, typography, rounded corners, shadows, animations, colors, and component style.
+
+Task:
+Build the Checkout page UI only.
+
+Requirements:
+- Mobile-first.
+- Reuse existing ShopLayout, Header, Bottom Navigation, SearchBar, ProductCard, Button, Card, Badge, etc.
+- Do not duplicate existing components.
+- No backend.
+- No API.
+- Use mock data only.
+
+Checkout page must include:
+
+1. Product summary
+- Product image
+- Product name
+- Category
+- Price
+- Quantity selector
+
+2. Buyer information
+- Full Name
+- WhatsApp Number
+- Email (optional)
+
+3. Order notes
+
+4. Payment method cards
+- QRIS
+- Bank Transfer
+- E-Wallet
+
+5. Order summary
+- Product subtotal
+- Admin fee
+- Discount
+- Total payment
+
+6. Sticky "Continue Payment" button
+
+7. Smooth Framer Motion animations.
+
+8. Responsive for mobile, tablet and desktop.
+
+Rules:
+- No hardcoded colors outside design tokens.
+- No any type.
+- No duplicated code.
+- Follow project folder structure.
+- Update only files required.
+- Commit changes.
+
+IMPORTANT:
+After finishing:
+1. Update ROADMAP.md.
+2. Mark only the completed Checkout UI task as done.
+3. Update progress percentage.
+4. Append CHANGELOG.md.
+5. Do NOT modify unfinished roadmap tasks.
+
+
+
+```
+
 # Prompt berikutnya
 ```
 
