@@ -17,6 +17,65 @@
 ```
 
 
+
+Continue the project following SPEC.md and ROADMAP.md.
+
+I have uploaded the OFFICIAL Login & Register design reference.
+
+The current Login and Register pages are functionally complete.
+
+Your task is ONLY to refine the UI so it matches the uploaded reference image as closely as possible.
+
+Do NOT rebuild the pages.
+
+Keep:
+- Existing routing
+- Existing validation
+- Existing components
+- Existing logic
+- Existing animations where appropriate
+
+Only improve the visual appearance.
+
+Match the uploaded reference in:
+
+- Layout
+- White card proportions
+- Blue illustration panel
+- Logo placement
+- Typography
+- Input styling
+- Button styling
+- Border radius
+- Shadows
+- Gradients
+- Icon placement
+- Google & Apple buttons
+- Forgot password
+- Register/Login links
+- Spacing
+- Mobile responsiveness
+
+The uploaded Login/Register image is now the OFFICIAL Authentication design for this project.
+
+Future pages (OTP, Forgot Password, Reset Password, Profile, Security, Account Settings) MUST follow the same visual language.
+
+After finishing:
+
+- Update ROADMAP.md
+- Add a CHANGELOG entry for Authentication UI refinement
+- Commit the changes
+
+Do NOT modify any unfinished roadmap tasks.
+
+
+```
+
+
+# 
+```
+
+
 Continue the project following SPEC.md and ROADMAP.md.
 
 I have now uploaded the official Login & Register design reference.
