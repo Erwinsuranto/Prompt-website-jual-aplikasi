@@ -5,6 +5,51 @@
 
 
 
+# Prompt 5 — Promo Banner
+```
+
+
+
+Task: Implement Home Page - Promo Banner section only.
+
+Reference:
+Use the attached Digital Cell homepage screenshot.
+
+Requirements:
+
+- Build only the promotional banner below the Featured Products section.
+- Match the reference design as closely as possible.
+- Create a reusable PromoBanner component.
+- Include:
+  - Discount badge.
+  - Main promotional title.
+  - Subtitle.
+  - Decorative illustration/background.
+  - Circular arrow button.
+- Mobile-first responsive.
+- Framer Motion animation.
+- No business logic.
+- No API.
+- No backend.
+- Mock content only.
+
+Do not modify:
+- Header
+- Hero
+- Search Bar
+- Categories
+- Featured Products
+
+After completion:
+1. Verify there are no TypeScript/build errors if possible.
+2. Update ROADMAP.md by marking only this Promo Banner task completed.
+3. Update CHANGELOG.md.
+4. Commit changes.
+5. Stop and wait for my approval.
+
+
+```
+
 # Prompt 4 — Featured Products (Produk Populer)
 ```
 
