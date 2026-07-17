@@ -2,6 +2,28 @@
 
 
 
+
+# Prompt pertama yang bisa Anda berikan ke Genie Code
+```
+
+
+
+Implement the mobile-first layout based on the provided UI design.
+
+Requirements:
+- Use Next.js 14 App Router.
+- Use shadcn/ui and Tailwind CSS.
+- Create the global layout only.
+- Build a responsive header with logo, dark mode toggle, and menu button.
+- Build a responsive bottom navigation with Home, Categories, Orders, Favorites, and Account.
+- Create reusable layout components.
+- Do not implement business logic yet.
+- Do not create fake data.
+- Preserve the existing project structure.
+
+
+```
+
 #
 ```
 # Prompt 01 — Project Structure (Digital Cell)
