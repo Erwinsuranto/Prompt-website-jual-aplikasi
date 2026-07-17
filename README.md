@@ -3,7 +3,56 @@
 
 
 
+# 
+```
 
+
+Update the project workflow to make ROADMAP.md the single source of truth.
+
+Rules:
+
+1. Before every implementation:
+   - Read ROADMAP.md.
+   - Analyze the current repository.
+   - Find the first unchecked task ([ ]).
+   - Only implement that task unless I explicitly request another one.
+
+2. During implementation:
+   - Follow the existing architecture and coding style.
+   - Reuse existing components whenever possible.
+   - Do not break existing functionality.
+   - Keep the project modular and scalable.
+
+3. After implementation:
+   - Mark completed tasks as [x].
+   - Update the phase progress.
+   - Update the overall progress percentage.
+   - Update the Progress Summary table.
+   - Add the completed work to a Changelog section with today's date.
+   - If new subtasks are discovered, automatically insert them into the appropriate phase.
+
+4. Never:
+   - Mark incomplete work as completed.
+   - Skip roadmap steps.
+   - Delete completed history.
+   - Reorder completed tasks.
+
+5. Always preserve:
+   - Existing code.
+   - Existing architecture.
+   - Existing UI.
+   - Existing functionality.
+
+6. If implementation requires more than one session:
+   - Stop after completing the current roadmap task.
+   - Update ROADMAP.md.
+   - Wait for my next instruction.
+
+ROADMAP.md must always represent the real implementation status of the repository.
+
+
+
+```
 
 # 
 ```
