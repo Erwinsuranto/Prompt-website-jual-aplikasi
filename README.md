@@ -6,6 +6,63 @@
 
 
 
+# Prompt berikutnya: Categories Listing
+```
+
+
+Task: Implement Categories Listing Page only.
+
+Requirements:
+
+Create the /categories page.
+
+The page must display every category available in the shop.
+
+Reuse existing components whenever possible.
+
+Include:
+
+- Header
+- Search Bar
+- Grid of Category Cards
+- Category icon
+- Category title
+- Short description
+- Product count badge
+- Smooth animations
+- Mobile-first
+- Tablet responsive
+- Desktop responsive
+
+Each Category Card should navigate to:
+/category/[slug]
+
+Do not modify:
+
+- Homepage
+- Category Detail Page
+- Product Card
+- Product Detail
+- Checkout
+- Admin
+
+UI only.
+
+No backend.
+
+No API.
+
+After completion:
+
+1. Verify build if possible.
+2. Update ROADMAP.md by marking only this Categories Listing task completed.
+3. Update CHANGELOG.md.
+4. Commit changes.
+5. Stop and wait for my approval.
+
+
+
+```
 # Prompt 8 — Halaman Kategori
 ```
 
