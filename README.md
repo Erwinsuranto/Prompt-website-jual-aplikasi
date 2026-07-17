@@ -3,6 +3,142 @@
 
 
 
+
+
+# 
+```
+Create a new file named SPEC.md in the project root.
+
+This document is the permanent project specification and must always be read before implementing any feature.
+
+Requirements:
+
+# Project
+
+Name: Digital Cell
+
+Type:
+Modern mobile-first digital product marketplace.
+
+Main Goal:
+Build a production-ready e-commerce application for selling digital products and services.
+
+Tech Stack
+
+- Next.js 14 App Router
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Framer Motion
+- Zustand
+- React Hook Form
+- Zod
+
+Coding Rules
+
+- TypeScript Strict Mode.
+- No duplicated code.
+- Reusable components.
+- Modular architecture.
+- Clean code.
+- Strong typing.
+- Never use "any" unless absolutely necessary.
+- Keep components small and maintainable.
+- Always separate UI, business logic and API.
+
+Project Structure
+
+Always follow the existing folder structure.
+
+Do not create unnecessary folders.
+
+Prefer reusable components.
+
+Design Rules
+
+- Mobile-first.
+- Responsive for tablet and desktop.
+- Follow the provided Digital Cell design.
+- White background.
+- Blue primary color.
+- Rounded modern cards.
+- Soft shadows.
+- Smooth animations.
+- Dark mode support.
+- Accessibility friendly.
+
+Performance
+
+- Lazy loading where appropriate.
+- Image optimization.
+- Dynamic imports when useful.
+- Keep bundle size small.
+
+Component Rules
+
+Create reusable components.
+
+Never duplicate UI.
+
+Prefer composition.
+
+Naming
+
+PascalCase for Components.
+
+camelCase for functions.
+
+kebab-case only for route folders.
+
+Git Workflow
+
+Every implementation must:
+
+1. Update ROADMAP.md
+2. Update CHANGELOG.md
+3. Commit changes
+4. Stop and wait for user approval
+
+Never continue automatically.
+
+Memory
+
+Before every implementation:
+
+- Read SPEC.md
+- Read ROADMAP.md
+- Read CHANGELOG.md
+
+Always follow these files.
+
+If there is any conflict:
+
+SPEC.md has highest priority.
+
+ROADMAP.md is second.
+
+Existing code is third.
+
+Documentation
+
+Every new feature must include:
+
+- Clear comments where necessary.
+- Strong typing.
+- Proper folder placement.
+- No unused imports.
+- No dead code.
+
+Goal
+
+Maintain a production-quality codebase that is scalable, maintainable and easy for future AI sessions to continue.
+
+
+
+
+
+```
 # 
 ```
 
