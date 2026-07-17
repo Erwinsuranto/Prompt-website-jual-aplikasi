@@ -5,6 +5,43 @@
 
 
 
+# Prompt 3 – Categories
+```
+
+
+Task: Implement Home Page - Categories Section only.
+
+Reference:
+Use the attached Digital Cell homepage design as the UI reference.
+
+Requirements:
+
+- Build only the Categories section.
+- Match the provided design as closely as possible.
+- Horizontal category list.
+- Rounded icon cards.
+- Category icon.
+- Category title.
+- Active category state.
+- Horizontal scrolling on mobile if needed.
+- Responsive for tablet and desktop.
+- Reusable CategoryCard component.
+- Mock data only.
+- Smooth hover/tap animation using Framer Motion.
+- Use design tokens already defined in the project.
+- Do not modify Hero Section or Search Bar.
+- Do not implement Product Cards yet.
+
+After completion:
+1. Verify there are no TypeScript/build errors if the environment supports it.
+2. Update ROADMAP.md by marking only the Categories task as completed.
+3. Update CHANGELOG.md.
+4. Commit the changes.
+5. Stop and wait for my approval.
+
+
+
+```
 # Prompt 2 – Search Bar
 ```
 
