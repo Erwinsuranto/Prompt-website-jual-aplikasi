@@ -3,6 +3,64 @@
 
 
 
+
+# Prompt 7 — Bottom Navigation
+```
+
+
+
+Task: Implement Home Page - Bottom Navigation only.
+
+Reference:
+Use the attached homepage screenshot.
+
+Requirements:
+
+Build only the Bottom Navigation shown at the bottom of the screen.
+
+Create reusable components.
+
+Items:
+
+- Beranda
+- Kategori
+- Pesanan
+- Favorit
+- Akun
+
+Requirements:
+
+- Active item: Beranda.
+- Icon above text.
+- Match spacing, radius, shadow and colours from the reference.
+- Sticky to bottom on mobile.
+- Hidden on desktop.
+- Responsive.
+- Framer Motion hover/tap animation.
+- Tailwind design tokens only.
+- No hardcoded hex colours.
+- UI only.
+- No routing logic yet.
+
+Do not modify:
+- Header
+- Hero
+- Search
+- Categories
+- Featured Products
+- Promo Banner
+- Features Section
+
+After completion:
+
+1. Verify TypeScript/build if possible.
+2. Update ROADMAP.md by marking only this Bottom Navigation task completed.
+3. Update CHANGELOG.md.
+4. Commit changes.
+5. Stop and wait for my approval.
+
+
+```
 # Prompt 6 — Feature Cards (4 Keunggulan)
 ```
 
