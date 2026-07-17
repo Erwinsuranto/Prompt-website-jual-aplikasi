@@ -5,6 +5,46 @@
 
 
 
+# Prompt 4 — Featured Products (Produk Populer)
+```
+
+
+
+
+Task: Implement Home Page - Featured Products section only.
+
+Reference:
+Use the attached Digital Cell homepage design image.
+
+Requirements:
+
+- Build only the "Produk Populer" section.
+- Match the provided design as closely as possible.
+- Create reusable ProductCard component.
+- Each card must include:
+  - Product image
+  - Product title
+  - Product subtitle
+  - Rating
+  - Sold count
+  - Price
+  - Badge (Promo / Ready / New / Terlaris)
+  - Add-to-cart button
+- Horizontal scrolling on mobile.
+- Responsive grid on tablet and desktop.
+- Use mock product data only.
+- Framer Motion hover/tap animations.
+- Do not implement product detail or cart logic.
+- Do not modify Hero, Search Bar, or Categories.
+
+After completion:
+1. Verify there are no TypeScript or build errors if the environment supports it.
+2. Update ROADMAP.md by marking only the Featured Products task as completed.
+3. Update CHANGELOG.md.
+4. Commit the changes.
+5. Stop and wait for my approval.
+
+```
 # Prompt 3 – Categories
 ```
 
