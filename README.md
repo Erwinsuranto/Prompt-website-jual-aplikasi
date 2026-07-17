@@ -5,6 +5,40 @@
 
 
 
+# Prompt 1 — Hero Section
+```
+
+
+
+
+Task: Implement Home Page - Hero Section only.
+
+Reference:
+Use the attached Digital Cell homepage design image as the visual reference.
+
+Requirements:
+- Match the design as closely as possible.
+- Build only the Hero Section.
+- Include:
+  - Top Header (Logo, Dark Mode button, Menu button)
+  - Hero Banner / Slider
+  - Slider indicators
+  - CTA button ("Belanja Sekarang")
+- Mobile-first and fully responsive.
+- Reusable components.
+- Use Next.js 14, TypeScript, Tailwind CSS, shadcn/ui, and Framer Motion.
+- Use placeholder/mock images and data where needed.
+- Do not implement Search Bar, Categories, Product Cards, or other homepage sections yet.
+- Do not implement backend logic.
+
+After the Hero Section is fully completed:
+1. Verify there are no TypeScript or build errors.
+2. Update ROADMAP.md by marking only this task as completed.
+3. Update CHANGELOG.md.
+4. Commit the changes.
+5. Stop and wait for my next instruction.
+
+```
 # 
 ```
 Create a new file named SPEC.md in the project root.
