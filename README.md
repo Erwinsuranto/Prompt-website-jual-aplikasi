@@ -5,6 +5,39 @@
 
 
 
+# Prompt 2 – Search Bar
+```
+
+
+Task: Implement Home Page - Search Bar only.
+
+Reference:
+Use the attached Digital Cell homepage design image.
+
+Requirements:
+
+- Build only the Search Bar section.
+- Match the design as closely as possible.
+- Rounded search input.
+- Search icon on the left.
+- Filter button on the right.
+- Proper spacing below Hero Banner.
+- Mobile-first and fully responsive.
+- Reusable component.
+- No search functionality yet (UI only).
+- Do not modify Hero Section.
+- Do not implement Categories or Product Cards yet.
+
+After completion:
+1. Verify there are no build or TypeScript errors if the environment supports it.
+2. Update ROADMAP.md by marking only the Search Bar task as completed.
+3. Update CHANGELOG.md.
+4. Commit changes.
+5. Stop and wait for my approval.
+
+
+
+```
 # Prompt 1 — Hero Section
 ```
 
