@@ -3,6 +3,82 @@
 
 
 
+
+
+# 
+```
+
+Create a new file named ROADMAP.md in the root of the repository.
+
+This roadmap will be the single source of truth for the project.
+
+Requirements:
+
+- Analyze the entire repository structure before creating the roadmap.
+- Analyze the current implementation status.
+- Compare the implementation with the target Digital Cell e-commerce application.
+- Divide the roadmap into logical phases.
+- Break every phase into small implementation tasks.
+- Every task must use Markdown checkboxes:
+  - [ ] Not started
+  - [x] Completed
+- Number every task.
+- Group tasks by feature.
+- Mark already completed tasks automatically.
+- Leave unfinished tasks unchecked.
+- Do not mark a task completed unless it is fully implemented.
+
+The roadmap should include at least:
+
+1. Foundation
+2. Layout
+3. Home Page
+4. Categories
+5. Product List
+6. Product Detail
+7. Search
+8. Shopping Cart
+9. Checkout
+10. Payment
+11. Invoice
+12. User Authentication
+13. User Profile
+14. Favorites
+15. Order History
+16. Notifications
+17. Admin Dashboard
+18. Product Management
+19. Category Management
+20. Banner Management
+21. Order Management
+22. Payment Management
+23. Reports
+24. Settings
+25. API
+26. Database
+27. Authentication
+28. Performance
+29. SEO
+30. Testing
+31. Deployment
+
+After every future implementation:
+
+- Automatically update ROADMAP.md.
+- Mark completed tasks as [x].
+- Never mark incomplete work as completed.
+- Add new tasks if new requirements are discovered.
+- Keep numbering consistent.
+- Never remove completed history.
+- Preserve all previous progress.
+
+ROADMAP.md must always represent the real implementation status of the repository.
+
+
+
+
+```
+
 # Prompt pertama yang bisa Anda berikan ke Genie Code
 ```
 
