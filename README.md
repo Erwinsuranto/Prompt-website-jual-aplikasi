@@ -11,6 +11,64 @@
 
 
 
+
+
+# 
+```
+
+
+Continue the project following SPEC.md and ROADMAP.md.
+
+I have now uploaded the official Login & Register design reference.
+
+Your task is NOT to rebuild everything from scratch.
+
+Instead:
+
+- Compare the current Login and Register pages with the uploaded reference image.
+- Update the UI so it matches the reference as closely as possible.
+- Keep all existing functionality and project architecture.
+- Reuse existing components.
+- Only modify the necessary files.
+
+Match the uploaded design in:
+
+- Layout
+- Spacing
+- Typography
+- Colors
+- Gradients
+- Shadows
+- Border radius
+- Icons
+- Illustrations placement
+- Button styles
+- Input styles
+- Animations
+- Responsive behavior
+
+Do not introduce a new design language.
+
+Use the uploaded image as the official design reference for all Authentication pages going forward.
+
+Rules:
+- No duplicated code.
+- No hardcoded colors.
+- No any type.
+- Use design tokens.
+- Follow SPEC.md and existing architecture.
+
+After finishing:
+
+1. Update ROADMAP.md.
+2. Mark ONLY the Login/Register refinement task as completed.
+3. Update the progress percentage.
+4. Update CHANGELOG.md.
+5. Commit the changes.
+
+
+
+```
 # Prompt 13 — Authentication (Login & Register)
 ```
 
