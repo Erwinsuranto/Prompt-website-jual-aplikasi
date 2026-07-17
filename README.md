@@ -6,6 +6,71 @@
 
 
 
+
+
+# Prompt berikutnya
+```
+
+Task: Implement Product Detail Page UI only.
+
+Reference:
+Use the attached Product Detail reference image if available.
+If no reference is attached, follow the existing Digital Cell design system.
+
+Requirements:
+
+Create the Product Detail page.
+
+Include:
+
+- Product Image Gallery
+- Product Name
+- Category Badge
+- Rating
+- Sold Count
+- Price
+- Product Description
+- Product Features
+- Variant Selector
+- Quantity Selector
+- Sticky Bottom Purchase Bar
+- Buy Now button
+- Add to Cart button
+- Related Products section (reuse ProductCard)
+
+Requirements:
+
+- Mobile-first.
+- Tablet responsive.
+- Desktop responsive.
+- Reuse existing ProductCard and design system.
+- Framer Motion animations.
+- No API.
+- No backend.
+- UI only.
+
+Do not modify:
+
+- Homepage
+- Categories
+- Search
+- Checkout
+- Admin
+
+After completion:
+
+1. Verify TypeScript/build if possible.
+2. Update ROADMAP.md by marking only this Product Detail task completed.
+3. Update CHANGELOG.md.
+4. Commit changes.
+5. Stop and wait for my approval.
+
+
+
+
+```
+
+
 # Prompt berikutnya: Categories Listing
 ```
 
