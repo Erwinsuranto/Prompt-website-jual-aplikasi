@@ -7,6 +7,25 @@
 
 
 
+
+# 
+```
+Continue the project by following ROADMAP.md exactly.
+
+Phase 13.1 Task 3 is complete.
+
+Proceed to the next unchecked roadmap item only (Phase 13.1 Task 4).
+
+Requirements:
+- Follow SPEC.md and ROADMAP.md exactly.
+- Do not modify completed tasks.
+- Do not refactor unrelated files.
+- Keep the existing UI, design system, animations, and architecture.
+- Reuse existing components whenever possible.
+- Update ROADMAP.md and CHANGELOG.md after completion.
+- Commit only the files required for this task.
+- When finished, stop and wait for approval before continuing.
+``
 # 
 ```
 Continue with Phase 13.1 Task 3 exactly as defined in ROADMAP.md.
