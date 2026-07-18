@@ -7,6 +7,36 @@
 
 
 
+
+# 
+```
+Continue the project by following ROADMAP.md exactly.
+
+Phase 15.1 is fully complete (3/3).
+
+Proceed ONLY with the next unchecked task:
+
+Phase 15.2 Task 4 — Build app/(shop)/orders/page.tsx.
+
+Requirements:
+- Follow SPEC.md and ROADMAP.md exactly.
+- Build only the Orders page.
+- Compose the page using the existing components:
+  - OrderCard
+  - OrderStatusTimeline
+  - OrderDetailView (only where specified by the architecture)
+- Use mock data only.
+- Do not implement API fetching yet.
+- Do not implement status filters yet.
+- Do not implement empty state yet.
+- Reuse the existing Digital Cell design system, spacing, typography, animations, and components.
+- Keep responsive behavior.
+- Modify only the files required for Task 4.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only this task.
+- Stop after Task 4 is complete and wait for my approval before continuing.
+```
+
 # 
 ```
 Continue the project by following ROADMAP.md exactly.
