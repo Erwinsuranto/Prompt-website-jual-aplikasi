@@ -10,6 +10,26 @@
 
 
 
+
+# 
+```
+Continue the project by following ROADMAP.md exactly.
+
+Phase 14.1 Task 1 is complete.
+
+Proceed with only the next unchecked task in Phase 14.
+
+Requirements:
+- Reuse the existing useFavoritesStore.
+- Do not redesign the UI.
+- Keep the Digital Cell visual style.
+- Follow SPEC.md architecture.
+- Modify only the files required for this task.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only the files related to this task.
+- Stop after completing the task and wait for my approval before continuing.
+```
+
 # 
 ```
 Continue the project by following ROADMAP.md exactly.
