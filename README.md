@@ -13,6 +13,30 @@
 
 
 
+
+# 
+```
+
+Continue from the current ROADMAP and SPEC.
+
+Requirements:
+- Continue from the FIRST unfinished task after the latest completed task.
+- Do NOT repeat or modify completed tasks.
+- Do NOT rebuild Login or Register pages.
+- Do NOT change any completed UI unless required by the current task.
+- Continue implementing only the next unfinished UI task according to ROADMAP.md and SPEC.md.
+- If the next task requires matching a design reference, stop and ask for the design image before implementing.
+- After completing the task:
+  1. Update ROADMAP.md.
+  2. Update CHANGELOG.md.
+  3. Commit the changes.
+  4. Stop and wait for my approval.
+
+
+
+
+```
+
 # 
 ```
 
