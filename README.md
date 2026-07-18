@@ -8,7 +8,30 @@
 
 
 
+# 
+```
+Continue with the next unchecked task in ROADMAP.md.
 
+Start the first task in Phase 13 exactly as specified.
+
+Before coding:
+- Read SPEC.md
+- Read ROADMAP.md
+- Read CHANGELOG.md
+
+Do not skip any tasks.
+Do not change completed code.
+Follow the ROADMAP sequentially.
+
+If the next task is UI-related, use the uploaded Digital Cell design as the visual reference.
+If the next task is backend or logic, do not change the UI.
+
+After completing the task:
+- Update ROADMAP.md
+- Update CHANGELOG.md
+- Commit the changes
+- Stop and wait for my approval.
+```
 
 
 # 
