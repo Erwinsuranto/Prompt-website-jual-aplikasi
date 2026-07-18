@@ -7,6 +7,30 @@
 
 
 
+# 
+```
+Continue the project by following ROADMAP.md exactly.
+
+Phase 15.2 Task 4 is complete.
+
+Proceed ONLY with the next unchecked task:
+
+Phase 15.2 Task 5 — Fetch orders from orderService.getOrders().
+
+Requirements:
+- Follow SPEC.md and ROADMAP.md exactly.
+- Replace the mock data in the Orders page with data from orderService.getOrders().
+- Keep the existing OrderCard, OrderStatusTimeline, and OrderDetailView components unchanged.
+- Implement loading state while fetching.
+- Implement error state with retry.
+- Preserve the existing accordion behavior and animations.
+- Do not implement status filters yet.
+- Do not implement empty state yet.
+- Modify only the files required for Task 5.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only this task.
+- Stop after Task 5 is complete and wait for my approval before continuing.
+```
 
 # 
 ```
