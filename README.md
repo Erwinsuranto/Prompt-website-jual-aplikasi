@@ -7,6 +7,38 @@
 
 
 
+# 
+```
+Continue with Phase 13.1 Task 3 exactly as defined in ROADMAP.md.
+
+I have uploaded the official Digital Cell UI design reference.
+
+Implement ONLY AvatarUpload (image picker, preview, and crop).
+
+Requirements:
+- Read SPEC.md and ROADMAP.md first.
+- Match the uploaded Digital Cell design language.
+- Reuse existing design-system components.
+- Mobile-first and responsive.
+- Smooth Framer Motion animations.
+- Circular avatar with edit button.
+- Image picker.
+- Preview before saving.
+- Crop interface.
+- Validation for supported image types and size.
+- No API calls yet unless ROADMAP requires them.
+- No any.
+- No duplicated code.
+- No hardcoded values.
+
+After completion:
+1. Update ROADMAP.md.
+2. Update CHANGELOG.md.
+3. Commit the changes.
+4. Stop and wait for my approval.
+```
+
+
 
 # Next in queue: Phase 13.1 Task 2 — EditProfileForm (name, phone, React Hook Form + profileSchema).
 ```
