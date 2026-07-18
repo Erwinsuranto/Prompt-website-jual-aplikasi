@@ -10,6 +10,25 @@
 
 
 
+# Phase 14 = 2/5 (21.2%).
+```
+Continue the project by following ROADMAP.md exactly.
+
+Phase 14 Task 2 is complete.
+
+Proceed with only the next unchecked task in Phase 14.
+
+Requirements:
+- Follow ROADMAP.md and SPEC.md exactly.
+- Reuse the existing useFavoritesStore and FavoriteButton.
+- Do not redesign the UI.
+- Preserve the existing Digital Cell visual language.
+- Modify only the files required for this task.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only the files related to the current task.
+- Stop after completing the task and wait for my approval before continuing.
+```
+
 
 # 
 ```
