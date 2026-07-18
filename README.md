@@ -11,6 +11,34 @@
 
 
 
+# 
+```
+
+Continue with the next task exactly as defined in ROADMAP.md.
+
+Implement Phase 12.3 Task 11 only.
+
+Requirements:
+- Read SPEC.md and ROADMAP.md first.
+- Do not modify completed tasks.
+- Implement only Phase 12.3 Task 11 (useAuthGuard hook).
+- Reuse the existing middleware and authentication flow.
+- Keep the architecture clean.
+- No hardcoded values.
+- No "any".
+- No duplicated logic.
+- Follow existing coding style.
+
+After finishing:
+1. Update ROADMAP.md.
+2. Update CHANGELOG.md.
+3. Commit the changes.
+4. Then stop and wait for my approval before continuing to the next task.
+
+
+
+
+```
 
 
 # 
