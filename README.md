@@ -8,7 +8,30 @@
 
 
 
+# 
+```
+Continue the project by following ROADMAP.md exactly.
 
+Phase 15.1 Task 1 is complete.
+
+Proceed ONLY with the next unchecked task:
+
+Phase 15.1 Task 2 — Implement OrderStatusTimeline.
+
+Requirements:
+- Follow SPEC.md and ROADMAP.md exactly.
+- Build only the OrderStatusTimeline component.
+- Show a visual progress timeline for:
+  Pending → Paid → Completed
+- Support active/current step highlighting.
+- Reuse existing Digital Cell components, icons, colors, animations, spacing, typography, and design system.
+- Make the component responsive.
+- Do not implement OrderDetailView or Orders page yet.
+- Modify only the files required for Task 2.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only this task.
+- Stop after Task 2 is complete and wait for my approval before continuing.
+```
 
 # Phase 15 Task 1 (OrderCard)
 ```
