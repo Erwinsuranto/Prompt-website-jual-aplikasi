@@ -5,7 +5,38 @@
 
 
 
+# 
+```
+Continue the project by following ROADMAP.md exactly.
 
+Phase 15.2 Task 6 is complete.
+
+Proceed ONLY with the next unchecked task:
+
+Phase 15.2 Task 7 — Implement the empty state for the Orders page.
+
+Requirements:
+- Follow SPEC.md and ROADMAP.md exactly.
+- Display the empty state only when there are no orders after loading completes.
+- Keep the loading state and error state unchanged.
+- Include:
+  - Empty-state illustration or icon (reuse existing assets if available)
+  - Title
+  - Short description
+  - Primary CTA button: "Belanja Sekarang"
+  - CTA navigates to the shop/home page.
+- Match the existing Digital Cell design system:
+  - Typography
+  - Colors
+  - Spacing
+  - Components
+  - Animations
+- Make it fully responsive.
+- Modify only the files required for Task 7.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only this task.
+- Stop after Task 7 is complete, verify that Phase 15 is 7/7 complete in ROADMAP.md, then wait for my approval before continuing to Phase 16.
+```
 
 # 
 ```
