@@ -8,6 +8,32 @@
 
 
 
+
+# 
+```
+Continue the project by following ROADMAP.md exactly.
+
+Phase 13.1 is fully complete.
+
+Proceed with Phase 13.2 Task 5 only.
+
+Build app/(shop)/profile/page.tsx by composing the existing components:
+- ProfileHeader
+- EditProfileForm
+- AvatarUpload
+- LogoutButton
+
+Requirements:
+- Reuse existing components only.
+- Do not recreate components that already exist.
+- Keep the Digital Cell design system.
+- Mobile-first responsive layout.
+- Use existing animations only.
+- Do not modify completed tasks.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only files required for Phase 13.2 Task 5.
+- Stop after completing this task and wait for approval.
+``
 # 
 ```
 Continue the project by following ROADMAP.md exactly.
