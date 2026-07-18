@@ -10,6 +10,31 @@
 
 
 
+# Next: Phase 13.2 Task 7 — Submit profile updates via userService.updateProfile().
+```
+Continue the project by following ROADMAP.md exactly.
+
+Phase 13.2 Task 6 is complete.
+
+Proceed with Phase 13.2 Task 7 only.
+
+Implement profile update using userService.updateProfile().
+
+Requirements:
+- Reuse the existing EditProfileForm.
+- Do not redesign the UI.
+- Keep the Digital Cell design exactly as it is.
+- Submit edited profile data through userService.updateProfile().
+- Show loading state while submitting.
+- Show success feedback after saving.
+- Show error feedback if the request fails.
+- Update the displayed profile immediately after a successful save.
+- Preserve avatar changes.
+- Follow SPEC.md architecture.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only files required for Phase 13.2 Task 7.
+- Stop after completing this task and wait for approval.
+```
 # Next: Phase 13.2 Task 6 — Fetch user data from userService.getProfile().
 ```
 Continue the project by following ROADMAP.md exactly.
