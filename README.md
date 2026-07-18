@@ -7,7 +7,35 @@
 
 
 
+# 
+```
+Continue the project by following ROADMAP.md exactly.
 
+Phase 15.1 Task 2 is complete.
+
+Proceed ONLY with the next unchecked task:
+
+Phase 15.1 Task 3 — Implement OrderDetailView.
+
+Requirements:
+- Follow SPEC.md and ROADMAP.md exactly.
+- Build only the OrderDetailView component.
+- Include:
+  - Full product/item list
+  - Payment information
+  - Order summary
+  - OrderStatusTimeline integration
+  - Actions:
+    - Reorder
+    - Download Invoice
+- Reuse existing Digital Cell components, icons, typography, spacing, animations, and design system.
+- Responsive for mobile and desktop.
+- Do not build the Orders page yet.
+- Modify only the files required for Task 3.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only this task.
+- Stop after Task 3 is complete and wait for my approval before continuing.
+```
 # 
 ```
 Continue the project by following ROADMAP.md exactly.
