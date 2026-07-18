@@ -9,6 +9,30 @@
 
 
 
+
+# Next: Phase 13.2 Task 6 — Fetch user data from userService.getProfile().
+```
+Continue the project by following ROADMAP.md exactly.
+
+Phase 13.2 Task 5 is complete.
+
+Proceed with Phase 13.2 Task 6 only.
+
+Implement fetching the user profile from userService.getProfile().
+
+Requirements:
+- Reuse the existing Profile page and components.
+- Replace the current mock user data with userService.getProfile().
+- Keep the current Digital Cell UI exactly as it is.
+- Do not redesign the page.
+- Do not modify completed components unless required for integration.
+- Handle loading state.
+- Handle error state gracefully.
+- Keep the architecture consistent with SPEC.md.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only the files required for Phase 13.2 Task 6.
+- Stop after completing this task and wait for approval.
+```
 # 
 ```
 Continue the project by following ROADMAP.md exactly.
