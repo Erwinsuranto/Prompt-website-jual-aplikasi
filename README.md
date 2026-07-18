@@ -1,4 +1,4 @@
-⁶# Prompt-website-jual-aplikasi
+# Prompt-website-jual-aplikasi
 
 
 
@@ -12,6 +12,75 @@
 
 
 
+# 
+```
+
+
+Before doing any coding, stop and analyze the entire project.
+
+Your first task is to understand the project completely.
+
+Read and understand:
+
+- README.md
+- ROADMAP.md
+- SPEC.md
+- CHANGELOG.md
+- package.json
+- tsconfig.json
+- next.config.*
+- app/
+- components/
+- design-system/
+- lib/
+- services/
+- hooks/
+- config/
+- routes.ts
+- All shared UI components
+- Existing layouts
+- Existing authentication pages
+- Existing shop pages
+
+Understand:
+
+- Folder architecture
+- Component hierarchy
+- Design system
+- Routing structure
+- Naming conventions
+- Coding style
+- Current roadmap progress
+- Completed tasks
+- Remaining tasks
+- Reusable components
+- Design tokens
+- Framer Motion usage
+- Tailwind conventions
+
+Also understand that:
+
+- ROADMAP.md is the source of truth.
+- SPEC.md defines all implementation rules.
+- CHANGELOG.md tracks every completed task.
+- Every completed task must update ROADMAP.md and CHANGELOG.md.
+- Never duplicate components.
+- Never change completed features unless explicitly requested.
+- Always reuse existing components.
+- Keep the Digital Cell design language consistent throughout the project.
+
+After reading everything:
+
+1. Give me a concise summary of your understanding.
+2. List completed phases.
+3. List remaining phases.
+4. Mention any inconsistencies you find.
+5. Do NOT modify any code yet.
+6. Wait for my next instruction before implementing anything.
+
+
+
+```
 
 # 
 ```
