@@ -14,6 +14,40 @@
 # 
 ```
 
+Continue the project by following ROADMAP.md exactly.
+
+Phase 12 is now fully complete.
+
+Start the FIRST unchecked task in Phase 13 only.
+
+Requirements:
+- Read SPEC.md and ROADMAP.md first.
+- Implement ONLY the first unchecked task.
+- Do not modify completed work.
+- Reuse existing components.
+- Keep the current architecture.
+- Mobile-first responsive.
+- No any.
+- No duplicated code.
+- No hardcoded values.
+- Follow existing coding standards.
+
+If the task requires a UI, use the uploaded Digital Cell design as the visual reference.
+
+After completion:
+1. Update ROADMAP.md.
+2. Update CHANGELOG.md.
+3. Commit the changes.
+4. Stop and wait for my approval before continuing.
+
+
+
+
+```
+
+# 
+```
+
 Continue with the next task exactly as defined in ROADMAP.md.
 
 Implement Phase 12.3 Task 11 only.
