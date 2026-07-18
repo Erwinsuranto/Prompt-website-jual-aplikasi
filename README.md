@@ -10,6 +10,16 @@
 
 
 
+# 
+```
+Finish the current task completely.
+
+Resolve the CHANGELOG.md update failure and ensure ROADMAP.md is updated correctly.
+
+Do not start Phase 14.
+
+Only finish Phase 13.2 Task 7, verify all changes, commit them, then stop and wait for approval.
+```
 # Next: Phase 13.2 Task 7 — Submit profile updates via userService.updateProfile().
 ```
 Continue the project by following ROADMAP.md exactly.
