@@ -17,6 +17,30 @@
 # 
 ```
 
+Continue the project from the current ROADMAP and SPEC.
+
+Requirements:
+- Continue from the FIRST unfinished task in Phase 12.
+- Do NOT revisit or modify completed tasks.
+- Keep the existing Login and Register implementation.
+- Do NOT redesign or rebuild completed pages.
+- Implement only the next unfinished task exactly as described in ROADMAP.md and SPEC.md.
+- Preserve existing routing, validation, components, animations, and project architecture.
+- If the next task requires a visual design that has not been provided, stop and ask me for the reference image before implementing.
+- After finishing:
+  1. Update ROADMAP.md.
+  2. Update CHANGELOG.md.
+  3. Commit the changes.
+  4. Stop and wait for my approval.
+
+
+
+
+```
+
+# 
+```
+
 Continue from the current ROADMAP and SPEC.
 
 Requirements:
