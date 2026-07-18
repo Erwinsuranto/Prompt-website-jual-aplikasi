@@ -11,6 +11,34 @@
 ```
 Continue the project by following ROADMAP.md exactly.
 
+Phase 15.2 Task 5 is complete.
+
+Proceed ONLY with the next unchecked task:
+
+Phase 15.2 Task 6 — Add status filter tabs.
+
+Requirements:
+- Follow SPEC.md and ROADMAP.md exactly.
+- Add filter tabs:
+  - Semua
+  - Menunggu
+  - Diproses
+  - Selesai
+  - Gagal
+- Filter the fetched orders on the client side.
+- Preserve loading, error, retry, and accordion behavior.
+- Reuse existing Digital Cell components, typography, spacing, animations, and design system.
+- Make the filter responsive for mobile and desktop.
+- Do not implement the empty state yet.
+- Modify only the files required for Task 6.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only this task.
+- Stop after Task 6 is complete and wait for my approval before continuing.
+```
+# 
+```
+Continue the project by following ROADMAP.md exactly.
+
 Phase 15.2 Task 4 is complete.
 
 Proceed ONLY with the next unchecked task:
