@@ -10,6 +10,34 @@
 
 
 
+# Phase 15 Task 1 (OrderCard)
+```
+Continue the project by following ROADMAP.md exactly.
+
+Phase 14 is fully complete (5/5).
+
+Proceed ONLY with the first unchecked task:
+
+Phase 15.1 Task 1 — Implement OrderCard.
+
+Requirements:
+- Follow SPEC.md and ROADMAP.md exactly.
+- Build only the OrderCard component.
+- Include:
+  - Invoice number
+  - Order date
+  - Status badge
+  - Total payment
+  - Product thumbnails
+- Reuse existing UI components, utilities, animations, icons, and design system.
+- Match the existing Digital Cell visual style.
+- Do not implement OrderStatusTimeline, OrderDetailView, or Orders page yet.
+- Modify only the files required for Task 1.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only this task.
+- Stop after Task 1 is complete and wait for my approval before continuing.
+```
+
 # Phase 14 = 2/5 (21.2%).
 ```
 Continue the project by following ROADMAP.md exactly.
