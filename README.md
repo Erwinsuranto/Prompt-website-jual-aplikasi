@@ -13,6 +13,39 @@
 
 
 
+# 
+```
+
+
+Before continuing development, review the entire project history and current implementation.
+
+Requirements:
+
+1. Read ROADMAP.md, SPEC.md, CHANGELOG.md, README.md and the current source code.
+2. Compare the completed implementation with the roadmap.
+3. Check whether any previous prompt or roadmap task was only partially completed because a previous AI session ended.
+4. If any unfinished work from the previous prompt exists, complete it FIRST.
+5. If everything from previous prompts is already complete, continue from the FIRST unchecked task in ROADMAP.md.
+6. Never skip tasks.
+7. Never repeat completed work.
+8. Do not rebuild finished pages.
+9. Preserve the current architecture and code style.
+
+After completing ONLY one task:
+- Update ROADMAP.md.
+- Update CHANGELOG.md.
+- Commit the changes.
+- Stop and wait for my approval before continuing.
+
+Before coding, tell me:
+- Which unfinished task you found (if any).
+- Or confirm that all previous prompts are fully completed and you are continuing from the next roadmap task.
+
+
+
+```
+
+
 
 # 
 ```
