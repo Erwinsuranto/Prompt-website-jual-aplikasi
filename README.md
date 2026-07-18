@@ -12,6 +12,29 @@
 
 
 
+
+# 
+```
+
+Update the project documentation to match the current implementation.
+
+Requirements:
+
+- Update ROADMAP.md so completed tasks accurately reflect the current implementation.
+- Replace outdated descriptions (for example email/password authentication) with the actual WhatsApp phone authentication flow.
+- Keep completed tasks checked.
+- Keep unfinished tasks unchanged.
+- Do not remove future roadmap items.
+- Update SPEC.md only if implementation intentionally changed from the original specification.
+- Add an entry to CHANGELOG.md describing documentation synchronization.
+- Do NOT modify application code.
+- Commit only documentation changes.
+
+
+
+
+```
+
 # 
 ```
 
