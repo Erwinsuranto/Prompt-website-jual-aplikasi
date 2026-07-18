@@ -12,6 +12,28 @@
 
 # 
 ```
+Continue the project by following ROADMAP.md exactly.
+
+Phase 13 is fully complete and verified.
+
+Proceed with Phase 14 only.
+
+Implement only the first unchecked task in Phase 14.
+
+Requirements:
+- Follow SPEC.md and ROADMAP.md exactly.
+- Reuse existing components whenever possible.
+- Preserve the Digital Cell UI and design language.
+- Do not modify completed phases unless required by integration.
+- Keep mobile-first responsive layout.
+- Follow the existing architecture and coding standards.
+- Update ROADMAP.md and CHANGELOG.md.
+- Commit only files required for the current Phase 14 task.
+- Stop after completing the task and wait for my approval before continuing.
+```
+
+# 
+```
 Finish the current task completely.
 
 Resolve the CHANGELOG.md update failure and ensure ROADMAP.md is updated correctly.
