@@ -8,6 +8,33 @@
 
 
 
+# Next in queue: Phase 13.1 Task 2 — EditProfileForm (name, phone, React Hook Form + profileSchema).
+```
+Continue with Phase 13.1 Task 2 exactly as defined in ROADMAP.md.
+
+I have uploaded the official Digital Cell design reference.
+
+Implement ONLY the Edit Profile page and form.
+
+Requirements:
+- Read SPEC.md and ROADMAP.md first.
+- Match the uploaded Digital Cell design.
+- Reuse the existing design system, animations, spacing, typography, colors, cards, buttons, and inputs.
+- Keep the existing routing, validation, profileSchema, and business logic.
+- Do NOT redesign other pages.
+- Mobile-first and responsive.
+- No any.
+- No duplicated code.
+- No hardcoded values.
+
+After finishing:
+1. Update ROADMAP.md.
+2. Update CHANGELOG.md.
+3. Commit the changes.
+4. Stop and wait for my approval before continuing.
+```
+
+
 # 
 ```
 Continue with the next unchecked task in ROADMAP.md.
