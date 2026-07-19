@@ -14,6 +14,61 @@
 
 
 
+
+# 
+```
+Continue from the first unchecked task in Phase 12 (User Authentication).
+
+Current project status:
+- Audit completed.
+- Phases 1–11 are fully complete.
+- Continue only from the first unchecked task in Phase 12.
+- Do not modify completed phases unless fixing a verified bug.
+
+Complete every remaining Phase 12 task automatically.
+
+Requirements:
+- Follow SPEC.md exactly.
+- Reuse existing authStore, apiClient, validation schemas, UI primitives, hooks, services, layouts, Skeleton, Dialog, Toast, design tokens, animations, and route guards.
+- Keep the Digital Cell mobile-first UI consistent.
+- Implement the complete authentication flow:
+  - Login
+  - Register
+  - Forgot Password
+  - Reset Password
+  - Email Verification (if defined in SPEC)
+  - Session persistence
+  - Protected routes
+  - Logout
+- Connect authentication with the existing auth service architecture.
+- Preserve mock fallback where already defined.
+- No duplicate code.
+- Strict TypeScript.
+- ESLint clean.
+- Zero architecture regressions.
+
+For every completed task:
+1. Verify implementation.
+2. Update ROADMAP.md.
+3. Update CHANGELOG.md.
+4. Commit.
+5. Push.
+6. Continue automatically to the next unchecked task.
+
+Stop only when:
+- Phase 12 is 100% complete, or
+- A real blocking issue prevents further progress.
+
+Final report must include:
+- Completed tasks
+- Files modified
+- Git commits
+- ROADMAP progress
+- CHANGELOG version
+- Next unchecked phase
+```
+
+
 # 
 ```
 Continue from the first unchecked task in Phase 11 (Invoice).
