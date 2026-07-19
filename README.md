@@ -5,6 +5,61 @@
 
 
 
+
+
+# 
+```
+Before making any changes, perform a COMPLETE PROJECT AUDIT.
+
+This is a new chat and you have no previous context.
+
+Your job is to fully understand the project before writing any code.
+
+Audit everything, including:
+
+1. Read the entire repository.
+2. Read SPEC.md completely.
+3. Read ROADMAP.md completely.
+4. Read CHANGELOG.md completely.
+5. Read README.md completely.
+6. Inspect the entire folder structure.
+7. Identify all reusable components.
+8. Identify all services, stores, hooks, utilities, schemas, animations, icons and shared UI.
+9. Inspect routing structure.
+10. Inspect authentication flow.
+11. Inspect state management.
+12. Inspect design system.
+13. Inspect coding conventions.
+14. Inspect naming conventions.
+15. Inspect API architecture.
+16. Inspect current progress in ROADMAP.
+17. Identify the first unchecked task.
+18. Verify that CHANGELOG and ROADMAP match the actual source code.
+19. Verify there are no unfinished implementations, duplicated components, dead code, placeholder code, or architecture violations.
+20. Verify the project follows SPEC.md.
+
+Do NOT modify any file.
+
+Do NOT generate code.
+
+Do NOT create new files.
+
+Do NOT update ROADMAP or CHANGELOG.
+
+Output only:
+
+- Overall architecture summary
+- Current implementation status
+- Current completed phase
+- Current completed task
+- First unchecked task
+- Any inconsistencies found
+- Any risks
+- Confirmation whether the project is ready to continue.
+
+If everything is consistent, stop and wait for my approval before implementing the next task.
+```
+
 # 
 ```
 Continue the project by following ROADMAP.md exactly.
