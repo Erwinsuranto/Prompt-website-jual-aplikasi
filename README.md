@@ -17,6 +17,62 @@
 
 
 
+
+# 
+```
+Continue from the first unchecked task in Phase 16 (Notifications).
+
+Current project status:
+- Repository audit completed.
+- Phases 1–15 are fully complete.
+- Continue only from the first unchecked task in Phase 16.
+- Do not modify completed phases unless fixing a verified bug.
+
+Complete every remaining Phase 16 task automatically.
+
+Requirements:
+- Follow SPEC.md exactly.
+- Reuse existing UI primitives, Dialog, Toast, Skeleton, design tokens, animations, stores, hooks, services, authStore, orderService, paymentService, notificationStore, and layouts.
+- Integrate Sonner Toast for ephemeral notifications if not already integrated.
+- Implement the complete notification system including:
+  - Toast notifications
+  - Notification center
+  - Read / unread state
+  - Mark all as read
+  - Notification badge
+  - Empty state
+  - Persistence using the existing store architecture
+  - Navigation to related pages where applicable
+- Keep the Digital Cell mobile-first UI consistent.
+- Preserve the existing architecture.
+- No duplicate code.
+- Strict TypeScript.
+- ESLint clean.
+- Zero architecture regressions.
+
+For every completed task:
+1. Verify implementation.
+2. Update ROADMAP.md.
+3. Update CHANGELOG.md.
+4. Commit.
+5. Push.
+6. Continue automatically to the next unchecked task.
+
+Stop only when:
+- Phase 16 is 100% complete, or
+- A real blocking issue prevents further progress.
+
+Final report must include:
+- Completed tasks
+- Files modified
+- Git commits
+- ROADMAP progress
+- CHANGELOG version
+- Next unchecked phase
+```
+
+
+
 # 
 ```
 You are joining an existing long-term software project.
