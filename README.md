@@ -16,6 +16,54 @@
 
 # 
 ```
+Continue from the first unchecked task in Phase 11 (Invoice).
+
+Current project status:
+- Audit completed.
+- Phases 1–10 are fully complete.
+- Continue only from the first unchecked task in Phase 11.
+- Do not modify completed phases unless fixing a verified bug.
+
+Complete every remaining Phase 11 task automatically.
+
+Requirements:
+- Follow SPEC.md exactly.
+- Reuse existing orderService, paymentService, InvoiceStatusBadge, PaymentStatusBadge, Order components, UI primitives, hooks, stores, animations, Skeleton, Dialog, Toast, and design tokens.
+- Keep the Digital Cell mobile-first UI consistent.
+- Build the complete invoice flow.
+- Display invoice number, order details, customer information, payment information, status badges, timeline, totals, and actions.
+- Support invoice detail page, copy invoice number, print/download capability (where specified in SPEC), and navigation from orders/payment.
+- Preserve existing mock fallback architecture.
+- No duplicate code.
+- Strict TypeScript.
+- ESLint clean.
+- Zero architecture regressions.
+
+For every completed task:
+1. Verify implementation.
+2. Update ROADMAP.md.
+3. Update CHANGELOG.md.
+4. Commit.
+5. Push.
+6. Continue automatically to the next unchecked task.
+
+Stop only when:
+- Phase 11 is 100% complete, or
+- A real blocking issue prevents further progress.
+
+Final report must include:
+- Completed tasks
+- Files modified
+- Git commits
+- ROADMAP progress
+- CHANGELOG version
+- Next unchecked phase
+```
+
+
+
+# 
+```
 The previous stop was caused only by ROADMAP.md and CHANGELOG.md update limitations, not by implementation errors.
 
 Continue from the current repository state.
