@@ -8,6 +8,40 @@
 
 
 
+
+
+# 
+```
+Continue from the first unchecked task in Phase 4 (Categories).
+
+Do not re-audit the project.
+Do not revisit completed phases.
+Do not modify completed implementations unless fixing a real bug.
+
+Complete every remaining task in Phase 4 automatically.
+
+Requirements:
+- Follow SPEC.md exactly.
+- Reuse existing components, hooks, stores, services, utilities, layouts, design tokens, animations, and UI primitives.
+- Keep the approved Digital Cell mobile-first UI and visual consistency.
+- No duplicate code.
+- No breaking changes.
+- Keep TypeScript strict and ESLint clean.
+- Update ROADMAP.md after every completed task.
+- Update CHANGELOG.md after every completed task.
+- Create one Git commit per completed task and push to the repository.
+- Validate each completed task before moving to the next.
+- Stop only when Phase 4 is 100% complete or a real blocking issue cannot be resolved.
+
+When Phase 4 is complete, provide:
+- Completed tasks
+- Modified files
+- Git commits
+- Updated ROADMAP progress
+- Updated CHANGELOG version
+- The next unchecked phase to continue automatically.
+```
+
 # 
 ```
 Continue from the first unchecked task in ROADMAP.
