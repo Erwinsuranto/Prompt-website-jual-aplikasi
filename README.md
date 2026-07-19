@@ -12,6 +12,40 @@
 ```
 Continue from the first unchecked task in ROADMAP.
 
+Current state:
+- Audit is complete.
+- Phase 1 is complete.
+- Phase 2 is complete.
+- Phase 3 (Home Page) is already in progress.
+- Continue from the first unchecked task in Phase 3. Do NOT redo completed tasks.
+
+Rules:
+- Follow SPEC.md and the existing architecture exactly.
+- Reuse all existing components, hooks, stores, services, utilities, layouts, design tokens, and animations.
+- Do not duplicate code.
+- Do not refactor completed features unless fixing a real bug.
+- Maintain responsive mobile-first UI matching the approved Digital Cell design.
+- Keep TypeScript strict, ESLint clean, and production-ready.
+- Update ROADMAP.md immediately after every completed task.
+- Update CHANGELOG.md after every completed task.
+- Create one Git commit per completed task and push to the repository.
+- Automatically continue through all remaining tasks in the current phase.
+- Stop only when the entire current phase is 100% complete or if a real blocking issue cannot be resolved safely.
+- At the end of the phase, provide a concise summary including:
+  - Completed tasks
+  - Modified files
+  - Commits created
+  - Updated ROADMAP progress
+  - Updated CHANGELOG version
+  - Next phase to continue
+
+Do not ask for approval after every task. Only stop after the current phase is fully complete or if blocked.
+```
+
+# 
+```
+Continue from the first unchecked task in ROADMAP.
+
 Do not re-audit or revisit completed phases.
 Do not modify completed code unless a real bug is found.
 
