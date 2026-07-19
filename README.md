@@ -10,6 +10,26 @@
 
 # 
 ```
+Continue from the first unchecked task in ROADMAP.
+
+Do not re-audit or revisit completed phases.
+Do not modify completed code unless a real bug is found.
+
+Continue automatically until the entire current phase is 100% complete.
+
+Requirements:
+- Follow SPEC.md exactly.
+- Reuse existing components, hooks, stores, services, utilities, and design tokens.
+- No duplicate code.
+- Keep TypeScript strict and lint-clean.
+- Update ROADMAP.md and CHANGELOG.md after every completed task.
+- Create one commit per completed task and push to the repository.
+- Stop only after the entire phase is complete or if a real blocking issue prevents further progress.
+- At the end of the phase, provide a concise implementation summary, modified files, commits, updated ROADMAP progress, and the next phase to continue.
+```
+
+# 
+```
 Continue with the first unchecked task in ROADMAP. Follow SPEC.md exactly. Reuse existing components. Update ROADMAP.md and CHANGELOG.md after completion. Commit after each completed task. Stop and wait for approval after every task.
 ```
 # 
