@@ -18,6 +18,54 @@
 
 
 
+
+
+# 
+```
+Continue from the next unchecked phase after Phase 16.
+
+Current project status:
+- Repository fully audited.
+- Phases 1–16 are complete.
+- ROADMAP progress: 287/472 (60.8%).
+- CHANGELOG version: v0.58.0.
+- Continue only from the first unchecked task after Phase 16.
+- Do not repeat completed work.
+
+Rules:
+- Follow SPEC.md exactly.
+- Preserve the existing architecture.
+- Reuse existing components, hooks, stores, services, design tokens, layouts, utilities and animations.
+- No duplicate code.
+- Strict TypeScript.
+- ESLint clean.
+- Mobile-first UI.
+- Zero architecture regressions.
+
+Workflow:
+1. Complete the first unchecked task.
+2. Verify implementation.
+3. Update ROADMAP.md.
+4. Update CHANGELOG.md.
+5. Commit.
+6. Push.
+7. Automatically continue to the next unchecked task.
+
+Only stop when:
+- The entire next phase is 100% complete, or
+- A real blocking issue prevents further implementation.
+
+Final report must include:
+- Phase completed
+- Tasks completed
+- Files modified
+- Git commits
+- ROADMAP progress
+- CHANGELOG version
+- Next unchecked phase
+```
+
+
 # 
 ```
 Continue from the first unchecked task in Phase 16 (Notifications).
