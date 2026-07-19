@@ -15,6 +15,54 @@
 
 
 
+
+# 
+```
+Continue from the first unchecked task in Phase 8 (Shopping Cart).
+
+Current project status:
+- Full audit completed.
+- Phases 1–7 are fully complete.
+- Continue only from the first unchecked task in Phase 8.
+- Do not modify completed phases unless a real bug is found.
+
+Complete every remaining Phase 8 task automatically.
+
+Requirements:
+- Follow SPEC.md exactly.
+- Reuse existing useCartStore, ProductCard, ProductDetail, Button, EmptyState, Skeleton, Dialog, Toast, design tokens, animations, hooks, services, and UI primitives.
+- Keep the existing Digital Cell mobile-first design.
+- Persist cart with the existing middleware.
+- Cart updates must instantly synchronize badge count, subtotal, total, and checkout state.
+- Implement swipe-to-delete on mobile while keeping desktop actions.
+- No duplicate components.
+- No hardcoded data except existing mock fallback.
+- Strict TypeScript.
+- ESLint clean.
+- Zero architecture regressions.
+
+For every completed task:
+1. Verify implementation.
+2. Update ROADMAP.md.
+3. Update CHANGELOG.md.
+4. Commit.
+5. Push.
+6. Continue automatically to the next unchecked task.
+
+Stop only when:
+- Phase 8 reaches 100%, or
+- A real blocking issue prevents further progress.
+
+Final report must include:
+- Completed tasks
+- Modified files
+- Commits created
+- ROADMAP percentage
+- CHANGELOG version
+- Next unchecked phase
+```
+
+
 # 
 ```
 Continue from the first unchecked task in Phase 7 (Search).
