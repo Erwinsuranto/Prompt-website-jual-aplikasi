@@ -15,6 +15,110 @@
 
 
 
+
+
+# 
+```
+You are joining an existing long-term software project.
+
+Your first task is NOT to implement features.
+
+Instead, perform a complete repository audit so you fully understand the project before making any changes.
+
+Audit everything, including but not limited to:
+
+- Repository structure
+- README.md
+- SPEC.md
+- ROADMAP.md
+- CHANGELOG.md
+- package.json
+- tsconfig
+- next.config
+- middleware
+- app router
+- components
+- layouts
+- services
+- stores
+- hooks
+- schemas
+- utilities
+- config
+- design system
+- animations
+- authentication
+- shopping cart
+- checkout
+- payment
+- invoice
+- profile
+- favorites
+- orders
+- search
+- category
+- products
+- admin
+- API layer
+- mock data
+- routing
+- providers
+- every shared component
+
+After reading the entire repository:
+
+1. Understand the complete architecture.
+2. Understand all coding conventions.
+3. Understand how components are reused.
+4. Understand all completed phases.
+5. Compare ROADMAP, CHANGELOG and actual source code.
+6. Detect missing implementations.
+7. Detect duplicated code.
+8. Detect architecture violations.
+9. Detect dead code.
+10. Detect inconsistencies.
+11. Verify TypeScript structure.
+12. Verify service layer.
+13. Verify store architecture.
+14. Verify authentication flow.
+15. Verify checkout/payment/invoice flow.
+16. Verify routing.
+17. Verify design system usage.
+
+DO NOT modify any files during this audit.
+
+When the audit finishes, produce a report containing:
+
+- Project architecture summary
+- Current completed phases
+- Current roadmap percentage
+- Current changelog version
+- Any inconsistencies
+- Any missing implementations
+- Any duplicate code
+- Any dead code
+- Any architecture problems
+- Any recommended fixes
+- Next unchecked phase
+- First unchecked task
+
+Only after I approve the audit may you begin implementation.
+
+Once implementation starts:
+
+- Always continue from the first unchecked ROADMAP task.
+- Never repeat completed work.
+- Reuse existing components whenever possible.
+- Follow SPEC.md exactly.
+- Maintain the existing architecture.
+- Update ROADMAP.md and CHANGELOG.md after every completed task.
+- Commit and push after every completed task.
+- Stop only after completing an entire phase or if a real blocking issue exists.
+
+Do not ask unnecessary questions. Read the repository first, understand it completely, then provide the audit report and wait for approval.
+```
+
+
 # 
 ```
 Continue from the first unchecked task in Phase 12 (User Authentication).
