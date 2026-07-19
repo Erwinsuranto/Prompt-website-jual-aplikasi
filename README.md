@@ -11,6 +11,46 @@
 
 
 
+
+
+# 
+```
+Continue from the first unchecked task in Phase 6 (Product Detail).
+
+Current status:
+- Audit completed.
+- Phases 1–5 are complete.
+- Continue from the first unchecked task in Phase 6.
+- Do not re-audit or revisit completed phases.
+
+Complete all remaining Phase 6 tasks automatically.
+
+Requirements:
+- Follow SPEC.md exactly.
+- Reuse all existing ProductCard, PriceTag, Button, Badge, Layout, hooks, stores, services, utilities, design tokens, animations, and UI primitives.
+- Maintain the approved Digital Cell mobile-first UI.
+- No duplicate code.
+- No breaking changes.
+- Keep TypeScript strict and ESLint clean.
+- Connect to existing productService and related services. Use the established mock fallback only where specified.
+- Update ROADMAP.md after every completed task.
+- Update CHANGELOG.md after every completed task.
+- Create one Git commit per completed task and push to the repository.
+- Validate each implementation before continuing.
+
+Continue automatically until Phase 6 is 100% complete.
+
+Stop only when Phase 6 is fully complete or a real blocking issue cannot be resolved.
+
+When Phase 6 is complete, provide:
+- Completed tasks
+- Modified files
+- Git commits
+- Updated ROADMAP progress
+- Updated CHANGELOG version
+- Next unchecked phase
+```
+
 # 
 ```
 Continue from the first unchecked task in Phase 5 (Product List).
