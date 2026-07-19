@@ -14,6 +14,59 @@
 
 
 
+# 
+```
+The previous stop was caused only by ROADMAP.md and CHANGELOG.md update limitations, not by implementation errors.
+
+Continue from the current repository state.
+
+Your tasks:
+
+1. Safely update ROADMAP.md without overwriting unrelated content.
+2. Safly update CHANGELOG.md by appending the missing Phase 9 entries only.
+3. Verify that Phase 9 is actually complete.
+4. Commit the documentation update.
+5. Push the commit.
+
+After the documentation is finished:
+
+- Mark Phase 9 as fully complete.
+- Continue automatically to Phase 10 (Payment) from the first unchecked task.
+- Do not repeat Phase 9 implementation.
+- Do not perform another audit.
+- Continue only from the first unchecked task.
+
+While implementing Phase 10:
+- Follow SPEC.md exactly.
+- Reuse existing orderService, paymentService, checkout components, stores, hooks, UI primitives, design tokens and animations.
+- No duplicate code.
+- Strict TypeScript.
+- ESLint clean.
+- Preserve architecture.
+
+For every completed task:
+- Verify.
+- Update ROADMAP.md.
+- Update CHANGELOG.md.
+- Commit.
+- Push.
+- Continue automatically.
+
+Stop only when:
+- Phase 10 is 100% complete, or
+- A real blocking issue exists that cannot be resolved.
+
+Final report:
+- Phase completed
+- Files modified
+- Commits created
+- ROADMAP progress
+- CHANGELOG version
+- Next unchecked phase
+```
+
+
+
 
 # 
 ```
