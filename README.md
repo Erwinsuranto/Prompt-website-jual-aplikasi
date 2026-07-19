@@ -10,6 +10,45 @@
 
 
 
+
+# 
+```
+Continue from the first unchecked task in Phase 5 (Product List).
+
+Current progress:
+- Audit completed.
+- Phases 1–4 are complete.
+- Start from the first unchecked task in Phase 5.
+- Do not revisit completed phases or tasks.
+
+Requirements:
+- Follow SPEC.md exactly.
+- Reuse existing UI primitives, ProductCard, layouts, hooks, stores, services, utilities, design tokens, animations, and components.
+- Keep the approved Digital Cell mobile-first design.
+- No duplicate code.
+- No breaking changes.
+- Maintain TypeScript strict mode and zero ESLint errors.
+- Connect to existing services where available, otherwise use the established mock fallback pattern.
+- Update ROADMAP.md and CHANGELOG.md after every completed task.
+- Create one Git commit per completed task and push to the repository.
+- Validate every task before proceeding.
+
+Continue automatically through every remaining task in Phase 5.
+
+Stop only when Phase 5 is 100% complete or if a real blocking issue cannot be resolved.
+
+At the end of Phase 5 provide:
+- Completed tasks
+- Modified files
+- Git commits
+- Updated ROADMAP progress
+- Updated CHANGELOG version
+- Next unchecked phase
+```
+
+
+
+
 # 
 ```
 Continue from the first unchecked task in Phase 4 (Categories).
