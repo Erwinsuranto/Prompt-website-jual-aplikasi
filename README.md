@@ -13,6 +13,55 @@
 
 
 
+
+
+# 
+```
+Continue from the first unchecked task in Phase 7 (Search).
+
+Current status:
+- Audit completed.
+- Phases 1–6 are complete.
+- Continue from the first unchecked task in Phase 7.
+- Do not re-audit or revisit completed phases.
+
+Complete all remaining Phase 7 tasks automatically.
+
+Requirements:
+- Follow SPEC.md exactly.
+- Reuse existing SearchBar, ProductCard, ProductGrid, EmptyState, Skeleton, Pagination, hooks, stores, services, design tokens, animations, and UI primitives.
+- Keep the Digital Cell mobile-first UI consistent.
+- Support URL query parameter synchronization.
+- Connect to productService.searchProducts() using the existing architecture.
+- Preserve mock fallback where already defined.
+- No duplicate code.
+- No breaking changes.
+- Strict TypeScript.
+- ESLint clean.
+- Reuse existing components whenever possible.
+
+For every completed task:
+- Update ROADMAP.md.
+- Update CHANGELOG.md.
+- Commit the completed task.
+- Push to the repository.
+- Verify the implementation before continuing automatically.
+
+Continue until Phase 7 is 100% complete.
+
+Stop only when:
+- Phase 7 is fully complete, or
+- A real blocking issue cannot be resolved.
+
+At the end report:
+- Completed tasks
+- Files modified
+- Git commits
+- ROADMAP progress
+- CHANGELOG version
+- Next unchecked phase
+```
+
 # 
 ```
 Continue from the first unchecked task in Phase 6 (Product Detail).
