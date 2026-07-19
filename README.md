@@ -15,6 +15,55 @@
 
 
 
+# 
+```
+Continue from the first unchecked task in Phase 9 (Checkout).
+
+Current project status:
+- Audit completed.
+- Phases 1–8 are fully complete.
+- Continue only from the first unchecked task in Phase 9.
+- Do not modify completed phases unless fixing a verified bug.
+
+Complete every remaining Phase 9 task automatically.
+
+Requirements:
+- Follow SPEC.md exactly.
+- Reuse existing useCartStore, orderService, paymentService, authStore, ProductCard, CartSummary, Form components, UI primitives, hooks, services, animations, design tokens, Skeleton, Dialog, Toast, and EmptyState.
+- Keep the Digital Cell mobile-first design consistent.
+- Build a complete multi-step checkout flow.
+- Customer information must use React Hook Form + Zod validation.
+- Connect checkout to orderService.createOrder().
+- Generate an order and navigate to the payment page after successful checkout.
+- Preserve existing mock fallback architecture.
+- Synchronize totals with CartSummary.
+- No duplicate code.
+- No architecture changes.
+- Strict TypeScript.
+- ESLint clean.
+- Zero regressions.
+
+For every completed task:
+1. Verify implementation.
+2. Update ROADMAP.md.
+3. Update CHANGELOG.md.
+4. Commit.
+5. Push.
+6. Continue automatically to the next unchecked task.
+
+Stop only when:
+- Phase 9 is 100% complete, or
+- A real blocking issue prevents further progress.
+
+Final report must include:
+- Completed tasks
+- Modified files
+- Git commits
+- ROADMAP progress
+- CHANGELOG version
+- Next unchecked phase
+```
+
 
 # 
 ```
