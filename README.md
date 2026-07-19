@@ -20,6 +20,66 @@
 
 
 
+
+
+# 
+```
+Continue implementing the project from the current repository state.
+
+Current status:
+- Repository has already been audited.
+- Phase 17 (Admin Dashboard) is fully completed.
+- ROADMAP progress: 297/472 (62.9%).
+- CHANGELOG version: v0.59.0.
+- Start from Phase 18 — Product Management (Task 1 of 8).
+
+Requirements:
+- Follow SPEC.md exactly.
+- Follow ROADMAP.md in order.
+- Preserve the current architecture.
+- Reuse existing components, stores, hooks, services, utilities, design tokens, layouts and animations.
+- Do not duplicate code.
+- Use strict TypeScript.
+- Keep ESLint and build clean.
+- Mobile-first responsive UI.
+- Do not modify completed phases except when required for integration.
+- Commit after each completed task.
+- Push to the main branch.
+- Update ROADMAP.md and CHANGELOG.md after every completed task.
+
+Implement every remaining task of Phase 18:
+
+1. ProductTable
+2. ProductForm
+3. ProductImageUpload
+4. ProductStatusToggle
+5. Product List page
+6. New Product page
+7. Edit Product page
+8. Delete Product with confirmation dialog
+
+After each task:
+- Verify functionality.
+- Fix all TypeScript/ESLint issues.
+- Commit.
+- Push.
+- Update ROADMAP and CHANGELOG.
+- Continue automatically to the next task without asking for confirmation.
+
+Only stop if:
+- Phase 18 reaches 100% completion, or
+- A real blocking issue prevents further implementation.
+
+Final report must include:
+- Completed tasks
+- Files created/modified
+- Git commit hashes
+- Updated ROADMAP progress
+- Updated CHANGELOG version
+- Next unchecked phase and first remaining task
+```
+
+
 # 
 ```
 Continue from the next unchecked phase after Phase 16.
