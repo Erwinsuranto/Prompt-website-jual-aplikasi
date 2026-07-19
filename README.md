@@ -7,6 +7,11 @@
 
 
 
+
+# 
+```
+Continue with the first unchecked task in ROADMAP. Follow SPEC.md exactly. Reuse existing components. Update ROADMAP.md and CHANGELOG.md after completion. Commit after each completed task. Stop and wait for approval after every task.
+```
 # 
 ```
 Before making any changes, perform a COMPLETE PROJECT AUDIT.
