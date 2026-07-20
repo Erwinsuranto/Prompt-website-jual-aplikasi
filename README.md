@@ -19,6 +19,52 @@
 
 
 
+
+# Phase 23
+```
+Continue from the current repository state.
+
+Current status:
+- Phase 22 (Payment Management) is complete.
+- Start Phase 23 — Reports.
+- Continue strictly according to ROADMAP.md and SPEC.md.
+
+Requirements:
+- Implement every remaining task in Phase 23 sequentially.
+- Reuse existing architecture, components, services, stores, hooks and design system.
+- Do not duplicate code.
+- Keep strict TypeScript.
+- ESLint and build must stay clean.
+- Mobile-first responsive UI.
+- Update ROADMAP.md and CHANGELOG.md after every completed task.
+- Commit after every completed task.
+- Push every commit to the main branch.
+- Do not stop for confirmation between tasks.
+
+For every completed task:
+1. Verify functionality.
+2. Fix TypeScript/ESLint issues.
+3. Commit.
+4. Push.
+5. Update ROADMAP.md.
+6. Update CHANGELOG.md.
+7. Continue automatically to the next task.
+
+Only stop when:
+- Phase 23 reaches 100%, or
+- A genuine blocking issue prevents further progress.
+
+Final report must include:
+- Completed tasks
+- Files created/modified
+- Git commit hashes
+- Updated ROADMAP progress
+- Updated CHANGELOG version
+- Next unchecked phase and its first remaining task.
+
+```
+
+
 # 
 ```
 Continue implementing the project from the current repository state.
