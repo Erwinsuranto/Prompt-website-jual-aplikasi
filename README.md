@@ -19,6 +19,65 @@
 
 
 
+# 
+```
+Continue implementing the project from the current repository state.
+
+Current status:
+- Repository has already been fully audited.
+- Phase 21 (Order Management) is complete.
+- ROADMAP progress: 323/472 (68.4%).
+- CHANGELOG version: v0.63.0.
+- Start from Phase 22 — Payment Management (Task 1 of 6).
+
+Requirements:
+- Follow SPEC.md exactly.
+- Follow ROADMAP.md sequentially.
+- Preserve the existing architecture.
+- Reuse existing components, stores, hooks, services, utilities, design tokens, layouts and animations.
+- Do not duplicate code.
+- Strict TypeScript.
+- ESLint and build must remain clean.
+- Mobile-first responsive UI.
+- Do not modify completed phases unless required for integration.
+- Commit after every completed task.
+- Push every commit to the main branch.
+- Update ROADMAP.md and CHANGELOG.md after every completed task.
+
+Complete all remaining Phase 22 tasks:
+
+1. PaymentTable
+2. VerifyPaymentButton
+3. RefundButton
+4. Admin Payments List page
+5. Manual Payment Verification Flow
+6. Refund Initiation Flow
+
+After each completed task:
+- Verify functionality.
+- Fix all TypeScript and ESLint issues.
+- Commit.
+- Push.
+- Update ROADMAP.md.
+- Update CHANGELOG.md.
+- Continue automatically to the next task without asking for confirmation.
+
+Only stop if:
+- Phase 22 reaches 100% completion, or
+- A real blocking issue prevents further implementation.
+
+Final report must include:
+- Completed tasks
+- Files created/modified
+- Git commit hashes
+- Updated ROADMAP progress
+- Updated CHANGELOG version
+- Next unchecked phase and its first remaining task.
+
+```
+
+
+
 # Phase 21 – Order Management (0/7)
 ```
 Continue implementing the project from the current repository state.
