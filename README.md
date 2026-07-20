@@ -18,6 +18,66 @@
 
 
 
+
+# Phase 21 – Order Management (0/7)
+```
+Continue implementing the project from the current repository state.
+
+Current status:
+- Repository has already been fully audited.
+- Phase 20 (Banner Management) is complete.
+- ROADMAP progress: 316/472 (66.9%).
+- CHANGELOG version: v0.62.0.
+- Start from Phase 21 — Order Management (Task 1 of 7).
+
+Requirements:
+- Follow SPEC.md exactly.
+- Follow ROADMAP.md sequentially.
+- Preserve the existing architecture.
+- Reuse existing components, stores, hooks, services, utilities, design tokens, layouts and animations.
+- Do not duplicate code.
+- Strict TypeScript.
+- ESLint and build must remain clean.
+- Mobile-first responsive UI.
+- Do not modify completed phases unless required for integration.
+- Commit after every completed task.
+- Push every commit to the main branch.
+- Update ROADMAP.md and CHANGELOG.md after every completed task.
+
+Complete all remaining Phase 21 tasks:
+
+1. OrderTable
+2. OrderStatusSelect
+3. OrderDetailPanel
+4. Admin Orders List page
+5. Admin Order Detail page
+6. Order Status Update Flow
+7. Order filtering by status and date range
+
+After each completed task:
+- Verify functionality.
+- Fix all TypeScript and ESLint issues.
+- Commit.
+- Push.
+- Update ROADMAP.md.
+- Update CHANGELOG.md.
+- Continue automatically to the next task without asking for confirmation.
+
+Only stop if:
+- Phase 21 reaches 100% completion, or
+- A real blocking issue prevents further implementation.
+
+Final report must include:
+- Completed tasks
+- Files created/modified
+- Git commit hashes
+- Updated ROADMAP progress
+- Updated CHANGELOG version
+- Next unchecked phase and its first remaining task.
+
+```
+
+
 # 
 ```
 Continue implementing the project from the current repository state.
