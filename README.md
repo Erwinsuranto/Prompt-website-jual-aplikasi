@@ -24,6 +24,63 @@ Continue implementing the project from the current repository state.
 
 Current status:
 - Repository has already been fully audited.
+- Phase 19 (Category Management) is complete.
+- ROADMAP progress: 311/472 (65.9%).
+- CHANGELOG version: v0.61.0.
+- Start from Phase 20 — Banner Management (Task 1 of 5).
+
+Requirements:
+- Follow SPEC.md exactly.
+- Follow ROADMAP.md sequentially.
+- Preserve the existing architecture.
+- Reuse existing components, stores, hooks, services, utilities, design tokens, layouts and animations.
+- Do not duplicate code.
+- Strict TypeScript.
+- ESLint and build must remain clean.
+- Mobile-first responsive UI.
+- Do not modify completed phases unless required for integration.
+- Commit after each completed task.
+- Push every commit to the main branch.
+- Update ROADMAP.md and CHANGELOG.md after every completed task.
+
+Complete all remaining Phase 20 tasks:
+
+1. BannerTable
+2. BannerForm
+3. Banner List page
+4. Add/Edit Banner pages
+5. Drag-and-drop banner reorder with persistent sort order
+
+After each completed task:
+- Verify functionality.
+- Fix all TypeScript and ESLint issues.
+- Commit.
+- Push.
+- Update ROADMAP.md.
+- Update CHANGELOG.md.
+- Continue automatically to the next task without asking for confirmation.
+
+Only stop if:
+- Phase 20 reaches 100% completion, or
+- A real blocking issue prevents further implementation.
+
+Final report must include:
+- Completed tasks
+- Files created/modified
+- Git commit hashes
+- Updated ROADMAP progress
+- Updated CHANGELOG version
+- Next unchecked phase and its first remaining task.
+
+```
+
+
+# 
+```
+Continue implementing the project from the current repository state.
+
+Current status:
+- Repository has already been fully audited.
 - Phase 18 (Product Management) is complete.
 - ROADMAP progress: 305/472 (64.6%).
 - CHANGELOG version: v0.60.0.
