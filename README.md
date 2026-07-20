@@ -18,8 +18,62 @@
 
 
 
+# 
+```
+Continue implementing the project from the current repository state.
 
+Current status:
+- Repository has already been fully audited.
+- Phase 18 (Product Management) is complete.
+- ROADMAP progress: 305/472 (64.6%).
+- CHANGELOG version: v0.60.0.
+- Start from Phase 19 — Category Management (Task 1 of 6).
 
+Requirements:
+- Follow SPEC.md exactly.
+- Follow ROADMAP.md sequentially.
+- Preserve the existing architecture.
+- Reuse existing components, stores, hooks, services, utilities, design tokens, layouts and animations.
+- Do not duplicate code.
+- Strict TypeScript.
+- ESLint and build must remain clean.
+- Mobile-first responsive UI.
+- Do not modify completed phases unless integration requires it.
+- Commit after each completed task.
+- Push every commit to the main branch.
+- Update ROADMAP.md and CHANGELOG.md after every completed task.
+
+Implement all remaining Phase 19 tasks:
+
+1. CategoryTable
+2. CategoryForm
+3. Category List page
+4. New Category page
+5. Edit Category page
+6. Drag-and-drop category reorder with persistent sort order
+
+For every completed task:
+- Verify functionality.
+- Fix all TypeScript and ESLint issues.
+- Commit.
+- Push.
+- Update ROADMAP.md.
+- Update CHANGELOG.md.
+- Continue automatically to the next task without asking for confirmation.
+
+Only stop if:
+- Phase 19 reaches 100% completion, or
+- A real blocking issue prevents further implementation.
+
+Final report must include:
+- Completed tasks
+- Files created/modified
+- Git commit hashes
+- Updated ROADMAP progress
+- Updated CHANGELOG version
+- Next unchecked phase and its first remaining task
+
+```
 
 
 # 
