@@ -4,8 +4,69 @@
 
 
 
+# Sekarang masuk ke fitur utama BotSpace
+```
+Phase berikutnya: Multi Workspace Runtime.
 
+Implementasikan fitur berikut dengan commit terpisah setiap fitur.
 
+1. Authentication
+- Login
+- Refresh Token
+- Logout
+- JWT
+- Password Hash
+- Middleware Auth
+
+2. User Management
+- Profile
+- Change Password
+- API Key pribadi
+- Preferences
+
+3. Workspace Member
+- Invite Member
+- Accept Invitation
+- Remove Member
+- Role:
+  - Owner
+  - Admin
+  - Operator
+  - Viewer
+
+4. Bot Installation
+- Install Bot
+- Uninstall Bot
+- Generate Telegram webhook URL
+- Bot Secret
+- Bot Status
+
+5. Workspace Settings
+- Timezone
+- Language
+- Default AI Provider
+- Default Model
+- Rate Limit
+- Logging
+
+6. Permission System
+Implement RBAC sehingga semua endpoint mengecek permission.
+
+7. Audit Log
+Catat semua perubahan Workspace dan Bot.
+
+8. Testing
+Tambahkan unit dan integration test.
+
+9. Jalankan:
+- pnpm lint
+- pnpm typecheck
+- pnpm test
+- pnpm build
+
+10. Commit per fitur dan tampilkan ringkasan perubahan setelah selesai.
+
+```
 
 
 
