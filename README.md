@@ -10,6 +10,52 @@
 
 
 
+
+
+# 
+```
+Continue from the current repository state.
+
+Current status:
+- Phase 26 (Database) is partially complete.
+- ROADMAP: 381/443 (~86.0%).
+- CHANGELOG: v0.68.0.
+- Resume from task 26.1.4 (Run initial database migration).
+- Do NOT restart Phase 26 from the beginning.
+
+Requirements:
+- Continue every remaining Phase 26 task sequentially until Phase 26 reaches 100%.
+- Keep Prisma as the ORM.
+- Complete schema, migrations, repositories, seeds, database utilities and service integration.
+- Replace remaining mock implementations only where Phase 26 requires.
+- Reuse existing architecture, services, validation, repositories and types.
+- Maintain strict TypeScript.
+- Do not introduce breaking changes.
+- Keep API compatibility.
+- Do not modify completed phases except for required integration fixes.
+
+If the execution environment cannot run Node.js, npm, Prisma CLI, migrations, TypeScript or ESLint, continue implementing every remaining source file and clearly report which runtime validation or migration commands could not be executed instead of stopping.
+
+After every completed task:
+1. Verify implementation.
+2. Fix issues when possible.
+3. Update ROADMAP.md.
+4. Update CHANGELOG.md.
+5. Continue automatically without asking for approval.
+
+Only stop when:
+- Phase 26 is fully complete, or
+- A genuine blocking issue prevents further progress.
+
+Final report must include:
+- Completed tasks.
+- Files created/modified.
+- Updated ROADMAP progress.
+- Updated CHANGELOG version.
+- Remaining uncompleted task (if any), otherwise the next unchecked phase and its first task.
+
+`
+
 # Phase 26 — Database
 ```
 
