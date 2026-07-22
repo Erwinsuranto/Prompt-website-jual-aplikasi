@@ -4,6 +4,61 @@
 
 
 
+
+
+
+
+
+
+# Phase 26 — Database
+```
+
+Continue from the current repository state.
+
+Current status:
+- Phase 25 (API) is 100% complete.
+- ROADMAP: 371/443 (~83.7%).
+- CHANGELOG: v0.67.0.
+- Branch: main.
+
+Start Phase 26 — Database exactly as defined in ROADMAP.md.
+
+Requirements:
+- Use Prisma as the ORM unless ROADMAP explicitly specifies another ORM.
+- Design a scalable database architecture.
+- Create a normalized schema with proper relations, indexes and constraints.
+- Generate Prisma schema, migrations, seed files and database utilities.
+- Replace mock data incrementally with database-backed services where required by Phase 26.
+- Reuse existing services, types, validation schemas and project architecture.
+- Keep strict TypeScript.
+- Do not introduce breaking changes.
+- Keep all existing APIs compatible.
+- Maintain clean code and documentation.
+
+For every completed task:
+1. Verify implementation.
+2. Fix TypeScript/ESLint issues when possible.
+3. Commit with a meaningful message.
+4. Push to main.
+5. Update ROADMAP.md.
+6. Update CHANGELOG.md.
+7. Continue automatically to the next task without asking for confirmation.
+
+If Node.js, npm, Prisma CLI, TypeScript or build tools are unavailable in the current environment, continue implementing all source files and clearly report which validation or migration steps could not be executed instead of stopping.
+
+Only stop when:
+- Phase 26 reaches 100%, or
+- A genuine blocking issue prevents further progress.
+
+Final report must include:
+- Completed tasks.
+- Files created/modified.
+- Git commit hashes (or explain if commits could not be created).
+- Updated ROADMAP progress.
+- Updated CHANGELOG version.
+- Next unchecked phase and its first remaining task.
+```
+
 # 
 ```
 Continue from the current repository state.
