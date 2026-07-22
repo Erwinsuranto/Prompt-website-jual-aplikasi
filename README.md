@@ -10,6 +10,96 @@
 
 
 
+```
+Phase berikutnya: Multi Workspace Runtime.
+
+Implementasikan fitur berikut dengan commit terpisah setiap fitur.
+
+1. Authentication
+- Login
+- Refresh Token
+- Logout
+- JWT
+- Password Hash
+- Middleware Auth
+
+2. User Management
+- Profile
+- Change Password
+- API Key pribadi
+- Preferences
+
+3. Workspace Member
+- Invite Member
+- Accept Invitation
+- Remove Member
+- Role:
+  - Owner
+  - Admin
+  - Operator
+  - Viewer
+
+4. Bot Installation
+- Install Bot
+- Uninstall Bot
+- Generate Telegram webhook URL
+- Bot Secret
+- Bot Status
+
+5. Workspace Settings
+- Timezone
+- Language
+- Default AI Provider
+- Default Model
+- Rate Limit
+- Logging
+
+6. Permission System
+Implement RBAC sehingga semua endpoint mengecek permission.
+
+7. Audit Log
+Catat semua perubahan Workspace dan Bot.
+
+8. Testing
+Tambahkan unit dan integration test.
+
+9. Jalankan:
+- pnpm lint
+- pnpm typecheck
+- pnpm test
+- pnpm build
+
+10. Commit per fitur dan tampilkan ringkasan perubahan setelah selesai.
+
+```
+
+
+Audit seluruh project BotSpace secara menyeluruh.
+
+Fokus pada:
+1. Bug yang menyebabkan runtime error atau crash.
+2. Bug logika dan race condition.
+3. Celah keamanan (auth, permission, secret, injection, SSRF, XSS, CSRF, path traversal).
+4. API dan database.
+5. Struktur project dan arsitektur.
+6. Performa dan penggunaan memori.
+7. Kualitas kode (duplikasi, dead code, file tidak terpakai).
+8. Konfigurasi Docker, GitHub Actions, environment, dan deployment.
+9. Dependency yang usang atau berisiko.
+10. Konsistensi TypeScript/JavaScript dan error handling.
+
+Jangan langsung mengubah kode.
+
+Buat laporan audit dalam format Markdown yang berisi:
+- Ringkasan kondisi project.
+- Daftar temuan berdasarkan prioritas (Critical, High, Medium, Low).
+- Lokasi file dan baris yang bermasalah.
+- Penjelasan penyebab.
+- Dampak.
+- Rekomendasi perbaikan.
+
+Setelah laporan selesai, tunggu instruksi sebelum melakukan perubahan apa pun.
+
 
 ```
 v03%3AeyJhbGciOiJkaXIiLCJraWQiOiJwcm9kdWN0aW9uOnRva2VuLXYzOjIwMjQtMTEtMDciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..-ftVD7DVNOy9Tk895KdoqQ.7vf962F_mjJ50FpstT3P6GA6fEdL2BouwwxLZPkjTebB8TNPH6G5mgd_T_Cws67Y5ImPW0B4u8Z7Zzb156TX3iotTAyT1ZUVex1EMiIW8pSTYr9i7tqUN5RrOsK61N0kNig93OxfU6k-FwEztaUp1-EsAs1a_ZGoRSP3xZN0Rhi4Q2Y83Ca7bmmv58-vL86GPfdi3yFHR10XaIcWLay5gzRQVHaH7T6LDJYGh62pPJk1wCfBBf8QO9qFb8-tPtFYmMiK5-PXW0lQl0AOw8EZQ4CtBjX_yDtmXv93lEvoFL2DHBca8FeqBOXw_d8AJ4jtW77DksJ6UmIezFfhCJB4vyeUgZuYrV1csiLaQDUOLec.qVkRWNyFbIe-GuAkiKe55Xo68GHTY4gR_cMZx4ri0JU
