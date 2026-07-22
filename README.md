@@ -4,6 +4,54 @@
 
 
 
+# 
+```
+Continue from the current repository state.
+
+Current status:
+- Phase 24 is 100% complete.
+- ROADMAP: 341/443 (~77.0%).
+- CHANGELOG: v0.66.0.
+- Branch: main is clean.
+
+Start Phase 25 — API (Next.js Route Handlers) exactly as defined in ROADMAP.md.
+
+Requirements:
+- Complete every remaining Phase 25 task sequentially.
+- Build all required Next.js Route Handlers.
+- Reuse existing services, schemas, validation, auth, stores, utilities and design system.
+- Keep strict TypeScript.
+- No duplicated code.
+- Follow existing project architecture.
+- Keep all API responses consistent.
+- Add proper validation and error handling.
+- Add pagination, filtering, sorting and authentication where required.
+- Do not introduce breaking changes.
+
+For every completed task:
+1. Verify implementation.
+2. Fix TypeScript/ESLint issues when possible.
+3. Commit with a meaningful message.
+4. Push to main.
+5. Update ROADMAP.md.
+6. Update CHANGELOG.md.
+7. Continue automatically without asking for confirmation.
+
+If the environment cannot execute npm, node, tsc or lint, continue implementing the code and clearly mention which validations could not be executed instead of stopping.
+
+Only stop when:
+- Phase 25 reaches 100%, or
+- A real blocking issue prevents further progress.
+
+Final report must include:
+- Completed tasks.
+- Files created/modified.
+- Git commit hashes.
+- Updated ROADMAP progress.
+- Updated CHANGELOG version.
+- Next unchecked phase and its first remaining task.
+
+```
 
 # 
 ```
