@@ -4,6 +4,54 @@
 
 
 
+
+# 
+```
+
+Continue from the current repository state.
+
+Current status:
+- Phase 23 (Reports) is 100% complete.
+- ROADMAP: 338/446 (75.8%).
+- CHANGELOG: v0.65.0.
+- Branch: main (clean).
+
+Start Phase 24 exactly as defined in ROADMAP.md.
+
+Requirements:
+- Complete every remaining Phase 24 task sequentially.
+- Follow SPEC.md, ROADMAP.md and existing architecture.
+- Reuse existing components, hooks, services, stores and design system.
+- No duplicated code.
+- Keep strict TypeScript.
+- Zero ESLint/build errors.
+- Mobile-first responsive UI.
+- Do not introduce breaking changes.
+- Keep commit history clean.
+
+For every completed task:
+1. Verify functionality.
+2. Fix TypeScript/ESLint/build issues.
+3. Commit with a meaningful message.
+4. Push to main.
+5. Update ROADMAP.md.
+6. Update CHANGELOG.md.
+7. Continue automatically to the next task without asking for approval.
+
+Only stop when:
+- Phase 24 is 100% complete, or
+- A real blocking issue prevents further progress.
+
+Final report must include:
+- Completed tasks.
+- Files created/modified.
+- Git commit hashes.
+- Updated ROADMAP progress.
+- Updated CHANGELOG version.
+- Next unchecked phase and its first remaining task.
+```
+
+
 # Sekarang masuk ke fitur utama BotSpace
 ```
 Phase berikutnya: Multi Workspace Runtime.
