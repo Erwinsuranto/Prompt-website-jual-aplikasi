@@ -12,6 +12,234 @@
 
 
 
+
+
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+Lakukan AUDIT terhadap repository GitHub `zenolambee/toko-online` untuk mengecek kondisi pengerjaan TERAKHIR.
+
+PENTING:
+- Jangan mengubah kode terlebih dahulu.
+- Jangan membuat file baru.
+- Jangan menghapus file.
+- Jangan melakukan refactor.
+- Jangan memperbaiki bug dulu.
+- Hanya audit dan laporkan hasilnya.
+- Gunakan kondisi/code yang BENAR-BENAR ada di repository saat ini, jangan berdasarkan asumsi atau rencana sebelumnya.
+
+TUJUAN AUDIT:
+
+Saya ingin mengetahui sejauh mana project website toko-online ini sudah dikerjakan dan apa hasil pengerjaan terakhirnya.
+
+Periksa:
+
+1. STRUKTUR PROJECT
+- Identifikasi framework/library yang digunakan.
+- Periksa struktur folder dan file utama.
+- Jelaskan fungsi setiap bagian penting.
+- Apakah struktur project sudah rapi dan mudah dikembangkan?
+
+2. PENGERJAAN TERAKHIR
+- Periksa commit terbaru.
+- Identifikasi file yang terakhir diubah.
+- Jelaskan fitur atau bagian UI apa yang dikerjakan pada commit terakhir.
+- Bandingkan dengan commit sebelumnya jika diperlukan untuk memahami perubahan.
+- Jangan hanya membaca nama commit; periksa isi perubahan kodenya.
+
+3. FRONTEND / UI
+Audit halaman yang sudah tersedia:
+- Homepage/shop
+- Header/navbar
+- Hero/banner
+- Category
+- Product listing
+- Product card
+- Product detail
+- Search
+- Filter
+- Cart
+- Checkout
+- Login/register jika sudah ada
+- Footer
+- halaman lainnya yang ditemukan.
+
+Untuk setiap bagian, tandai:
+- SUDAH ADA
+- SEBAGIAN
+- BELUM ADA
+- ERROR / BERMASALAH
+
+4. DESIGN/UI UX
+Periksa:
+- Responsive desktop
+- Responsive tablet
+- Responsive mobile
+- spacing
+- typography
+- warna
+- button
+- card
+- navigation
+- loading state
+- empty state
+- error state
+- konsistensi komponen
+- kualitas visual secara keseluruhan.
+
+Project ini nantinya ingin dibuat sebagai website toko online yang tampilannya lebih modern, menarik, profesional, dan berbeda dari website referensi yang sebelumnya saya berikan.
+
+Jangan menyalin desain website referensi.
+
+5. FUNCTIONALITY
+Periksa apakah fitur yang terlihat di UI benar-benar sudah berfungsi atau hanya tampilan.
+
+Periksa:
+- routing
+- navigation
+- search
+- category
+- product
+- cart
+- checkout
+- form
+- API
+- database
+- state management
+- authentication
+- admin functionality jika sudah tersedia.
+
+6. CODE QUALITY
+Cari:
+- duplicate code
+- komponen terlalu besar
+- file yang seharusnya dipisah
+- hardcoded data
+- unused code
+- TODO
+- FIXME
+- console.log/debug
+- error handling yang kurang
+- masalah TypeScript/JavaScript
+- masalah dependency
+- konfigurasi yang mencurigakan.
+
+7. ERROR / BUG
+Cari error yang jelas dari source code.
+
+Periksa juga:
+- syntax error
+- import error
+- missing component
+- broken route
+- missing asset
+- invalid reference
+- kemungkinan build error.
+
+Jika memungkinkan, lakukan pengecekan/build/type-check yang aman tanpa mengubah repository.
+
+8. KEAMANAN
+Periksa apakah ada:
+- API key/secret yang terekspos
+- credential di source code
+- `.env` yang seharusnya tidak masuk repository
+- konfigurasi sensitif
+- endpoint admin yang tidak terlindungi.
+
+JANGAN menampilkan secret/API key jika menemukannya. Cukup beri tahu bahwa ada secret yang terekspos dan lokasi filenya.
+
+9. KESESUAIAN DENGAN TARGET PROJECT
+Nilai apakah kondisi sekarang sudah siap dilanjutkan ke tahap desain/pengembangan berikutnya.
+
+Buat kategori:
+- READY
+- NEEDS IMPROVEMENT
+- MAJOR PROBLEM
+
+10. HASIL AKHIR
+
+Berikan laporan dengan format:
+
+# AUDIT TOKO-ONLINE
+
+## 1. Status Project
+- Framework:
+- Status:
+- Build:
+- Struktur:
+- UI:
+- Functionality:
+
+## 2. Pengerjaan Terakhir
+- Commit terakhir:
+- File yang berubah:
+- Fitur yang dikerjakan:
+- Kondisi hasilnya:
+
+## 3. Fitur
+| Fitur | Status | Catatan |
+|---|---|---|
+| Homepage | | |
+| Product | | |
+| Category | | |
+| Search | | |
+| Cart | | |
+| Checkout | | |
+| Authentication | | |
+| Admin | | |
+
+## 4. UI/UX
+Jelaskan bagian yang sudah bagus dan bagian yang masih perlu diperbaiki.
+
+## 5. Bug / Error
+List semua masalah yang ditemukan beserta lokasi file.
+
+## 6. Code Quality
+Berikan masalah utama yang ditemukan.
+
+## 7. Security
+Berikan temuan keamanan jika ada.
+
+## 8. Kesimpulan
+Jelaskan kondisi project saat ini secara singkat dan jujur.
+
+## 9. Prioritas Berikutnya
+Buat urutan:
+P0 = wajib diperbaiki
+P1 = penting
+P2 = peningkatan
+
+PENTING:
+Jangan mengerjakan perbaikan apa pun pada tahap ini.
+
+Setelah laporan selesai, BERHENTI dan tunggu instruksi saya berikutnya.
+
+
+```
 # 
 ```
 Continue from the current repository state.
