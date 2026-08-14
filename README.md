@@ -27,10 +27,119 @@
 
 ```
 
-# 
+# Phase 26 Remaining Repositories
 ```
 
+PROMPT: Phase 26 — Complete Remaining Repositories
 
+Lanjutkan repository `toko-online` dari kondisi terakhir.
+
+HASIL TERAKHIR:
+- TypeScript: 0 errors
+- Build: berhasil, 37/37 pages generated
+- Phase 25 API endpoints: sudah selesai
+- Phase 26 masih tersisa tasks 8–11:
+  8. Order repository
+  9. Payment repository
+  10. User repository
+  11. Banner repository
+
+TASK:
+Selesaikan HANYA 4 repository yang masih tersisa tersebut.
+
+1. AUDIT DULU
+Periksa repository/service/schema/model yang sudah ada.
+Ikuti pattern repository yang sudah digunakan oleh category, product, atau repository lain.
+Jangan membuat architecture baru jika pattern existing sudah tersedia.
+
+2. ORDER REPOSITORY
+Implementasikan repository untuk:
+- create order
+- get order by ID
+- get orders
+- update order
+- update status order
+
+Gunakan schema/database yang benar-benar tersedia.
+Jangan gunakan mock data sebagai database production.
+
+3. PAYMENT REPOSITORY
+Implementasikan repository untuk:
+- create payment
+- get payment
+- update payment
+- update payment status
+
+Pastikan relasi dengan order mengikuti schema yang sudah ada.
+
+4. USER REPOSITORY
+Implementasikan repository untuk:
+- find user
+- find user by ID
+- create user jika memang dibutuhkan schema
+- update user
+- kebutuhan authentication yang sudah disiapkan
+
+Jangan implementasikan JWT/bcrypt/authentication penuh pada task ini.
+Itu tetap untuk Phase 27.
+
+5. BANNER REPOSITORY
+Implementasikan repository untuk:
+- get banners
+- get active banners
+- create banner jika schema mendukung
+- update banner
+- delete/deactivate banner
+
+6. INTEGRASI
+Hubungkan repository dengan API/service layer yang SUDAH ada jika memang endpoint-nya sudah dibuat.
+
+Jangan membuat endpoint baru yang tidak diperlukan.
+
+7. MOCK DATA
+Hilangkan penggunaan mock hanya pada bagian yang sekarang sudah bisa memakai repository nyata.
+Jangan menghapus mock data secara membabi buta jika masih digunakan oleh UI yang belum mempunyai backend.
+
+8. ERROR HANDLING
+Pastikan:
+- not found ditangani dengan benar;
+- validation error tidak menyebabkan server crash;
+- database error ditangani;
+- tidak ada credential/secret yang masuk response.
+
+9. JANGAN UBAH UI
+Jangan redesign frontend.
+Jangan mengubah layout.
+Jangan mengubah styling kecuali benar-benar diperlukan untuk integrasi.
+
+10. VALIDASI
+Setelah selesai jalankan:
+- TypeScript check
+- lint
+- build
+
+Pastikan hasil akhirnya:
+- TypeScript = 0 error
+- build berhasil
+- tidak ada regression pada API yang sudah selesai.
+
+LAPORAN AKHIR:
+- repository yang berhasil dibuat/diperbaiki;
+- file yang diubah;
+- API/service yang terhubung;
+- hasil typecheck;
+- hasil lint;
+- hasil build;
+- masalah yang masih tersisa.
+
+PENTING:
+Jangan implementasikan Phase 27.
+Jangan membuat JWT.
+Jangan membuat bcrypt.
+Jangan membuat login baru.
+Jangan redesign UI.
+Jangan mengubah database schema besar-besaran.
+Kerjakan hanya Phase 26 tasks 8–11.
 
 ```
 # 
