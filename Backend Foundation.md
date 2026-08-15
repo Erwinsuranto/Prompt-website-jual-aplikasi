@@ -3,11 +3,101 @@
 
 
 
+
+
+
+
+
 # 
 ```
 
 
 
+``
+
+# 
+```
+
+
+
+``
+
+
+# 
+```
+
+
+
+``
+
+# 
+```
+
+
+
+``
+# 
+```
+
+
+
+``
+# 
+```
+
+
+Prompt: Phase 29 Task 2 — Category generateMetadata
+
+Kerjakan HANYA Phase 29 Task 2.
+
+Tujuan:
+Selesaikan metadata SEO untuk halaman detail category menggunakan generateMetadata dan metadataBase yang sudah tersedia.
+
+Scope:
+1. Audit:
+   app/src/app/(shop)/category/[slug]/page.tsx
+   dan category service yang digunakan.
+2. Lengkapi generateMetadata untuk category detail.
+3. Pastikan mencakup:
+   - title
+   - description
+   - Open Graph
+   - og:title
+   - og:description
+   - canonical URL
+   - Twitter Card
+   - twitter:title
+   - twitter:description
+4. Gunakan data category dari database/service, bukan hardcode/mock.
+5. Gunakan metadataBase dari Phase 29 Task 8 untuk URL absolut.
+6. Tangani category yang tidak ditemukan dengan graceful fallback.
+7. Jangan mengubah generateStaticParams dari Phase 28.
+8. Jangan mengubah caching Phase 28.
+9. Jangan mengubah auth/middleware Phase 27.
+10. Jangan mengerjakan Task 3, 5, 6, 7, atau 9.
+11. Jangan melakukan refactor besar.
+
+Verifikasi:
+- TypeScript
+- Lint
+- production build
+- test category valid
+- test slug category tidak ditemukan
+- verifikasi canonical URL absolute
+- verifikasi Open Graph
+- verifikasi Twitter Card
+- pastikan Phase 27 auth intact
+- pastikan Phase 28 caching intact
+
+Setelah selesai:
+- tampilkan file yang berubah;
+- tampilkan metadata yang dihasilkan;
+- hasil TypeScript/Lint/Build;
+- hasil test valid dan invalid;
+- pastikan Task 2 benar-benar 100% selesai;
+- update ROADMAP.md dan CHANGELOG.md sesuai pola project.
+
+Jika menemukan masalah di luar scope Task 2, jangan diperbaiki. Laporkan saja.
 ```
 # 
 ```
