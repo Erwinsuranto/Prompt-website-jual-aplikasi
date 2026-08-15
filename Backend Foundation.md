@@ -38,7 +38,61 @@
 ``
 # 
 ```
+Prompt: Phase 29 Task 3 — Homepage OG + Twitter Card
 
+Kerjakan HANYA Phase 29 Task 3.
+
+Tujuan:
+Lengkapi metadata SEO homepage Digital Cell, terutama Open Graph dan Twitter Card, dengan menggunakan metadataBase dari Phase 29 Task 8.
+
+Scope:
+1. Audit:
+   app/src/app/(shop)/page.tsx
+   dan layout/metadata homepage yang sudah ada.
+2. Tambahkan atau lengkapi generateMetadata untuk homepage jika memang diperlukan.
+3. Pastikan metadata homepage mencakup:
+   - title
+   - description
+   - Open Graph
+   - og:title
+   - og:description
+   - og:type = website
+   - og:url
+   - og:image jika tersedia dan valid
+   - Twitter Card
+   - twitter:title
+   - twitter:description
+   - twitter:image jika tersedia dan valid
+4. Gunakan metadataBase dari Phase 29 Task 8.
+5. Jangan hardcode domain baru.
+6. Gunakan konfigurasi/data project yang sudah ada.
+7. Jangan membuat gambar dummy hanya untuk memenuhi metadata.
+8. Jangan mengubah UI homepage.
+9. Jangan mengubah auth Phase 27.
+10. Jangan mengubah caching Phase 28.
+11. Jangan mengerjakan Task 5, 6, 7, atau 9.
+12. Jangan melakukan refactor besar.
+
+Verifikasi:
+- TypeScript
+- Lint
+- production build
+- runtime homepage HTTP 200
+- periksa HTML homepage dan pastikan OG tags ada
+- periksa Twitter Card tags
+- pastikan URL metadata menjadi absolute melalui metadataBase
+- pastikan Phase 27 auth tetap intact
+- pastikan Phase 28 caching tetap intact
+
+Setelah selesai:
+1. Tampilkan file yang berubah.
+2. Tampilkan metadata homepage yang dihasilkan.
+3. Tampilkan hasil verifikasi HTML/meta tags.
+4. Tampilkan hasil TypeScript/Lint/Build.
+5. Pastikan Task 3 benar-benar 100% selesai.
+6. Update ROADMAP.md dan CHANGELOG.md sesuai pola project.
+
+Jika menemukan masalah di luar scope Task 3, jangan diperbaiki. Laporkan saja.
 
 
 ``
