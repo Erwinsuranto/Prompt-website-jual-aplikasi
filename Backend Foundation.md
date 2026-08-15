@@ -16,10 +16,102 @@
 
 ```
 
-# 
+# Prompt Audit Phase 29
 ```
 
+Prompt: Audit Phase 29 — Toko Online
 
+Lakukan AUDIT SAJA pada project toko-online yang sedang aktif di /root/toko-online.
+
+JANGAN mengubah kode.
+JANGAN membuat file baru.
+JANGAN memperbaiki bug.
+JANGAN menghapus data.
+JANGAN menjalankan refactor.
+JANGAN mulai mengerjakan Phase 29.
+
+Konteks:
+- Phase 26 sudah selesai 100%.
+- Phase 27 Authentication sudah selesai 100%.
+- Phase 28 Performance sudah selesai 100% (12/12).
+- Phase 28 terakhir diverifikasi:
+  TypeScript PASS
+  Lint PASS, hanya 2 warning pre-existing
+  Build PASS 52/52 pages
+  Runtime utama PASS.
+- Phase 28 Task 12 generateStaticParams category/[slug] sudah COMPLETE.
+- Jangan mengulang pekerjaan Phase 26, 27, atau 28 yang sudah selesai.
+
+Tujuan audit:
+Tentukan secara akurat apa isi resmi Phase 29 berdasarkan kondisi repository SAAT INI.
+
+Periksa:
+
+1. ROADMAP.md
+   - Temukan definisi resmi Phase 29.
+   - Catat semua task/subtask Phase 29.
+   - Hitung total task Phase 29.
+   - Tandai mana yang sudah selesai, partial, deferred, atau belum dikerjakan.
+
+2. CHANGELOG.md
+   - Cari perubahan terakhir.
+   - Cocokkan dengan ROADMAP.
+   - Deteksi task yang sudah dikerjakan tetapi roadmap belum diperbarui.
+
+3. Git status dan commit terakhir
+   - Tampilkan branch aktif.
+   - Tampilkan status working tree.
+   - Identifikasi pekerjaan terbaru setelah Phase 28.
+
+4. Source code
+   - Audit file yang berkaitan dengan Phase 29.
+   - Jangan hanya percaya checklist ROADMAP.
+   - Pastikan implementasi benar-benar ada.
+
+5. Cari TODO / FIXME / placeholder / mock yang berkaitan dengan Phase 29.
+
+6. Audit dependency Phase 29 terhadap Phase 27 authentication dan Phase 28 performance.
+   - Jangan sampai implementasi Phase 29 merusak auth.
+   - Jangan sampai caching/session user rusak.
+   - Jangan sampai protected routes berubah perilakunya.
+   - Jangan meng-cache data private/user-specific.
+
+7. Quality check:
+   - TypeScript
+   - ESLint
+   - production build
+   Hanya jalankan check, jangan memperbaiki error.
+
+8. Bandingkan:
+   ROADMAP → CHANGELOG → commit terakhir → source code → hasil build.
+
+HASIL YANG WAJIB DIBERIKAN:
+
+A. Status Phase 29:
+   - Belum mulai / sedang berjalan / sebagian selesai / selesai.
+
+B. Daftar seluruh task Phase 29 dalam tabel:
+   Task | Status | File terkait | Bukti implementasi
+
+C. Task yang ternyata sudah selesai tetapi belum tercatat di ROADMAP.
+
+D. Task yang ditandai selesai tetapi implementasinya belum lengkap.
+
+E. Masalah/bug yang ditemukan.
+
+F. Dependency atau risiko terhadap Phase 27 dan Phase 28.
+
+G. Urutan pengerjaan Phase 29 yang paling aman.
+
+H. Tentukan dengan jelas:
+   "Phase 29 siap dikerjakan"
+   atau
+   "Phase 29 belum siap, ada gap yang harus diselesaikan terlebih dahulu."
+
+PENTING:
+Audit ini READ-ONLY.
+Jangan melakukan perubahan apa pun.
+Setelah audit selesai, berhenti dan tunggu instruksi berikutnya.
 
 ```
 # Prompt — Phase 28 Task 12
