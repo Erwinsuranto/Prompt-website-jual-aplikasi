@@ -13,9 +13,77 @@
 
 
 ```
-# 
+# Prompt: Phase 26.1 — Selesaikan Integrasi Backend API
 ```
+PHASE 26.1 — COMPLETE API & BROWSER INTEGRATION
 
+Lanjutkan pengerjaan repository toko-online berdasarkan hasil audit Phase 26 sebelumnya.
+
+Jangan mengubah arsitektur besar yang sudah ada.
+Jangan mengerjakan Phase 27 Authentication.
+Fokus hanya menyelesaikan sisa Phase 26.
+
+Tugas:
+
+1. Buat API routes nyata untuk:
+- /api/orders
+- /api/payments
+- /api/users
+- /api/banners
+
+Gunakan repository Prisma yang sudah ada.
+Jangan menggunakan mock data.
+
+2. Hubungkan service:
+- order-service.ts
+- payment-service.ts
+- user-service.ts
+- banner-service.ts
+
+ke API routes tersebut dengan benar.
+
+3. Perbaiki browser/client flow yang sebelumnya broken:
+- Admin Order Management
+- Admin Payment Management
+- Admin Banner Management
+- Checkout → createOrder
+- Payment page → getPaymentStatus
+- Shop Orders page
+- Profile page
+
+4. Perbaiki bug:
+app/src/components/.../OrderStatusSelect.tsx:96
+
+Saat ini menggunakan:
+order.invoiceNumber
+
+Periksa tipe/order schema dan gunakan field ID yang benar sesuai Prisma.
+
+5. Pastikan semua mutation/read dari browser tidak lagi memanggil mock service secara langsung jika seharusnya melalui API.
+
+6. Jangan mengimplementasikan JWT, bcrypt, login middleware, HTTP-only cookie, atau role-based authentication.
+Itu khusus Phase 27.
+
+7. Setelah selesai jalankan:
+- TypeScript check
+- lint
+- production build
+
+8. Test API routes utama dan pastikan tidak menghasilkan 404.
+
+HASIL AKHIR:
+Laporkan:
+- file yang dibuat
+- file yang diubah
+- API route yang berhasil
+- browser flow yang sudah diperbaiki
+- bug yang diperbaiki
+- TypeScript PASS/FAIL
+- lint PASS/FAIL
+- build PASS/FAIL
+- apakah Phase 26 sekarang 100% selesai
+
+Jangan commit atau push.
 
 
 ```
