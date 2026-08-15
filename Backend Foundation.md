@@ -13,6 +13,157 @@
 
 
 ```
+
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# Prompt: Phase 27 — Real Authentication
+```
+
+PHASE 27 — REAL AUTHENTICATION
+
+Lanjutkan project toko-online dari kondisi saat ini.
+
+Phase 26 sudah selesai dan sudah PASS:
+- Repository Prisma
+- API routes
+- Order/Payment/User/Banner integration
+- Admin CRUD
+- Checkout/payment/profile/orders
+- TypeScript
+- Lint
+- Production build
+
+Sekarang kerjakan PHASE 27 saja.
+
+TUJUAN:
+Ganti auth mock menjadi authentication nyata menggunakan:
+- JWT
+- bcrypt/bcryptjs
+- HTTP-only cookie
+- login/logout
+- session validation
+- authentication middleware
+- role-based access control
+
+TASK:
+
+1. Audit auth yang sekarang terlebih dahulu.
+Cari:
+- auth-service.ts
+- login page/form
+- user schema
+- existing auth utilities
+- middleware
+- mock credentials
+- cookie/session logic
+
+2. Implement login nyata:
+- email + password
+- cari user dari Prisma
+- verifikasi password dengan bcrypt
+- generate JWT
+- simpan JWT pada HTTP-only cookie
+- jangan expose JWT ke client-side JavaScript
+
+3. Implement logout:
+- hapus/invalidate authentication cookie
+- redirect ke login bila diperlukan
+
+4. Implement session/current-user:
+- endpoint atau server utility untuk mendapatkan user yang sedang login
+- validasi JWT
+- ambil user dari database
+- jangan percaya user ID dari client
+
+5. Middleware:
+- lindungi route yang membutuhkan authentication
+- unauthenticated user diarahkan ke login
+- jangan mengganggu public routes
+
+6. Role-based access:
+- admin route hanya dapat diakses user dengan role admin
+- user biasa tidak boleh mengakses admin
+- lakukan pengecekan server-side, bukan hanya menyembunyikan UI
+
+7. Password:
+- password harus disimpan dalam bentuk hash
+- jangan menyimpan plaintext password
+- seed/dev user harus menggunakan password hash
+- jangan menampilkan password di response/API/log
+
+8. Hapus ketergantungan terhadap mock authentication setelah auth nyata berfungsi.
+
+9. Perbaiki seluruh flow yang masih memakai auth mock agar menggunakan session nyata.
+
+10. Jangan mengubah fitur bisnis Phase 26:
+- order
+- payment
+- banner
+- product
+- category
+
+11. Security:
+- HTTP-only cookie
+- Secure cookie pada production
+- SameSite yang sesuai
+- JWT secret dari environment variable
+- jangan hardcode secret
+- jangan expose secret ke browser
+- validasi input login
+- jangan bocorkan apakah email atau password yang salah
+
+12. Setelah implementasi jalankan:
+- TypeScript check
+- lint
+- production build
+
+13. Test minimal:
+- login valid
+- login password salah
+- user tidak login → protected route ditolak
+- user biasa → admin route ditolak
+- admin → admin route berhasil
+- logout → session tidak lagi valid
+- refresh browser → session tetap valid selama cookie masih berlaku
+
+HASIL AKHIR:
+Laporkan:
+1. File yang dibuat/diubah
+2. Auth flow yang sekarang digunakan
+3. JWT disimpan di mana
+4. Middleware yang digunakan
+5. Role protection yang diterapkan
+6. Mock auth yang sudah dihapus/diganti
+7. TypeScript PASS/FAIL
+8. Lint PASS/FAIL
+9. Build PASS/FAIL
+10. Hasil test login/logout/admin/user
+11. Apakah Phase 27 sudah 100% selesai
+
+JANGAN:
+- mengerjakan Phase 28
+- mengubah database schema tanpa alasan yang diperlukan
+- menghapus data production
+- commit
+- push
+
+```
 # Prompt: Phase 26.1 — Selesaikan Integrasi Backend API
 ```
 PHASE 26.1 — COMPLETE API & BROWSER INTEGRATION
