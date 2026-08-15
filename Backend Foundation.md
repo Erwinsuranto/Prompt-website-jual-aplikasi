@@ -35,10 +35,90 @@
 
 
 ```
-# 
+# Prompt — Phase 28 Task 8 + 9
 ```
 
+Lanjutkan Phase 28 dari posisi terakhir.
 
+Status:
+- Task 1–4 COMPLETE
+- Task 5 loading.tsx COMPLETE
+- Task 6 error.tsx COMPLETE
+- TypeScript PASS
+- Lint PASS, hanya 2 warning pre-existing
+- Build PASS 46/46
+- Runtime PASS
+- Phase 26 dan Phase 27 tetap intact
+
+Sekarang kerjakan HANYA TASK 8 + TASK 9.
+
+TASK 8 — Suspense boundaries
+TASK 9 — next/dynamic untuk komponen yang tepat
+
+AUDIT DULU sebelum mengubah kode.
+
+1. Cari komponen/page yang melakukan server fetch atau rendering yang berpotensi menahan seluruh halaman.
+2. Cari komponen berat/client component yang tidak perlu dimuat pada initial render.
+3. Cari penggunaan Suspense yang sudah ada agar tidak membuat nested/double loading yang buruk.
+4. Identifikasi route yang benar-benar membutuhkan Suspense atau dynamic import.
+
+Prioritaskan area:
+- homepage
+- products
+- categories
+- profile
+- orders
+- admin
+- FAQ/instructions/footer-heavy sections
+- komponen interaktif/berat yang tidak diperlukan untuk initial viewport
+
+TASK 8:
+- Tambahkan <Suspense> hanya pada boundary yang memang memberikan manfaat.
+- Gunakan fallback yang konsisten dengan loading UI Phase 28.
+- Jangan membuat Suspense hanya untuk memenuhi task.
+- Jangan menyebabkan double skeleton/flash.
+- Jangan mengubah business logic atau API.
+
+TASK 9:
+- Gunakan next/dynamic hanya untuk komponen yang memang layak lazy-load.
+- Prioritaskan komponen berat/non-critical atau client-only yang tidak dibutuhkan initial viewport.
+- Jangan dynamic-import komponen yang seharusnya langsung tersedia untuk SEO/initial render.
+- Jangan menggunakan ssr:false kecuali memang diperlukan dan sudah dibuktikan.
+- Pertahankan behavior dan tampilan existing.
+
+PENTING:
+- Jangan ubah Prisma/schema/database.
+- Jangan ubah authentication/JWT/cookie Phase 27.
+- Jangan ubah API contract.
+- Jangan mengerjakan Task 10–12.
+- Jangan melakukan refactor besar.
+- Jangan memperbaiki warning pre-existing yang tidak berkaitan.
+
+VERIFIKASI:
+1. TypeScript check.
+2. Lint.
+3. Production build.
+4. Runtime homepage.
+5. Runtime products/categories.
+6. Runtime admin dengan auth.
+7. Pastikan protected routes Phase 27 tetap protected.
+8. Pastikan tidak ada hydration error atau regression.
+
+LAPORAN:
+- hasil audit sebelum perubahan;
+- komponen yang diberi Suspense;
+- komponen yang diberi next/dynamic;
+- alasan setiap perubahan;
+- komponen yang sengaja TIDAK diubah dan alasannya;
+- TypeScript result;
+- Lint result;
+- Build result;
+- Runtime result;
+- status Task 8: COMPLETE/PARTIAL;
+- status Task 9: COMPLETE/PARTIAL;
+- masalah tersisa.
+
+Berhenti setelah Task 8 + 9. Jangan lanjut Task 10–12.
 
 ```
 # Prompt — Phase 28 Task 5 + 6
