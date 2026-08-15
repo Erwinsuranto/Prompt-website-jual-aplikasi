@@ -29,9 +29,106 @@
 
 ```
 
-# 
+# Phase 28 — Task 10 + 11: caching.
 ```
+Lanjutkan Phase 28 dari posisi terakhir.
 
+STATUS:
+- Task 1–4 COMPLETE
+- Task 5–6 COMPLETE
+- Task 8–9 COMPLETE
+- TypeScript PASS
+- Lint PASS, hanya 2 warning pre-existing
+- Build PASS 46/46
+- Runtime PASS
+- Phase 26 dan Phase 27 tetap intact
+
+Sekarang kerjakan HANYA:
+
+TASK 10 — Caching
+TASK 11 — Cache tags / revalidation
+
+AUDIT TERLEBIH DAHULU sebelum mengubah kode.
+
+Tujuan utama:
+Mengoptimalkan caching untuk DATA PUBLIK tanpa pernah melakukan cache terhadap data yang bergantung pada session/JWT/user.
+
+WAJIB DIPERHATIKAN:
+- products, categories, banners = data publik → kandidat caching.
+- orders, payments, profile, checkout, user-specific data = JANGAN di-cache sebagai shared/public cache.
+- Jangan cache response berdasarkan user/JWT secara global.
+- Jangan menyebabkan user A melihat data user B.
+- Jangan mengubah authentication Phase 27.
+
+TASK 10:
+1. Audit seluruh server fetch/service/repository yang mengambil:
+   - products
+   - categories
+   - banners
+   - orders
+   - payments
+   - profile
+2. Tentukan mana yang aman untuk cache.
+3. Terapkan caching hanya pada data publik yang memang aman.
+4. Gunakan mekanisme caching Next.js yang sesuai dengan versi project.
+5. Jangan meng-cache data session/user.
+6. Jangan mengubah API contract atau Prisma schema.
+
+TASK 11:
+1. Tambahkan cache tags/revalidation untuk data publik yang tepat.
+2. Pastikan mutation admin dapat melakukan invalidasi cache yang relevan.
+3. Contoh:
+   - perubahan product → invalidate product cache
+   - perubahan category → invalidate category cache
+   - perubahan banner → invalidate banner cache
+4. Jangan melakukan invalidasi global jika tidak diperlukan.
+5. Jangan menambahkan cache tag pada orders/payments/profile jika data tersebut bersifat user/session-specific.
+6. Pastikan setelah mutation, data terbaru dapat muncul tanpa harus menunggu cache stale yang tidak perlu.
+
+WAJIB AUDIT:
+- Cari semua penggunaan unstable_cache/cache/revalidate/revalidateTag/revalidatePath yang sudah ada.
+- Jangan membuat duplicate caching layer.
+- Periksa apakah project menggunakan API route atau direct service/repository sehingga caching ditempatkan di layer yang benar.
+- Pastikan caching tidak merusak Phase 26 order/payment flow.
+- Pastikan protected routes tetap dynamic/session-aware.
+
+VERIFIKASI:
+1. TypeScript check.
+2. Lint.
+3. Production build.
+4. Test homepage/products/categories.
+5. Test admin mutation untuk product/category/banner jika memungkinkan.
+6. Pastikan perubahan public data melakukan invalidasi yang benar.
+7. Test orders/profile/payment tetap mengambil data berdasarkan session user.
+8. Pastikan user-specific data tidak masuk shared cache.
+9. Pastikan authentication Phase 27 tetap intact.
+
+PENTING:
+- Jangan mengerjakan Task 12.
+- Jangan mengubah Prisma schema.
+- Jangan mengubah JWT/cookie/auth middleware.
+- Jangan refactor besar.
+- Jangan memperbaiki 2 warning lint pre-existing.
+- Jika caching tidak aman pada suatu area, JANGAN dipaksakan. Laporkan dan biarkan dynamic.
+
+LAPORAN:
+- Semua area yang diaudit.
+- Data yang diberi caching.
+- Data yang sengaja TIDAK di-cache dan alasannya.
+- Cache tags yang dibuat.
+- Mutation yang melakukan invalidasi.
+- File yang diubah.
+- TypeScript result.
+- Lint result.
+- Build result.
+- Runtime result.
+- Bukti bahwa orders/payments/profile tidak terkena shared cache.
+- Status Task 10: COMPLETE/PARTIAL.
+- Status Task 11: COMPLETE/PARTIAL.
+- Masalah yang masih tersisa.
+
+BERHENTI setelah Task 10 + 11 selesai.
+Jangan lanjut Task 12.
 
 
 ```
