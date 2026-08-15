@@ -32,7 +32,69 @@
 
 # 
 ```
+Phase 29 — Task 5: Dynamic Sitemap
 
+Kerjakan hanya Task 5 Phase 29: implementasi/update sitemap.ts pada repository toko-online.
+
+Tujuan:
+Buat sitemap.xml dinamis berdasarkan data publik yang benar-benar tersedia dari database/service.
+
+Ketentuan:
+1. Audit terlebih dahulu struktur route publik dan service yang sudah ada.
+2. Gunakan data dari productService dan categoryService yang sudah digunakan Phase 28.
+3. Sitemap harus mencakup:
+   - /
+   - /products
+   - /categories
+   - /products/[slug] untuk produk aktif/publik
+   - /category/[slug] untuk kategori aktif/publik
+4. Jangan masukkan route:
+   - /admin/*
+   - /api/*
+   - /auth/*
+   - /profile
+   - /orders/*
+   - /checkout
+   - /invoice/*
+   - /payment/*
+   - /favorites/*
+   - /search/*
+   - route private lainnya.
+5. Gunakan URL absolute berdasarkan siteConfig.url / metadataBase yang sudah dibuat pada Phase 29 Task 8.
+6. Jangan hardcode slug produk atau kategori.
+7. Gunakan service/database yang sudah ada, jangan membuat akses database baru jika service existing dapat digunakan.
+8. Perhatikan caching Phase 28:
+   - data publik boleh menggunakan caching yang sudah ada;
+   - jangan pernah memasukkan data user/session ke cache.
+9. Jangan mengubah authentication Phase 27.
+10. Jangan mengubah caching Phase 28 selain jika benar-benar diperlukan untuk sitemap.
+11. Jangan mengerjakan Task 6, 7, atau 9.
+12. Jangan melakukan refactor besar.
+
+Setelah implementasi:
+- jalankan TypeScript check;
+- jalankan lint;
+- jalankan production build;
+- verifikasi endpoint /sitemap.xml;
+- pastikan XML valid;
+- pastikan URL yang dihasilkan absolute;
+- pastikan produk/kategori dari database muncul;
+- pastikan route private tidak muncul;
+- pastikan Phase 27 auth tetap intact;
+- pastikan Phase 28 caching tetap intact.
+
+Laporkan:
+- file yang berubah;
+- implementasi yang dilakukan;
+- jumlah URL sitemap;
+- contoh URL yang dihasilkan;
+- hasil TypeScript;
+- hasil lint;
+- hasil build;
+- hasil runtime /sitemap.xml;
+- masalah yang masih tersisa jika ada.
+
+Jangan mengklaim selesai sebelum benar-benar diverifikasi.
 
 
 ``
