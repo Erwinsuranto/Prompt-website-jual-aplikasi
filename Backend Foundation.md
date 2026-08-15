@@ -41,10 +41,98 @@
 
 
 ```
-# 
+# Prompt — Phase 28 Task 5 + 6
 ```
 
+Lanjutkan Phase 28 setelah Task 3 dan Task 4.
 
+Status sebelumnya:
+- Task 2 — COMPLETE
+- Task 3 (img → next/image) — COMPLETE, 4/4
+- Task 4 priority — COMPLETE
+- Task 4 blurDataURL — DEFERRED karena tidak ada sumber blur yang valid
+- TypeScript PASS
+- Lint PASS, hanya 2 warning pre-existing
+- Build PASS 46/46
+- Phase 26 dan Phase 27 tidak boleh mengalami regression.
+
+Sekarang kerjakan HANYA:
+
+TASK 5 — Loading states
+TASK 6 — Error boundaries
+
+Tujuan:
+Menambahkan loading.tsx dan error.tsx pada route groups/pages yang memang membutuhkan, tanpa mengubah business logic.
+
+LANGKAH 1 — AUDIT DULU
+Cari seluruh route di app/src/app dan tentukan:
+- route yang melakukan server fetch / dynamic data;
+- route yang membutuhkan loading UI;
+- route yang membutuhkan error boundary;
+- route yang sudah memiliki loading.tsx/error.tsx.
+
+Jangan membuat file secara membabi buta.
+
+TASK 5 — loading.tsx
+Tambahkan loading.tsx hanya pada route yang memang membutuhkan loading state.
+
+Prioritaskan:
+- products
+- categories
+- profile
+- orders
+- checkout
+- admin routes yang melakukan server/data loading
+
+Gunakan UI loading yang konsisten dengan desain existing:
+- jangan membuat redesign;
+- gunakan skeleton/spinner sederhana;
+- jangan mengubah layout utama;
+- jangan mengubah API atau service layer.
+
+TASK 6 — error.tsx
+Tambahkan error.tsx pada route groups yang memang membutuhkan error boundary.
+
+Persyaratan:
+- gunakan pola Next.js App Router yang benar;
+- harus berupa Client Component jika diperlukan oleh error boundary;
+- tampilkan pesan error yang aman untuk user;
+- jangan membocorkan stack trace, credential, token, database detail, atau informasi sensitif;
+- sediakan tombol retry menggunakan mekanisme Next.js yang sesuai;
+- jangan mengubah authentication/authorization Phase 27.
+
+PENTING:
+- Jangan mengubah Prisma schema.
+- Jangan mengubah API contract.
+- Jangan mengubah JWT/session.
+- Jangan mengubah Phase 26.
+- Jangan mengubah Phase 27.
+- Jangan mengerjakan Task 7+ sebelum Task 5 dan 6 selesai.
+- Jangan memperbaiki warning lama yang tidak berkaitan.
+
+SETELAH SELESAI:
+1. Jalankan TypeScript check.
+2. Jalankan lint.
+3. Jalankan production build.
+4. Verifikasi route utama tetap HTTP 200.
+5. Verifikasi protected route tetap membutuhkan authentication.
+6. Jika memungkinkan, uji error boundary secara aman.
+7. Pastikan tidak ada regression.
+
+LAPORKAN:
+- route yang diaudit;
+- file loading.tsx yang dibuat/diubah;
+- file error.tsx yang dibuat/diubah;
+- alasan setiap file dibuat;
+- hasil TypeScript;
+- hasil lint;
+- hasil build;
+- hasil runtime test;
+- status Task 5: COMPLETE/PARTIAL;
+- status Task 6: COMPLETE/PARTIAL;
+- masalah yang masih tersisa.
+
+Jangan lanjut ke Task 7+ sampai laporan ini selesai.
 
 ```
 
