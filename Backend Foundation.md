@@ -38,9 +38,128 @@
 
 ```
 
-# 
+# Prompt: Phase 30 — Audit & Planning
 ```
+Prompt: Phase 30 — Testing Audit & Planning
 
+Lanjutkan repository toko-online / Digital Cell dari kondisi TERKINI.
+
+STATUS WAJIB:
+- Phase 27 = VERIFIED 100%
+- Phase 28 = VERIFIED 100%
+- Phase 29 = VERIFIED 100% (9/9)
+- Phase 29 final audit = PASS
+- Tidak ada Critical/High/Medium issue.
+- Low issue Phase 27 di ROADMAP adalah dokumentasi lama dan bukan bug Phase 29.
+
+TARGET:
+Audit terlebih dahulu Phase 30 dan tentukan pekerjaan testing yang benar-benar diperlukan.
+JANGAN implementasi atau mengubah kode pada tahap ini.
+
+PENTING:
+- READ-ONLY.
+- Jangan mengubah source code.
+- Jangan membuat file.
+- Jangan menghapus file.
+- Jangan mengubah database/schema.
+- Jangan upgrade/downgrade dependency.
+- Jangan install dependency baru.
+- Jangan memperbaiki issue yang ditemukan.
+- Jangan mengubah konfigurasi.
+- Jangan menjalankan migration.
+- Jangan mengubah Phase 27/28/29.
+
+PHASE 30:
+Roadmap sebelumnya mengarah ke:
+Testing — Vitest + Playwright.
+
+AUDIT WAJIB:
+
+1. Baca ROADMAP.md, CHANGELOG.md, package.json dan konfigurasi testing yang sudah ada.
+2. Tentukan definisi resmi Phase 30 dari repository saat ini.
+3. Identifikasi seluruh task/subtask Phase 30.
+4. Jangan menganggap Phase 30 hanya Vitest + Playwright sebelum memeriksa roadmap aktual.
+5. Periksa apakah Vitest sudah terpasang.
+6. Periksa apakah Playwright sudah terpasang.
+7. Periksa konfigurasi:
+   - vitest.config.*
+   - playwright.config.*
+   - package.json scripts
+   - test directories
+   - existing test files
+8. Audit apakah sudah ada unit/integration test.
+9. Audit apakah sudah ada E2E Playwright.
+10. Identifikasi flow paling penting yang harus dites berdasarkan fitur aktual:
+    - authentication
+    - login/logout/session
+    - role/admin protection
+    - products
+    - categories
+    - checkout
+    - order
+    - payment
+    - profile
+    - admin CRUD
+    - caching/public API
+    - metadata/SEO jika memang masuk scope Phase 30.
+
+11. Periksa apakah testing environment dapat berjalan tanpa merusak database development/production.
+12. Periksa apakah test membutuhkan seed/test database khusus.
+13. Periksa apakah ada hardcoded credentials atau production secrets di test.
+14. Periksa apakah existing test dapat menyebabkan data production berubah.
+15. Periksa apakah Playwright membutuhkan running server dan bagaimana repository saat ini menjalankannya.
+16. Identifikasi gap antara kondisi repository dan task Phase 30.
+
+REGRESSION:
+Pastikan audit tidak menemukan perubahan yang diperlukan pada:
+- Phase 27 authentication
+- Phase 28 caching
+- Phase 29 metadata/SEO/PWA
+
+HASIL YANG WAJIB DIBERIKAN:
+
+A. Definisi resmi Phase 30
+B. Daftar seluruh task Phase 30
+C. Status setiap task:
+   - DONE
+   - PARTIAL
+   - TODO
+   - BLOCKED
+
+D. Testing infrastructure saat ini:
+- Vitest:
+- Playwright:
+- Existing unit tests:
+- Existing E2E tests:
+- Test scripts:
+- Test database/environment:
+
+E. Gap yang ditemukan:
+- Critical
+- High
+- Medium
+- Low
+
+F. Urutan implementasi Phase 30 paling aman.
+
+G. Dependency antar-task.
+
+H. Risiko regression.
+
+I. Estimasi jumlah prompt yang paling aman untuk menyelesaikan Phase 30 tanpa membuat prompt terlalu besar.
+
+J. File yang kemungkinan perlu diubah pada tahap implementasi.
+
+PENTING:
+Jangan mengubah apa pun.
+Jangan mulai mengerjakan Phase 30.
+Hanya audit + planning.
+
+Di akhir berikan:
+
+"PHASE 30 AUDIT COMPLETE"
+
+dan nyatakan task pertama yang paling aman untuk dikerjakan.
 
 
 ```
