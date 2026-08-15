@@ -22,10 +22,68 @@
 
 
 ```
-# 
+# Prompt — Phase 28 Task 12
 ```
 
+Lanjutkan Phase 28 dari posisi terakhir.
 
+STATUS:
+- Task 1–11 sudah COMPLETE.
+- Task 10 caching COMPLETE.
+- Task 11 cache tags/revalidation COMPLETE.
+- Categories mutation handler gap adalah pre-existing dan JANGAN diperbaiki dalam Task 12.
+- TypeScript PASS.
+- Lint PASS, hanya 2 warning pre-existing.
+- Build PASS 46/46.
+
+Sekarang kerjakan HANYA:
+
+TASK 12 — generateStaticParams untuk category/[slug]
+
+Audit terlebih dahulu file:
+
+app/src/app/(shop)/category/[slug]/page.tsx
+
+Tujuan:
+Tambahkan generateStaticParams untuk category/[slug] jika memang aman dan sesuai dengan arsitektur project.
+
+Persyaratan:
+1. Gunakan sumber data kategori yang sudah tersedia di service/repository.
+2. Jangan membuat data kategori baru/hardcode.
+3. Pastikan slug yang dihasilkan berasal dari database/data kategori nyata.
+4. Jangan melakukan static generation terhadap data user/session-specific.
+5. Jangan mengubah authentication atau protected routes.
+6. Jangan mengubah Prisma schema.
+7. Jangan mengubah API contract.
+8. Jangan mengubah caching Task 10–11 kecuali benar-benar diperlukan untuk generateStaticParams.
+9. Pertahankan dynamic behavior untuk kategori yang tidak termasuk hasil generateStaticParams.
+10. Periksa apakah halaman category/[slug] membutuhkan dynamicParams atau konfigurasi lain agar behavior existing tidak rusak.
+11. Jangan mengerjakan perubahan Phase 29 atau task lain di luar scope.
+
+VERIFIKASI:
+1. TypeScript check.
+2. Lint.
+3. Production build.
+4. Pastikan category/[slug] berhasil di-generate sesuai data yang tersedia.
+5. Test minimal satu category slug yang valid.
+6. Test slug kategori yang tidak valid tetap menghasilkan behavior/error yang benar.
+7. Pastikan homepage, products, orders, profile, admin tetap tidak regression.
+8. Pastikan authentication Phase 27 tetap intact.
+
+SETELAH SELESAI, LAPORKAN:
+- file yang diubah;
+- implementasi generateStaticParams;
+- sumber data yang digunakan;
+- jumlah/daftar slug yang terdeteksi jika aman dilaporkan;
+- konfigurasi dynamicParams jika diubah;
+- hasil TypeScript;
+- hasil lint;
+- hasil build;
+- hasil runtime;
+- status Task 12: COMPLETE/PARTIAL;
+- masalah yang masih tersisa.
+
+JANGAN lanjut ke Phase 29 sebelum laporan Task 12 selesai.
 
 ```
 
