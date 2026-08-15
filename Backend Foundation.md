@@ -1,6 +1,8 @@
 
 
 
+
+
 # 
 ```
 
@@ -18,6 +20,101 @@
 ```
 
 
+
+```
+# 
+```
+
+
+
+```
+
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+
+# Prompt — Phase 28 Task 3 + 4
+```
+
+Lanjutkan pengerjaan Phase 28 pada repository toko-online.
+
+Task 2 sudah 100% selesai dan sudah diverifikasi:
+- next.config.mjs sudah benar
+- tidak ada remote image hostname yang diperlukan
+- TypeScript PASS
+- Lint PASS
+- Build PASS 46/46 pages
+- runtime image optimizer PASS
+
+Sekarang kerjakan HANYA:
+
+TASK 3 — Migrasi image ke next/image
+TASK 4 — Optimasi blurDataURL + priority
+
+Sebelum mengubah kode:
+1. Audit seluruh penggunaan <img> di app/src.
+2. Identifikasi 4 komponen yang masih menggunakan <img>:
+   - BannerTable
+   - DraggableBannerList
+   - ProductImageUpload
+   - BannerSlide
+3. Pastikan sumber image tetap kompatibel dengan data/database yang sekarang.
+4. Jangan mengubah behavior bisnis, API, database, authentication, atau Phase 26/27.
+
+TASK 3:
+- Ganti <img> yang relevan menjadi next/image.
+- Gunakan width/height atau fill sesuai layout sebenarnya.
+- Jangan menggunakan remotePatterns jika memang tidak diperlukan.
+- Pertahankan object-fit, aspect ratio, className, loading behavior, dan tampilan existing.
+- Untuk image yang berasal dari URL eksternal, jangan menebak hostname. Audit dulu sumber URL dan hanya ubah konfigurasi jika benar-benar diperlukan.
+- Hindari perubahan yang tidak terkait.
+
+TASK 4:
+- Audit image utama pada homepage, product detail, banner, dan image yang terlihat di initial viewport.
+- Tambahkan priority hanya pada image yang benar-benar membutuhkan prioritas loading.
+- Gunakan blurDataURL/placeholder="blur" hanya jika sumber blurDataURL valid dan tersedia.
+- Jangan membuat blurDataURL palsu.
+- Jangan menambahkan priority ke semua image.
+- Jangan menyebabkan warning Next.js mengenai priority, fill, width/height, atau image optimization.
+
+Setelah selesai:
+1. Jalankan TypeScript check.
+2. Jalankan lint.
+3. Jalankan production build.
+4. Jika memungkinkan lakukan runtime smoke test pada homepage dan halaman yang terkena perubahan.
+5. Pastikan tidak ada regression Phase 26 dan Phase 27.
+6. Jangan mengerjakan Task 5+ sebelum Task 3 dan 4 selesai.
+
+LAPORKAN:
+- file yang diubah
+- jumlah <img> yang berhasil dimigrasikan
+- image mana yang diberi priority dan alasannya
+- image mana yang menggunakan blurDataURL dan sumbernya
+- apakah next.config.mjs perlu berubah
+- hasil TypeScript
+- hasil lint
+- hasil build
+- hasil runtime test
+- status Task 3: COMPLETE/PARTIAL
+- status Task 4: COMPLETE/PARTIAL
+- masalah yang masih tersisa
+
+Jika menemukan masalah yang membutuhkan perubahan di luar scope Task 3/4, jangan langsung mengerjakannya. Laporkan terlebih dahulu.
 
 ```
 # 
