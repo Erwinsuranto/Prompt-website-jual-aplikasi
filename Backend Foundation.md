@@ -28,7 +28,51 @@
 ```
 # 
 ```
+PROMPT — AUDIT ROADMAP PHASE 28
 
+Project: toko-online
+
+Phase 26 dan Phase 27 sudah selesai dan terverifikasi.
+
+Jangan mengubah kode.
+Jangan membuat fitur.
+Jangan commit.
+Jangan push.
+
+Sekarang audit repository dan dokumentasi proyek untuk menentukan:
+
+1. Apa definisi resmi PHASE 28?
+2. Apa saja task Phase 28?
+3. File apa yang terkait?
+4. Apakah ada dependency dari Phase 27?
+5. Apakah ada task Phase 28 yang sebenarnya sudah dikerjakan?
+6. Apakah ada pekerjaan Phase 26/27 yang belum selesai tetapi tercatat untuk Phase 28?
+7. Apa urutan implementasi Phase 28 yang paling aman?
+
+Periksa:
+- README.md
+- roadmap/project documentation
+- TODO
+- task list
+- komentar Phase 28 di source code
+- git history jika relevan
+
+Jangan mengarang task Phase 28.
+
+HASIL:
+Buat tabel:
+
+| Task Phase 28 | Status | File terkait | Keterangan |
+|---|---|---|---|
+
+Kemudian berikan:
+- definisi resmi Phase 28
+- daftar task lengkap
+- task yang sudah selesai
+- task yang belum selesai
+- urutan pengerjaan yang direkomendasikan
+
+Hanya AUDIT. Jangan melakukan perubahan kode.
 
 
 ```
