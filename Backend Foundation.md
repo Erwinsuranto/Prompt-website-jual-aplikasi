@@ -22,7 +22,51 @@
 ```
 # 
 ```
+PROMPT — PHASE 28 TASK 2: IMAGE CONFIGURATION
 
+Project: toko-online
+
+Implementasikan HANYA Phase 28 Task 2.
+
+Tujuan:
+Konfigurasi image handling Next.js agar seluruh penggunaan next/image untuk gambar lokal maupun remote dapat berjalan dengan benar.
+
+Sebelum mengubah kode:
+1. Audit next.config.mjs yang sekarang.
+2. Cari seluruh penggunaan <Image> / next/image di project.
+3. Identifikasi hostname/domain remote image yang benar-benar digunakan.
+4. Jangan menebak hostname.
+5. Jangan mengubah konfigurasi yang tidak berkaitan dengan image.
+
+Implementasi:
+- Tambahkan konfigurasi images yang diperlukan pada next.config.mjs.
+- Gunakan konfigurasi modern yang kompatibel dengan versi Next.js project.
+- Pastikan remotePatterns hanya berisi hostname/source yang memang digunakan project.
+- Jangan menggunakan konfigurasi terlalu permisif seperti wildcard semua domain jika tidak diperlukan.
+- Jangan mengubah UI atau business logic.
+- Jangan mengubah API/authentication.
+- Jangan mengubah database.
+- Jangan mengerjakan Task 3 dan seterusnya.
+
+Setelah selesai:
+1. Jalankan TypeScript check.
+2. Jalankan lint.
+3. Jalankan production build.
+4. Pastikan tidak ada regression.
+
+LAPORKAN:
+- File yang diubah.
+- Konfigurasi image yang ditambahkan.
+- Semua hostname remote image yang terdeteksi.
+- Hasil TypeScript.
+- Hasil lint.
+- Hasil build.
+- Apakah Phase 28 Task 2 100% selesai.
+
+PENTING:
+Jangan mengklaim selesai jika test/build gagal.
+Jangan mengerjakan task Phase 28 lainnya.
+Jangan commit atau push.
 
 
 ```
