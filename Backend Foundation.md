@@ -11,7 +11,38 @@
 ```
 # 
 ```
+Prompt: Phase 29 Task 4 — themeColor + viewport
 
+Kerjakan HANYA Phase 29 Task 4.
+
+Tujuan:
+Tambahkan metadata themeColor dan viewport sesuai standar Next.js terbaru tanpa mengubah behavior aplikasi.
+
+Scope:
+1. Audit app/src/app/layout.tsx.
+2. Tambahkan konfigurasi themeColor/viewport pada metadata sesuai API Next.js yang digunakan project.
+3. Gunakan nilai yang sudah konsisten dengan tema Digital Cell/project.
+4. Jangan mengubah metadataBase yang sudah selesai pada Task 8.
+5. Jangan mengerjakan Task 1, 2, 3, 5, 6, 7, atau 9.
+6. Jangan mengubah auth, API, database, caching, routing, atau komponen bisnis.
+
+Verifikasi:
+- TypeScript
+- Lint
+- production build
+- pastikan Phase 27 auth tetap intact
+- pastikan Phase 28 caching tetap intact
+- pastikan metadataBase dari Task 8 tetap ada
+
+Setelah selesai:
+- tampilkan file yang berubah;
+- tampilkan perubahan;
+- hasil TypeScript/Lint/Build;
+- update ROADMAP.md dan CHANGELOG.md sesuai pola project;
+- nyatakan apakah Task 4 benar-benar 100% selesai.
+
+Jangan melakukan refactor besar.
+Jika menemukan masalah di luar Task 4, jangan diperbaiki. Laporkan saja.
 
 
 ```
