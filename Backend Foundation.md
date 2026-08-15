@@ -7,28 +7,199 @@
 
 
 
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
 
 # 
 ```
 
 
 
-``
-
-# 
 ```
 
 
-
-``
-
-
-# 
+# Prompt: Phase 29 — Task 6 + 7 + 9 Final
 ```
 
 
+Prompt: Phase 29 — Final Tasks 6, 7, 9
 
-``
+Lanjutkan repository toko-online / Digital Cell dari kondisi saat ini.
+
+STATUS SAAT INI:
+Phase 27 = selesai dan harus tetap intact.
+Phase 28 = selesai dan harus tetap intact.
+Phase 29:
+- Task 1 = DONE
+- Task 2 = DONE
+- Task 3 = DONE
+- Task 4 = DONE
+- Task 5 = DONE
+- Task 8 = DONE
+- Task 6 = TODO
+- Task 7 = TODO
+- Task 9 = TODO
+
+Target: selesaikan Task 6, 7, dan 9 sekaligus sehingga Phase 29 menjadi 9/9 = 100%.
+
+PENTING:
+- Jangan mengubah fitur yang sudah selesai.
+- Jangan merusak Phase 27 authentication.
+- Jangan merusak Phase 28 caching.
+- Jangan mengubah database/schema tanpa kebutuhan.
+- Jangan membuat fake data.
+- Jangan membuat asset/image palsu.
+- Gunakan pola dan konfigurasi yang sudah ada di repository.
+- Sebelum mengubah file, audit implementasi yang sudah ada.
+- Jika suatu bagian sebenarnya sudah benar, jangan ubah tanpa alasan.
+- Jangan melakukan refactor besar di luar scope task.
+- Setelah semua selesai jalankan TypeScript, lint, build, dan runtime verification.
+
+TASK 6 — robots.ts
+
+Implementasikan robots.txt menggunakan pola Next.js App Router yang sesuai dengan versi project.
+
+Requirement:
+- Buat/sempurnakan app/robots.ts jika belum ada.
+- Gunakan siteConfig.url sebagai base URL.
+- Public routes yang boleh di-crawl:
+  /
+  /products
+  /categories
+  /product/*
+  /category/*
+- Jangan allow:
+  /admin/*
+  /api/*
+  /auth/*
+  /profile
+  /orders/*
+  /checkout
+  /invoice/*
+  /payment/*
+  /favorites/*
+  /search/*
+  /cart/*
+- Sitemap harus menunjuk ke URL absolute:
+  ${siteConfig.url}/sitemap.xml
+- Jangan hardcode domain.
+- Pastikan format robots sesuai Next.js MetadataRoute.Robots.
+
+TASK 7 — Product JSON-LD
+
+Tambahkan structured data JSON-LD untuk halaman detail produk:
+app/src/app/(shop)/product/[slug]/page.tsx
+
+Requirement:
+- Gunakan data product yang benar dari product service/repository.
+- Jangan hardcode produk.
+- JSON-LD harus menggunakan schema.org Product.
+- Sertakan data yang memang tersedia dan valid, misalnya:
+  name
+  description
+  image jika tersedia dan valid
+  sku jika tersedia
+  offers jika harga/stok tersedia.
+- Jangan membuat nilai palsu jika field tidak tersedia.
+- Pastikan JSON-LD aman untuk React/Next.js dan tidak menyebabkan XSS.
+- Gunakan JSON.stringify untuk serialisasi.
+- Tambahkan script type="application/ld+json".
+- Pastikan metadata Phase 29 Task 1 yang sudah ada tetap bekerja.
+- Jika produk tidak ditemukan, jangan menghasilkan structured data palsu.
+
+TASK 9 — manifest.ts
+
+Implementasikan Web App Manifest menggunakan Next.js MetadataRoute.Manifest.
+
+Requirement:
+- Buat app/manifest.ts jika belum ada.
+- Gunakan konfigurasi project yang sudah tersedia, terutama siteConfig.
+- Gunakan nama aplikasi Digital Cell.
+- Gunakan short_name yang sesuai.
+- Gunakan start_url "/".
+- Gunakan display "standalone".
+- Gunakan theme/background color yang konsisten dengan theme project.
+- Jangan mengarang file icon yang belum ada.
+- Karena public/ sebelumnya diketahui belum memiliki asset icon yang valid, jangan membuat referensi icon palsu.
+- Jika icon belum tersedia, manifest tetap harus valid tanpa icon atau gunakan hanya asset yang benar-benar ada.
+- Jangan membuat fake PNG/SVG.
+
+VERIFIKASI WAJIB:
+
+1. TypeScript:
+   npx tsc --noEmit
+
+2. Lint:
+   npm run lint
+   atau command lint yang memang digunakan repository.
+
+3. Production build:
+   npm run build
+
+4. Runtime:
+   - GET /robots.txt harus 200 dan isinya benar.
+   - GET /sitemap.xml harus tetap 200.
+   - Product detail harus 200.
+   - Product detail harus memiliki JSON-LD Product.
+   - GET /manifest.webmanifest atau endpoint manifest yang sesuai harus 200.
+   - Protected routes tetap redirect ke login.
+   - API products/categories tetap 200.
+   - Pastikan Phase 28 cache tetap intact.
+
+5. Periksa regresi:
+   - Phase 27 authentication tidak berubah.
+   - Phase 28 caching tidak berubah.
+   - Task 1/2/3/4/5/8 Phase 29 tetap intact.
+
+SETELAH SELESAI:
+
+Berikan laporan singkat:
+- Task 6 status
+- Task 7 status
+- Task 9 status
+- file yang diubah
+- TypeScript result
+- Lint result
+- Build result
+- runtime result
+- regression result Phase 27/28
+- apakah Phase 29 sekarang 9/9 = 100%
+- masalah tersisa jika ada.
+
+Jika semua PASS, nyatakan dengan jelas:
+
+"PHASE 29 — 100% COMPLETE (9/9)"
+
+Jangan lanjut ke Phase 30.
+```
 
 # 
 ```
