@@ -30,11 +30,180 @@
 
 
 
-```
+```Prompt: Full Repository Audit — Phase 23–29 Recovery
 # 
 ```
 
+Lakukan AUDIT MENYELURUH repository toko-online saat ini.
 
+KONDISI:
+- Repository: /root/toko-online
+- Branch: main
+- Commit HEAD saat ini: 5c9f0a8
+- origin/main juga berada di 5c9f0a8
+- Working tree harus diperlakukan sebagai baseline resmi.
+- VPS sebelumnya mati sehingga pekerjaan Phase 28–29 yang pernah dikerjakan mungkin tidak lagi ada di repository.
+- Tujuan audit adalah menentukan kondisi kode SEBENARNYA sebelum kita melanjutkan development.
+
+ATURAN PENTING:
+1. JANGAN mengubah source code.
+2. JANGAN membuat commit.
+3. JANGAN push.
+4. JANGAN upgrade/downgrade dependency.
+5. JANGAN menghapus file, database, credentials, atau data.
+6. Jangan memperbaiki masalah apa pun.
+7. Audit dan laporan saja.
+8. Jangan menganggap ROADMAP.md benar hanya karena task tertulis [x]. Verifikasi status berdasarkan source code dan git history.
+
+AUDIT GIT:
+- Periksa git status.
+- Periksa HEAD, origin/main, branch dan tag.
+- Periksa commit history yang relevan.
+- Cari apakah pernah ada commit Phase 23, 24, 25, 26, 27, 28, atau 29 di repository/history.
+- Cari branch/tag/commit yang mungkin masih menyimpan pekerjaan Phase 27–29.
+- Tentukan commit terakhir yang benar-benar berisi implementasi masing-masing Phase.
+
+AUDIT ROADMAP:
+Baca ROADMAP.md secara menyeluruh, terutama Phase 23–29.
+
+Untuk setiap Phase 23, 24, 25, 26, 27, 28, 29:
+- daftar task;
+- status menurut ROADMAP;
+- status sebenarnya berdasarkan source code;
+- commit yang mengimplementasikannya jika ditemukan;
+- apakah task benar-benar selesai, partial, atau hilang;
+- file utama yang terkait.
+
+AUDIT SOURCE CODE:
+Verifikasi langsung source code untuk:
+- admin/settings
+- reports
+- order/payment
+- authentication/session/JWT/RBAC
+- loading.tsx
+- error.tsx
+- next/image
+- image configuration
+- Suspense
+- next/dynamic
+- caching / unstable_cache
+- revalidateTag
+- generateStaticParams
+- metadataBase
+- generateMetadata
+- canonical URL
+- OpenGraph
+- Twitter Card
+- sitemap
+- robots.txt
+- JSON-LD Product
+- PWA manifest
+
+Khusus Phase 27:
+Pastikan apakah:
+- JWT benar-benar digunakan;
+- HTTP-only cookie benar-benar digunakan;
+- session benar-benar berasal dari cookie;
+- protected routes benar-benar protected;
+- RBAC benar-benar aktif;
+- tidak ada MOCK_USER/mock token/mock authentication;
+- tidak ada hardcoded user ID pada production flow.
+
+Khusus Phase 28:
+Pastikan apakah:
+- image optimization benar;
+- next/image sudah digunakan pada target components;
+- remotePatterns memang diperlukan atau tidak;
+- loading states benar-benar ada;
+- error states benar-benar ada;
+- Suspense boundary benar;
+- next/dynamic benar;
+- caching hanya diterapkan pada public data;
+- data user/session tidak tercache;
+- revalidateTag benar-benar meng-invalidasi cache;
+- generateStaticParams product/category benar.
+
+Khusus Phase 29:
+Periksa apakah implementasi berikut benar-benar ada:
+- metadataBase
+- themeColor viewport
+- Product generateMetadata
+- Category generateMetadata
+- Homepage metadata
+- sitemap
+- robots.txt
+- Product JSON-LD
+- manifest.ts
+
+CARI PEKERJAAN YANG HILANG:
+Bandingkan ROADMAP dengan source code dan git history.
+
+Buat kategori:
+A. SUDAH ADA DAN TERVERIFIKASI
+B. ADA SEBAGIAN / PARTIAL
+C. TERTULIS DI ROADMAP TAPI TIDAK ADA DI CODE
+D. TIDAK ADA DAN MEMANG BELUM DIKERJAKAN
+E. PERNAH ADA DI COMMIT/HISTORY TAPI SEKARANG HILANG DARI HEAD
+
+Untuk kategori E, cari commit yang menyimpannya jika memungkinkan.
+
+AUDIT REGRESSION:
+Pastikan Phase sebelumnya tidak rusak.
+Minimal verifikasi:
+- TypeScript
+- lint
+- build
+- auth/protected route
+- API products
+- API categories
+- API banners
+- orders/payment jika relevan
+
+Jangan melakukan perubahan untuk memperbaiki error.
+Jika command build/lint mahal atau lama, tetap prioritaskan audit statis terlebih dahulu lalu jalankan verification yang aman.
+
+HASIL AKHIR WAJIB:
+
+1. BASELINE REPOSITORY
+   - HEAD
+   - origin/main
+   - working tree
+   - commit terakhir
+
+2. PHASE STATUS TABLE
+   Buat tabel:
+   Phase | ROADMAP | SOURCE CODE | GIT HISTORY | STATUS
+
+3. TASK RECOVERY TABLE
+   Task | Phase | Status | Evidence/File | Commit jika ada
+
+4. PHASE 27 SECURITY STATUS
+
+5. PHASE 28 PERFORMANCE STATUS
+
+6. PHASE 29 SEO/PWA STATUS
+
+7. MISSING/LOST WORK
+   Jelaskan secara spesifik pekerjaan mana yang hilang akibat VPS mati.
+
+8. REGRESSION STATUS
+
+9. ROOT CAUSE / FINDINGS
+   Pisahkan:
+   - Critical
+   - High
+   - Medium
+   - Low
+   - Documentation-only
+
+10. RECOMMENDED NEXT STEP
+   Tentukan SATU task pertama yang paling aman untuk dikerjakan setelah audit.
+
+PENTING:
+Jangan langsung membuat prompt implementasi.
+Jangan memperbaiki kode.
+Jangan commit.
+Audit harus selesai terlebih dahulu dan berikan laporan lengkap.
 
 ```
 
