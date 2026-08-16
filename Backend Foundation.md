@@ -30,309 +30,92 @@
 
 
 
-```Prompt: Full Repository Audit — Phase 23–29 Recovery
+```
 # 
 ```
 
-Lakukan AUDIT MENYELURUH repository toko-online saat ini.
 
-KONDISI:
-- Repository: /root/toko-online
-- Branch: main
-- Commit HEAD saat ini: 5c9f0a8
-- origin/main juga berada di 5c9f0a8
-- Working tree harus diperlakukan sebagai baseline resmi.
-- VPS sebelumnya mati sehingga pekerjaan Phase 28–29 yang pernah dikerjakan mungkin tidak lagi ada di repository.
-- Tujuan audit adalah menentukan kondisi kode SEBENARNYA sebelum kita melanjutkan development.
-
-ATURAN PENTING:
-1. JANGAN mengubah source code.
-2. JANGAN membuat commit.
-3. JANGAN push.
-4. JANGAN upgrade/downgrade dependency.
-5. JANGAN menghapus file, database, credentials, atau data.
-6. Jangan memperbaiki masalah apa pun.
-7. Audit dan laporan saja.
-8. Jangan menganggap ROADMAP.md benar hanya karena task tertulis [x]. Verifikasi status berdasarkan source code dan git history.
-
-AUDIT GIT:
-- Periksa git status.
-- Periksa HEAD, origin/main, branch dan tag.
-- Periksa commit history yang relevan.
-- Cari apakah pernah ada commit Phase 23, 24, 25, 26, 27, 28, atau 29 di repository/history.
-- Cari branch/tag/commit yang mungkin masih menyimpan pekerjaan Phase 27–29.
-- Tentukan commit terakhir yang benar-benar berisi implementasi masing-masing Phase.
-
-AUDIT ROADMAP:
-Baca ROADMAP.md secara menyeluruh, terutama Phase 23–29.
-
-Untuk setiap Phase 23, 24, 25, 26, 27, 28, 29:
-- daftar task;
-- status menurut ROADMAP;
-- status sebenarnya berdasarkan source code;
-- commit yang mengimplementasikannya jika ditemukan;
-- apakah task benar-benar selesai, partial, atau hilang;
-- file utama yang terkait.
-
-AUDIT SOURCE CODE:
-Verifikasi langsung source code untuk:
-- admin/settings
-- reports
-- order/payment
-- authentication/session/JWT/RBAC
-- loading.tsx
-- error.tsx
-- next/image
-- image configuration
-- Suspense
-- next/dynamic
-- caching / unstable_cache
-- revalidateTag
-- generateStaticParams
-- metadataBase
-- generateMetadata
-- canonical URL
-- OpenGraph
-- Twitter Card
-- sitemap
-- robots.txt
-- JSON-LD Product
-- PWA manifest
-
-Khusus Phase 27:
-Pastikan apakah:
-- JWT benar-benar digunakan;
-- HTTP-only cookie benar-benar digunakan;
-- session benar-benar berasal dari cookie;
-- protected routes benar-benar protected;
-- RBAC benar-benar aktif;
-- tidak ada MOCK_USER/mock token/mock authentication;
-- tidak ada hardcoded user ID pada production flow.
-
-Khusus Phase 28:
-Pastikan apakah:
-- image optimization benar;
-- next/image sudah digunakan pada target components;
-- remotePatterns memang diperlukan atau tidak;
-- loading states benar-benar ada;
-- error states benar-benar ada;
-- Suspense boundary benar;
-- next/dynamic benar;
-- caching hanya diterapkan pada public data;
-- data user/session tidak tercache;
-- revalidateTag benar-benar meng-invalidasi cache;
-- generateStaticParams product/category benar.
-
-Khusus Phase 29:
-Periksa apakah implementasi berikut benar-benar ada:
-- metadataBase
-- themeColor viewport
-- Product generateMetadata
-- Category generateMetadata
-- Homepage metadata
-- sitemap
-- robots.txt
-- Product JSON-LD
-- manifest.ts
-
-CARI PEKERJAAN YANG HILANG:
-Bandingkan ROADMAP dengan source code dan git history.
-
-Buat kategori:
-A. SUDAH ADA DAN TERVERIFIKASI
-B. ADA SEBAGIAN / PARTIAL
-C. TERTULIS DI ROADMAP TAPI TIDAK ADA DI CODE
-D. TIDAK ADA DAN MEMANG BELUM DIKERJAKAN
-E. PERNAH ADA DI COMMIT/HISTORY TAPI SEKARANG HILANG DARI HEAD
-
-Untuk kategori E, cari commit yang menyimpannya jika memungkinkan.
-
-AUDIT REGRESSION:
-Pastikan Phase sebelumnya tidak rusak.
-Minimal verifikasi:
-- TypeScript
-- lint
-- build
-- auth/protected route
-- API products
-- API categories
-- API banners
-- orders/payment jika relevan
-
-Jangan melakukan perubahan untuk memperbaiki error.
-Jika command build/lint mahal atau lama, tetap prioritaskan audit statis terlebih dahulu lalu jalankan verification yang aman.
-
-HASIL AKHIR WAJIB:
-
-1. BASELINE REPOSITORY
-   - HEAD
-   - origin/main
-   - working tree
-   - commit terakhir
-
-2. PHASE STATUS TABLE
-   Buat tabel:
-   Phase | ROADMAP | SOURCE CODE | GIT HISTORY | STATUS
-
-3. TASK RECOVERY TABLE
-   Task | Phase | Status | Evidence/File | Commit jika ada
-
-4. PHASE 27 SECURITY STATUS
-
-5. PHASE 28 PERFORMANCE STATUS
-
-6. PHASE 29 SEO/PWA STATUS
-
-7. MISSING/LOST WORK
-   Jelaskan secara spesifik pekerjaan mana yang hilang akibat VPS mati.
-
-8. REGRESSION STATUS
-
-9. ROOT CAUSE / FINDINGS
-   Pisahkan:
-   - Critical
-   - High
-   - Medium
-   - Low
-   - Documentation-only
-
-10. RECOMMENDED NEXT STEP
-   Tentukan SATU task pertama yang paling aman untuk dikerjakan setelah audit.
-
-PENTING:
-Jangan langsung membuat prompt implementasi.
-Jangan memperbaiki kode.
-Jangan commit.
-Audit harus selesai terlebih dahulu dan berikan laporan lengkap.
 
 ```
-
-# Prompt: Phase 30 — Audit & Planning
+# 
 ```
-Prompt: Phase 30 — Testing Audit & Planning
 
-Lanjutkan repository toko-online / Digital Cell dari kondisi TERKINI.
 
-STATUS WAJIB:
-- Phase 27 = VERIFIED 100%
-- Phase 28 = VERIFIED 100%
-- Phase 29 = VERIFIED 100% (9/9)
-- Phase 29 final audit = PASS
-- Tidak ada Critical/High/Medium issue.
-- Low issue Phase 27 di ROADMAP adalah dokumentasi lama dan bukan bug Phase 29.
 
-TARGET:
-Audit terlebih dahulu Phase 30 dan tentukan pekerjaan testing yang benar-benar diperlukan.
-JANGAN implementasi atau mengubah kode pada tahap ini.
+```
+# 
+```
 
-PENTING:
-- READ-ONLY.
-- Jangan mengubah source code.
-- Jangan membuat file.
-- Jangan menghapus file.
-- Jangan mengubah database/schema.
-- Jangan upgrade/downgrade dependency.
-- Jangan install dependency baru.
-- Jangan memperbaiki issue yang ditemukan.
-- Jangan mengubah konfigurasi.
-- Jangan menjalankan migration.
-- Jangan mengubah Phase 27/28/29.
 
-PHASE 30:
-Roadmap sebelumnya mengarah ke:
-Testing — Vitest + Playwright.
 
-AUDIT WAJIB:
+```
+# 
+```
 
-1. Baca ROADMAP.md, CHANGELOG.md, package.json dan konfigurasi testing yang sudah ada.
-2. Tentukan definisi resmi Phase 30 dari repository saat ini.
-3. Identifikasi seluruh task/subtask Phase 30.
-4. Jangan menganggap Phase 30 hanya Vitest + Playwright sebelum memeriksa roadmap aktual.
-5. Periksa apakah Vitest sudah terpasang.
-6. Periksa apakah Playwright sudah terpasang.
-7. Periksa konfigurasi:
-   - vitest.config.*
-   - playwright.config.*
-   - package.json scripts
-   - test directories
-   - existing test files
-8. Audit apakah sudah ada unit/integration test.
-9. Audit apakah sudah ada E2E Playwright.
-10. Identifikasi flow paling penting yang harus dites berdasarkan fitur aktual:
-    - authentication
-    - login/logout/session
-    - role/admin protection
-    - products
-    - categories
-    - checkout
-    - order
-    - payment
-    - profile
-    - admin CRUD
-    - caching/public API
-    - metadata/SEO jika memang masuk scope Phase 30.
 
-11. Periksa apakah testing environment dapat berjalan tanpa merusak database development/production.
-12. Periksa apakah test membutuhkan seed/test database khusus.
-13. Periksa apakah ada hardcoded credentials atau production secrets di test.
-14. Periksa apakah existing test dapat menyebabkan data production berubah.
-15. Periksa apakah Playwright membutuhkan running server dan bagaimana repository saat ini menjalankannya.
-16. Identifikasi gap antara kondisi repository dan task Phase 30.
 
-REGRESSION:
-Pastikan audit tidak menemukan perubahan yang diperlukan pada:
-- Phase 27 authentication
-- Phase 28 caching
-- Phase 29 metadata/SEO/PWA
+```
+# 
+```
 
-HASIL YANG WAJIB DIBERIKAN:
 
-A. Definisi resmi Phase 30
-B. Daftar seluruh task Phase 30
-C. Status setiap task:
-   - DONE
-   - PARTIAL
-   - TODO
-   - BLOCKED
 
-D. Testing infrastructure saat ini:
-- Vitest:
-- Playwright:
-- Existing unit tests:
-- Existing E2E tests:
-- Test scripts:
-- Test database/environment:
+```
+# 
+```
 
-E. Gap yang ditemukan:
-- Critical
-- High
-- Medium
-- Low
 
-F. Urutan implementasi Phase 30 paling aman.
 
-G. Dependency antar-task.
+```
+# 
+```
 
-H. Risiko regression.
 
-I. Estimasi jumlah prompt yang paling aman untuk menyelesaikan Phase 30 tanpa membuat prompt terlalu besar.
 
-J. File yang kemungkinan perlu diubah pada tahap implementasi.
+```
+# 
+```
 
-PENTING:
-Jangan mengubah apa pun.
-Jangan mulai mengerjakan Phase 30.
-Hanya audit + planning.
 
-Di akhir berikan:
 
-"PHASE 30 AUDIT COMPLETE"
+```
+# 
+```
 
-dan nyatakan task pertama yang paling aman untuk dikerjakan.
+
+
+```
+# 
+```
+
 
 
 ```
 
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
 
 # Prompt: Phase 29 — Task 6 + 7 + 9 Final
 ```
