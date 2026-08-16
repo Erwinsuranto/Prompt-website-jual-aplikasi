@@ -104,9 +104,37 @@
 
 
 ```
-# 
+# Prompt — Regression Fix Before Phase 25–29
 ```
+Lanjutkan dari audit sebelumnya.
 
+KERJAKAN HANYA REGRESSION FIX yang sudah ditemukan. Jangan mengerjakan Phase 25–29 dulu.
+
+1. Periksa package.json dan package-lock.json.
+2. Regenerate package-lock.json dengan package manager yang memang digunakan repository.
+3. Jalankan npm ci untuk memastikan clean install.
+4. Perbaiki JSX escape `\"` yang valid/bermasalah pada:
+   - BannerTable.tsx
+   - CategoryTable.tsx
+   Jangan mengubah behavior/UI selain memperbaiki syntax.
+5. Jalankan:
+   - npx tsc --noEmit
+   - npm run lint
+   - npm run build
+6. Periksa git diff dengan teliti.
+7. Pastikan tidak ada perubahan tidak terkait.
+8. Jangan mengerjakan fitur Phase 25–29.
+9. Jangan menghapus credentials/data.
+10. Jika semua PASS, buat SATU commit khusus regression fix.
+
+Format laporan:
+- file yang diperbaiki
+- dependency/lockfile yang berubah
+- hasil TypeScript
+- hasil Lint
+- hasil Build
+- commit hash
+- apakah aman melanjutkan audit Phase berikutnya
 
 
 ```
