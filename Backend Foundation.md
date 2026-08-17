@@ -34,7 +34,143 @@
 # 
 ```
 
+PROMPT — Phase 26.1 Task 2: Configure Supabase PostgreSQL Safely
 
+Kita sedang melanjutkan project /root/toko-online.
+
+Tujuan:
+Konfigurasi Prisma agar terhubung ke Supabase PostgreSQL dengan aman berdasarkan connection string yang SUDAH tersedia di environment lokal.
+
+PENTING:
+- Jangan membuat-buat DATABASE_URL.
+- Jangan mengubah password/credential.
+- Jangan menampilkan credential ke output.
+- Jangan commit .env.local atau file secret.
+- Jangan menghapus data/database.
+- Jangan menjalankan migration sebelum koneksi benar-benar tervalidasi.
+- Jangan mengubah schema Prisma pada task ini kecuali memang diperlukan untuk kompatibilitas konfigurasi.
+- Jangan upgrade/downgrade dependency.
+- Jangan melakukan refactor yang tidak berhubungan.
+
+LANGKAH 1 — AUDIT ENV
+
+Periksa:
+- .env.local
+- .env
+- .env.example
+- prisma/schema.prisma
+- .gitignore
+- package.json
+
+Pastikan:
+- DATABASE_URL tersedia.
+- DIRECT_URL tersedia jika konfigurasi Prisma membutuhkannya.
+- .env.local tetap untracked/ignored.
+- Tidak ada credential hardcoded di source code.
+- Jangan pernah print nilai lengkap DATABASE_URL/DIRECT_URL.
+
+Untuk validasi URL, hanya tampilkan metadata aman seperti:
+- scheme
+- hostname
+- port
+- apakah database name tersedia
+- apakah URL berhasil diparse
+
+Jangan tampilkan username/password/query secret.
+
+LANGKAH 2 — PERBAIKI KONFIGURASI PRISMA
+
+Gunakan connection string Supabase yang sudah diberikan di .env.local.
+
+Target arsitektur:
+- DATABASE_URL = connection pooler Supabase untuk runtime/application.
+- DIRECT_URL = direct PostgreSQL connection untuk Prisma migration bila konfigurasi Prisma project memang menggunakan directUrl.
+
+Periksa versi Prisma yang sedang terpasang sebelum menentukan syntax konfigurasi.
+
+Jangan mengganti URL dengan placeholder.
+
+Jika prisma/schema.prisma sudah benar, jangan ubah.
+
+Jika perlu perubahan konfigurasi, lakukan perubahan paling kecil dan jelaskan alasannya.
+
+LANGKAH 3 — VALIDASI
+
+Jalankan pemeriksaan yang aman terlebih dahulu:
+
+1. Validasi Prisma schema.
+2. Validasi environment/configuration.
+3. Jalankan:
+   npx prisma migrate status
+
+JANGAN menjalankan:
+- prisma migrate dev
+- prisma migrate deploy
+- prisma db push
+- reset database
+- seed
+
+sampai koneksi database benar-benar terbukti valid dan target database sudah dikonfirmasi.
+
+Jika muncul:
+- invalid port number
+- P1001
+- P1000
+- authentication error
+- SSL error
+- connection timeout
+- URL parsing error
+
+STOP dan analisis root cause. Jangan mencoba password atau URL acak.
+
+LANGKAH 4 — BUILD/LINT
+
+Setelah konfigurasi valid, jalankan verifikasi yang relevan:
+- TypeScript check
+- npm run lint
+- npm run build
+
+Jangan memperbaiki error unrelated secara besar-besaran pada task ini.
+
+LANGKAH 5 — GIT SAFETY CHECK
+
+Sebelum commit:
+- git status --short
+- git diff --check
+- pastikan .env.local tidak masuk staging
+- pastikan tidak ada credential di diff
+- tampilkan file yang berubah
+- tampilkan ringkasan perubahan
+
+Jika semua verification PASS:
+buat SATU commit checkpoint dengan message:
+
+chore(database): configure Supabase PostgreSQL connection
+
+Kemudian push ke origin/main jika authentication GitHub tersedia.
+
+Jika push gagal karena credential/network:
+- jangan force push
+- jangan reset
+- jangan mengubah remote
+- jangan membuat commit tambahan
+- pertahankan commit lokal sebagai backup
+- laporkan error push dengan jelas.
+
+OUTPUT AKHIR WAJIB:
+
+1. DATABASE_URL valid/tidak valid — tanpa credential.
+2. DIRECT_URL valid/tidak valid — tanpa credential.
+3. Prisma schema PASS/FAIL.
+4. prisma migrate status PASS/FAIL.
+5. lint PASS/FAIL.
+6. build PASS/FAIL.
+7. git diff --check PASS/FAIL.
+8. commit hash jika dibuat.
+9. push PASS/FAIL.
+10. Jika ada blocker, jelaskan blocker dan NEXT STEP paling aman.
+
+JANGAN lanjut ke Task 3 (Prisma schema/migration) sebelum Task 2 benar-benar PASS.
 
 ```
 # Phase 26.1 Task 4
