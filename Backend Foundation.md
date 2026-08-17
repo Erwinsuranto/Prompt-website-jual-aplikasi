@@ -100,7 +100,56 @@
 ```
 # 
 ```
+Prompt: Fix Baseline TypeScript/Lint/Build Errors
 
+Lanjutkan dari hasil audit terakhir.
+
+JANGAN mengerjakan Phase 25–29.
+JANGAN melakukan refactor besar.
+JANGAN upgrade/downgrade dependency.
+JANGAN menghapus data atau credentials.
+
+Ada 2 masalah yang harus diperbaiki:
+
+1. LINT
+File:
+src/app/layout.tsx
+
+Error:
+@next/next/no-before-interactive-script-outside-document
+
+Periksa penggunaan Script dengan strategy="beforeInteractive".
+Perbaiki sesuai aturan Next.js dan struktur App Router yang digunakan repository.
+Jangan mengubah behavior yang tidak terkait.
+
+2. BUILD
+File:
+src/app/(shop)/search/page.tsx
+
+Error:
+await digunakan di fungsi yang belum async.
+
+Periksa fungsi yang menggunakan await dan perbaiki dengan cara paling minimal dan sesuai arsitektur existing.
+Jangan mengubah behavior search.
+
+SETELAH FIX:
+1. npx tsc --noEmit
+2. npm run lint
+3. npm run build
+4. git diff --check
+5. git diff --stat
+6. Periksa diff agar hanya berisi fix untuk dua masalah di atas.
+
+JANGAN COMMIT jika salah satu verification masih FAIL.
+
+Jika semua PASS:
+- buat SATU commit khusus baseline regression fix;
+- jangan mengerjakan task Phase 25–29;
+- laporkan commit hash dan hasil semua verification.
+
+Jika masih FAIL:
+- JANGAN commit;
+- laporkan error yang tersisa dan file penyebabnya.
 
 
 ```
