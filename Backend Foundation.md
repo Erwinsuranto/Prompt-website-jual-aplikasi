@@ -92,10 +92,83 @@
 
 ```
 
-# 
+# Prompt sekarang — Final Baseline Fix + Commit + Push
 ```
 
+Prompt: Final Baseline Fix and Backup
 
+Lanjutkan dari hasil verification terakhir.
+
+KONDISI:
+- Lint: PASS
+- git diff --check: PASS
+- Build: FAIL
+- Error build:
+  src/app/(shop)/invoice/page.tsx
+  `orders` memiliki implicit any[].
+- Phase 25–29 BELUM dikerjakan.
+- Jangan mengerjakan fitur Phase 25–29.
+- package-lock.json sudah memiliki perubahan dari pekerjaan sebelumnya. Jangan menghapus/revert perubahan tersebut tanpa alasan.
+
+TUGAS:
+
+1. Periksa src/app/(shop)/invoice/page.tsx.
+2. Temukan penyebab `orders` menjadi implicit any[].
+3. Perbaiki TYPE ERROR tersebut dengan perubahan minimal dan mengikuti type/service/model yang sudah ada di repository.
+4. Jangan menggunakan `any` sebagai solusi.
+5. Jangan mengubah behavior invoice/order.
+6. Jangan refactor file lain kecuali benar-benar diperlukan oleh type fix ini.
+
+SETELAH FIX WAJIB JALANKAN:
+
+npx tsc --noEmit
+npm run lint
+npm run build
+git diff --check
+
+Jika semua PASS:
+1. Periksa `git status`.
+2. Periksa `git diff --stat`.
+3. Periksa `git diff` untuk memastikan tidak ada perubahan mencurigakan.
+4. Pastikan credentials, .env, database, dan data tidak tersentuh.
+5. Buat SATU commit khusus untuk seluruh baseline regression fixes yang saat ini memang sudah ada di working tree.
+
+Gunakan commit message:
+
+fix: restore clean build baseline
+
+6. Setelah commit berhasil, jalankan:
+   git status --short --branch
+   git log -1 --oneline --decorate
+
+7. PUSH commit ke origin/main sebagai backup VPS:
+   git push origin main
+
+8. Setelah push, verifikasi:
+   git status --short --branch
+   git log -1 --oneline --decorate
+   git ls-remote --heads origin main
+
+PENTING:
+- Jangan mengerjakan Phase 25–29.
+- Jangan membuat commit jika tsc/lint/build masih gagal.
+- Jangan force push.
+- Jangan reset --hard.
+- Jangan menghapus perubahan existing.
+- Jangan mengubah dependency/version kecuali memang diperlukan untuk memperbaiki error yang sedang diperiksa.
+- Jika build masih gagal setelah perbaikan, STOP dan laporkan error baru. Jangan commit/push.
+
+LAPORAN AKHIR WAJIB:
+- file yang diperbaiki
+- ringkasan perubahan
+- TypeScript: PASS/FAIL
+- Lint: PASS/FAIL
+- Build: PASS/FAIL
+- git diff --check: PASS/FAIL
+- commit hash
+- push: PASS/FAIL
+- origin/main hash
+- working tree clean atau tidak
 
 ```
 # 
