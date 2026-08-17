@@ -43,9 +43,189 @@
 
 
 ```
-# 
+# Prompt — Phase 26.1 Task 3: Prisma Schema
 ```
+Lanjutkan project Digital Cell dari titik terakhir.
 
+KONDISI SAAT INI:
+- DATABASE_URL sudah tersedia di .env.local.
+- Jangan tampilkan nilai DATABASE_URL atau credential apa pun.
+- Working tree sebelumnya CLEAN.
+- Phase 27 Auth harus tetap utuh.
+- Phase 28 Caching harus tetap utuh.
+- Phase 29 SEO/Metadata/PWA harus tetap utuh.
+- Jangan mengerjakan Phase 25 dulu.
+- Sekarang fokus hanya Phase 26.1 Task 3 — Prisma Schema.
+
+TUJUAN:
+Menyelesaikan konfigurasi Prisma schema secara aman sebagai checkpoint sebelum migration.
+
+ATURAN KESELAMATAN:
+1. JANGAN menjalankan:
+   - prisma migrate
+   - prisma migrate dev
+   - prisma migrate deploy
+   - prisma db push
+   - prisma db reset
+   - seed
+   - DROP/DELETE/TRUNCATE database
+2. Jangan mengubah database remote.
+3. Jangan mengubah credential.
+4. Jangan menampilkan secret.
+5. Jangan mengubah dependency/version kecuali benar-benar diperlukan oleh konfigurasi Prisma existing.
+6. Jangan melakukan refactor besar.
+7. Jangan menyentuh Phase 27, 28, atau 29 kecuali hanya untuk regression check.
+8. Jangan menghapus file existing.
+9. Jangan membuat fake/mock database.
+10. Jangan membuat data production baru.
+
+LANGKAH 1 — AUDIT EXISTING PRISMA
+
+Periksa:
+- package.json
+- package-lock.json
+- prisma/
+- prisma/schema.prisma jika sudah ada
+- seluruh penggunaan PrismaClient
+- konfigurasi Next.js yang berkaitan dengan database
+- environment variable yang digunakan Prisma.
+
+Tentukan apakah project memang menggunakan Prisma dan versi Prisma yang sedang terpasang.
+
+LANGKAH 2 — DATABASE SOURCE
+
+Pastikan datasource Prisma menggunakan:
+
+url = env("DATABASE_URL")
+
+Jangan hardcode connection string.
+
+Jika Prisma schema sudah benar, jangan mengubahnya tanpa alasan.
+
+Jika datasource belum ada atau salah, perbaiki hanya bagian yang diperlukan.
+
+LANGKAH 3 — MODEL SCHEMA
+
+Audit model/schema existing.
+
+PENTING:
+Jangan mengarang model database berdasarkan asumsi.
+
+Jangan membuat schema besar baru jika kebutuhan model belum jelas.
+
+Jika repository sudah mempunyai definisi model yang jelas, pertahankan model tersebut dan hanya perbaiki konfigurasi yang diperlukan untuk Task 3.
+
+Jika model database belum ditentukan, jangan memaksakan desain database. Catat sebagai blocker/next step untuk Task berikutnya.
+
+LANGKAH 4 — VALIDASI TANPA MENYENTUH DATABASE
+
+Gunakan validasi Prisma yang tidak melakukan migration atau perubahan database.
+
+Validasi:
+- syntax schema
+- datasource
+- generator
+- model definitions
+- environment variable reference.
+
+Kemudian jalankan:
+npm run lint
+npm run build
+git diff --check
+
+Jika ada error:
+- perbaiki hanya error yang berhubungan langsung dengan Task 3;
+- jangan melakukan perubahan besar;
+- ulangi validasi.
+
+LANGKAH 5 — PROTEKSI CREDENTIAL
+
+Periksa apakah repository mempunyai .gitignore.
+
+Pastikan:
+.env
+.env.local
+.env.*.local
+
+tidak dapat masuk commit.
+
+Jangan pernah commit .env.local.
+
+Jika .gitignore belum ada atau belum mengecualikan .env.local, tambahkan aturan minimal yang diperlukan.
+
+Verifikasi bahwa .env.local bukan tracked file.
+
+Jangan tampilkan isi .env.local.
+
+LANGKAH 6 — REGRESSION CHECK
+
+Pastikan perubahan tidak merusak:
+
+- Phase 27 Auth
+- Phase 28 Caching
+- Phase 29 SEO/Metadata/PWA
+
+Gunakan TypeScript/lint/build sebagai regression verification.
+
+LANGKAH 7 — COMMIT CHECKPOINT
+
+Jika:
+- Prisma schema valid
+- TypeScript PASS
+- Lint PASS
+- Build PASS
+- git diff --check PASS
+- credential aman
+- regression tidak bermasalah
+
+maka buat SATU checkpoint commit:
+
+feat(database): configure Prisma schema
+
+Sebelum commit:
+git status --short
+git diff --check
+
+Setelah commit:
+git status --short --branch
+git log -1 --oneline --decorate
+
+LANGKAH 8 — PUSH
+
+Jika GitHub authentication tersedia, push ke origin/main.
+
+Jika push gagal karena authentication:
+- JANGAN membuat commit tambahan.
+- JANGAN force push.
+- Pertahankan commit lokal.
+- Laporkan hash commit lokal.
+
+HASIL AKHIR
+
+Berikan laporan:
+
+1. Prisma version
+2. Schema status
+3. datasource status
+4. DATABASE_URL status tanpa menampilkan secret
+5. .gitignore/credential protection status
+6. TypeScript
+7. Lint
+8. Build
+9. git diff --check
+10. Phase 27 regression
+11. Phase 28 regression
+12. Phase 29 regression
+13. files changed
+14. commit hash
+15. push status
+16. working tree status
+17. blocker jika ada
+18. next step yang tepat
+
+PENTING:
+Jangan lanjut ke Task 4 atau migration.
+Berhenti setelah Phase 26.1 Task 3 selesai dan tervalidasi.
 
 
 ```
