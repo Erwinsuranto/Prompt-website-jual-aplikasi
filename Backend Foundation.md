@@ -67,10 +67,307 @@
 
 
 ```
-# 
+# Phase 26 Database
 ```
 
+Lanjutkan dari hasil audit terakhir.
 
+Repository: /root/toko-online
+Model: GPT-5.6 Luna
+
+KONDISI TERAKHIR:
+- Working tree: CLEAN
+- HEAD: 0f95e04
+- Commit: feat(settings): complete admin password change
+- Local main dan origin/main tracking berada pada commit yang sama.
+- GitHub push/ls-remote mungkin tidak tersedia karena credential environment, tetapi JANGAN mengubah atau membuat commit baru hanya karena masalah authentication.
+- Phase 27 Auth: PASS
+- Phase 28 Caching: PASS
+- Phase 29 SEO/Metadata/PWA: PASS
+- Phase 25 belum selesai.
+
+HASIL AUDIT PHASE 25:
+Task berikutnya:
+- Phase 25 Task 1 — GET /api/products
+
+Namun task tersebut memiliki dependency/blocker nyata:
+1. `export` tidak kompatibel dengan runtime Next.js Route Handlers.
+2. Database/repository layer belum tersedia dengan benar.
+3. Backend authentication/JWT yang dapat digunakan oleh protected API belum tersedia.
+4. Memaksakan implementasi API sekarang berisiko membuat architecture workaround dan regression.
+
+TUJUAN:
+Jangan memaksakan Phase 25 Task 1 hanya agar roadmap terlihat maju.
+
+Sekarang lakukan AUDIT DEPENDENCY untuk Phase 25 dan Phase 26.
+
+==================================================
+1. VALIDASI GIT
+==================================================
+
+Jalankan:
+
+git status --short --branch
+git branch -vv
+git log -5 --oneline --decorate
+git diff --check
+
+Jangan:
+- reset
+- revert
+- force push
+- git clean
+- hapus database
+- hapus credentials
+- mengubah commit 0f95e04
+
+==================================================
+2. BACA ROADMAP
+==================================================
+
+Baca:
+- ROADMAP.md
+- CHANGELOG.md
+- package.json
+
+Identifikasi:
+- seluruh task Phase 25;
+- seluruh task Phase 26;
+- dependency Phase 25 terhadap Phase 26;
+- apakah Phase 26 memang dirancang sebagai prerequisite API;
+- task Phase 26 mana yang paling dasar dan harus dikerjakan terlebih dahulu.
+
+Jangan menebak.
+
+==================================================
+3. AUDIT DATABASE ARCHITECTURE
+==================================================
+
+Periksa seluruh codebase untuk mencari:
+
+- Prisma / Drizzle / SQLite / PostgreSQL / MongoDB atau database lain;
+- schema;
+- migrations;
+- database client;
+- repository;
+- service;
+- model;
+- seed;
+- connection handling;
+- environment variables;
+- existing data access;
+- product/category/banner/order/payment tables atau collections.
+
+Jawab secara konkret:
+
+1. Database apa yang sebenarnya digunakan?
+2. Apakah database sudah aktif?
+3. Apakah schema sudah tersedia?
+4. Apakah migration sudah tersedia?
+5. Apakah repository/service layer sudah tersedia?
+6. Bagaimana productService saat ini memperoleh data?
+7. Apakah API dapat memakai service yang sama?
+8. Apakah ada data mock/local JSON yang masih digunakan?
+9. Apakah ada bagian database yang sudah dibuat tetapi belum terhubung?
+10. Apakah Phase 26 memang wajib diselesaikan sebelum Phase 25?
+
+==================================================
+4. AUDIT AUTH DEPENDENCY
+==================================================
+
+Jangan membuat auth baru.
+
+Periksa implementation Phase 27 yang sudah PASS.
+
+Cari:
+- middleware;
+- JWT;
+- session;
+- cookie;
+- jose;
+- login;
+- logout;
+- `/api/auth/*`;
+- admin authorization;
+- helper untuk membaca current user/session.
+
+Tentukan apakah API Phase 25 dapat menggunakan infrastructure tersebut.
+
+Jika infrastructure sudah ada:
+- gunakan yang existing.
+
+Jika belum ada:
+- jelaskan dependency-nya.
+
+Jangan membuat authentication duplicate.
+
+==================================================
+5. AUDIT NEXT.JS ROUTE HANDLER
+==================================================
+
+Periksa semua `app/api/**/route.ts`.
+
+Cari penggunaan:
+
+- `export default`
+- `GET`
+- `POST`
+- `PATCH`
+- `PUT`
+- `DELETE`
+- `OPTIONS`
+
+Tentukan pattern Route Handler yang benar untuk versi Next.js project ini.
+
+Jangan mengubah seluruh API hanya karena satu task.
+
+Jika `export default` memang salah:
+- tentukan file mana yang benar-benar affected;
+- jangan langsung refactor massal.
+
+==================================================
+6. TENTUKAN URUTAN YANG AMAN
+==================================================
+
+Buat dependency graph sederhana:
+
+Database
+↓
+Repository / Data Access
+↓
+Service
+↓
+Authentication / Authorization
+↓
+API Route Handler
+↓
+Client/Admin
+
+Tentukan bagian mana yang sudah tersedia dan bagian mana yang masih missing.
+
+Jika Phase 26 Database adalah prerequisite nyata:
+- jangan mengerjakan Phase 25 dengan mock;
+- jangan membuat fake repository;
+- jangan membuat API hardcoded;
+- jangan mengubah roadmap secara sembarangan.
+
+Pilih TASK PALING KECIL DAN PALING FUNDAMENTAL yang memang diperlukan untuk membuka blocker.
+
+==================================================
+7. JANGAN CODING DULU JIKA AUDIT BELUM SELESAI
+==================================================
+
+Tahap pertama harus audit.
+
+Setelah audit dependency selesai, jika ada prerequisite Phase 26 yang jelas dan aman:
+
+- implementasikan hanya prerequisite tersebut;
+- jangan langsung mengerjakan seluruh Phase 26;
+- jangan mengerjakan Phase 25 sekaligus;
+- jangan melompat beberapa phase.
+
+Jika prerequisite belum jelas:
+- berhenti dan laporkan.
+
+==================================================
+8. VERIFICATION
+==================================================
+
+Jika ada perubahan kode:
+
+WAJIB jalankan:
+
+npm run lint
+npm run build
+git diff --check
+
+Kemudian verifikasi behavior yang berkaitan.
+
+Pastikan:
+- Phase 27 auth tetap PASS;
+- Phase 28 caching tetap PASS;
+- Phase 29 SEO/metadata/PWA tetap PASS.
+
+Jika build gagal:
+- perbaiki root cause;
+- jangan commit.
+
+==================================================
+9. GIT CHECKPOINT
+==================================================
+
+Jika perubahan berhasil dan semua verification PASS:
+
+git status
+git diff --stat
+git diff --check
+
+Pastikan hanya perubahan task ini.
+
+Update ROADMAP.md dan CHANGELOG.md jika memang diperlukan.
+
+Buat SATU commit:
+
+feat(database): <deskripsi task sebenarnya>
+
+atau gunakan scope yang sesuai dengan task sebenarnya.
+
+Jangan membuat commit kosong.
+
+Setelah commit:
+
+git log -1 --oneline --decorate
+git status --short --branch
+
+Push hanya jika authentication GitHub tersedia.
+
+Jika push gagal karena authentication:
+- jangan mengulang coding;
+- jangan membuat commit tambahan;
+- laporkan hash commit lokal sebagai checkpoint.
+
+==================================================
+LAPORAN AKHIR
+==================================================
+
+Berikan:
+
+## Dependency Audit
+- Phase 25 blocker
+- Phase 26 dependency
+- database status
+- auth status
+- API architecture status
+
+## Task Dikerjakan
+- task
+- alasan
+- file berubah
+
+## Verification
+- TypeScript
+- Lint
+- Build
+- git diff --check
+
+## Regression
+- Phase 27
+- Phase 28
+- Phase 29
+
+## Git
+- HEAD
+- commit
+- origin/main
+- working tree
+- push status
+
+## Next Step
+Tentukan task paling aman berikutnya berdasarkan dependency aktual.
+
+PENTING:
+Jangan mengejar angka progress roadmap.
+Prioritaskan architecture yang benar, build yang PASS, dan checkpoint Git yang aman.
 
 ```
 # Phase 25 API, Audit → Implementasi → Verify → Commit → Push
