@@ -5,8 +5,6 @@
 
 
 
-
-
 # 
 ```
 
@@ -29,6 +27,76 @@
 ```
 
 
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+Lakukan audit terhadap semua perubahan working tree yang baru saja dibuat.
+
+Jangan commit dan jangan push.
+
+Fokus utama:
+1. Periksa apakah ada file existing yang kehilangan fitur atau logic akibat perubahan.
+2. Audit 33 file yang berubah, terutama file service:
+   - auth-service.ts
+   - banner-service.ts
+   - category-service.ts
+   - order-service.ts
+   - payment-service.ts
+   - product-service.ts
+   - report-service.ts
+   - settings-service.ts
+   - user-service.ts
+3. Pastikan perubahan bukan sekadar mengganti mock/static logic tanpa mempertahankan fitur existing.
+4. Pastikan Prisma benar-benar digunakan oleh service yang membutuhkan database.
+5. Periksa app/src/app/api/[...path]/ dan pastikan endpoint yang dibuat memang diperlukan dan aman.
+6. Periksa authentication/session agar tetap bekerja.
+7. Pastikan tidak ada API route, server logic, atau service yang rusak.
+8. Pastikan tidak ada data production yang diganti mock data.
+9. Pastikan DATABASE_URL dan SESSION_SECRET tidak masuk Git.
+10. Jangan menghapus migration atau fitur existing.
+
+Gunakan git diff untuk membandingkan perubahan dengan HEAD.
+
+Jika menemukan regression atau logic yang hilang, langsung perbaiki.
+
+Setelah selesai jalankan:
+npm run typecheck
+npm run build
+
+Jangan commit/push.
+
+Terakhir laporkan:
+- file yang memang perlu diubah
+- fitur yang dipulihkan
+- regression yang ditemukan
+- hasil typecheck
+- hasil build
 
 ```
 # 
