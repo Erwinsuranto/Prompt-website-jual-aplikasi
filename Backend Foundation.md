@@ -79,10 +79,272 @@
 
 
 ```
-# 
+# Prompt — Lanjut Development Aman Setelah Baseline
 ```
 
+Lanjutkan development repository Digital Cell di /root/toko-online.
 
+MODEL: GPT-5.6 Luna
+
+KONDISI BASELINE:
+- Repository sudah diaudit.
+- Phase 27 — Authentication: INTACT.
+- Phase 28 — Caching: INTACT.
+- Phase 29 — SEO/Metadata/PWA: COMPLETE dan sudah diverifikasi.
+- TypeScript: PASS.
+- Lint: PASS, hanya 2 warning pre-existing/non-blocking.
+- Build: PASS.
+- Working tree sudah CLEAN.
+- Commit baseline terbaru: 90bafa8 — "fix: restore clean build baseline"
+- Commit sudah berhasil di-push ke origin/main.
+- GitHub sekarang menjadi backup utama jika VPS mati.
+- JANGAN menganggap pekerjaan yang ada di commit tersebut hilang.
+- JANGAN melakukan reset, revert, force push, atau menghapus commit baseline.
+
+TUJUAN:
+Lanjutkan development dari kondisi repository SAAT INI dengan mengikuti ROADMAP.md secara ketat.
+
+ATURAN UTAMA:
+1. Baca ROADMAP.md terlebih dahulu secara menyeluruh.
+2. Baca CHANGELOG.md untuk memahami pekerjaan terakhir.
+3. Periksa git status, branch, HEAD, dan commit terbaru.
+4. Tentukan task/fase berikutnya yang benar-benar belum selesai.
+5. Jangan mengerjakan task yang sudah ditandai selesai.
+6. Jangan melompati dependency antar-task.
+7. Jangan membuat roadmap baru.
+8. Jangan mengubah requirement produk yang sudah ada.
+9. Jangan melakukan refactor besar jika tidak diperlukan oleh task.
+10. Pertahankan arsitektur dan pola kode yang sudah digunakan project.
+
+PROSEDUR WAJIB SEBELUM CODING:
+
+A. VALIDASI REPOSITORY
+Jalankan:
+- git status
+- git branch -vv
+- git log -5 --oneline --decorate
+- git diff --check
+
+Pastikan:
+- branch main
+- working tree bersih sebelum mulai
+- origin/main sesuai dengan baseline yang sudah dipush
+
+Jika working tree ternyata tidak bersih:
+- JANGAN menghapus perubahan.
+- Audit perubahan terlebih dahulu.
+- Pisahkan perubahan existing/pre-existing dengan perubahan yang dibuat pada task ini.
+
+B. BACA ROADMAP
+Baca:
+- ROADMAP.md
+- CHANGELOG.md
+- package.json
+- konfigurasi Next.js/TypeScript yang relevan
+
+Cari task pertama yang:
+- belum selesai,
+- tidak blocked,
+- dependency-nya sudah tersedia,
+- dan paling aman dikerjakan setelah Phase 29.
+
+Jangan menebak nomor task dari percakapan.
+Gunakan isi repository sebagai source of truth.
+
+C. AUDIT SCOPE TASK
+Sebelum mengubah file:
+- identifikasi file yang akan diubah;
+- identifikasi service/component/API yang sudah tersedia;
+- pahami pattern existing;
+- cari implementasi serupa yang sudah ada;
+- pastikan tidak membuat duplicate component/service/helper;
+- pastikan tidak mengubah behavior Phase 27/28/29.
+
+Jika task ternyata sudah sebagian diimplementasikan:
+- jangan membuat ulang;
+- lanjutkan bagian yang belum selesai;
+- pertahankan implementasi yang sudah benar.
+
+IMPLEMENTASI:
+
+Kerjakan task berikutnya secara lengkap, bukan sekadar membuat placeholder.
+
+Ketentuan:
+- gunakan TypeScript yang type-safe;
+- jangan menggunakan implicit any;
+- jangan menggunakan `any` kecuali benar-benar diperlukan dan diberi alasan;
+- gunakan service/repository yang sudah ada;
+- jangan bypass architecture hanya agar build cepat;
+- jangan hardcode data yang seharusnya berasal dari database/API/config;
+- gunakan Tailwind/design token yang sudah ada;
+- jangan membuat warna random/hardcoded jika project sudah mempunyai token;
+- pertahankan responsive behavior;
+- pertahankan accessibility;
+- pertahankan loading/error/empty state jika relevan;
+- pertahankan authentication/protected route;
+- jangan memasukkan credential, secret, token, password, atau data pribadi ke source code;
+- jangan menghapus data/database;
+- jangan mengubah migration/schema tanpa kebutuhan task yang jelas.
+
+REGRESSION PROTECTION:
+
+Setelah implementasi, WAJIB jalankan:
+
+1. npm run lint
+2. npm run build
+3. git diff --check
+
+Jika tersedia test/script lain yang relevan, jalankan juga.
+
+Periksa kembali minimal:
+- homepage
+- products
+- categories
+- product detail
+- category detail
+- admin route yang relevan
+- authentication/protected route
+- API yang disentuh task
+- caching Phase 28
+- metadata/SEO Phase 29
+
+Pastikan:
+- tidak ada regression;
+- tidak ada route yang tiba-tiba 500;
+- tidak ada TypeScript error;
+- tidak ada build error;
+- tidak ada perubahan authentication;
+- tidak ada user data masuk ke cache publik.
+
+JIKA TERJADI ERROR:
+
+Jangan berhenti pada error pertama dan jangan melakukan workaround asal.
+
+Lakukan:
+1. baca error lengkap;
+2. identifikasi root cause;
+3. perbaiki root cause;
+4. jalankan ulang TypeScript/build/lint;
+5. verifikasi kembali route terkait.
+
+Jika error berasal dari kode pre-existing:
+- jangan mengklaim task gagal tanpa investigasi;
+- jelaskan apakah error tersebut memang pre-existing atau akibat perubahan task ini.
+
+Jika perubahan task menyebabkan regression:
+- perbaiki sampai baseline kembali PASS.
+- jangan lanjut ke task berikutnya sebelum build kembali PASS.
+
+GIT SAFETY / BACKUP:
+
+Setelah task selesai dan SEMUA verification PASS:
+
+1. Periksa:
+   git status
+   git diff --stat
+   git diff --check
+
+2. Pastikan hanya file yang memang berkaitan dengan task yang berubah.
+
+3. Update ROADMAP.md sesuai status sebenarnya.
+
+4. Update CHANGELOG.md dengan:
+   - versi/entry berikutnya yang konsisten;
+   - tanggal;
+   - task yang dikerjakan;
+   - file penting yang berubah;
+   - hasil verification.
+
+5. Buat SATU commit untuk milestone/task ini.
+
+Format commit:
+   feat(<scope>): complete <task>
+
+JANGAN membuat commit jika:
+- TypeScript gagal;
+- lint gagal karena error baru;
+- build gagal;
+- regression belum selesai;
+- perubahan belum jelas;
+- working tree berisi perubahan unrelated.
+
+SETELAH COMMIT:
+
+Jalankan:
+git status
+git log -1 --oneline --decorate
+
+Kemudian push:
+git push origin main
+
+Setelah push:
+- pastikan push berhasil;
+- pastikan local HEAD sama dengan origin/main;
+- jalankan git status --short --branch.
+
+TARGET AKHIR:
+Working tree harus kembali CLEAN dan commit task terbaru harus sudah tersimpan di GitHub.
+
+JANGAN:
+- force push;
+- git reset --hard;
+- git clean -fd;
+- menghapus file yang tidak berkaitan;
+- menghapus credentials;
+- menghapus database;
+- mengubah package version tanpa alasan;
+- upgrade dependency secara massal;
+- mengganti framework;
+- mengganti arsitektur;
+- mengerjakan beberapa fase sekaligus;
+- membuat fitur baru di luar ROADMAP.
+
+PENTING:
+Jika task berikutnya terlalu besar atau mempunyai dependency yang belum siap, JANGAN memaksakan implementasi.
+
+Dalam kondisi tersebut:
+- jelaskan blocker;
+- jangan merusak baseline;
+- jangan membuat perubahan setengah jadi;
+- jangan commit pekerjaan yang belum selesai.
+
+FORMAT LAPORAN AKHIR:
+
+Tampilkan laporan ringkas namun lengkap:
+
+## Task
+- nomor dan nama task
+- alasan task ini dipilih
+
+## Files Changed
+- daftar file
+- fungsi/perubahan utama
+
+## Verification
+- TypeScript: PASS/FAIL
+- Lint: PASS/FAIL
+- Build: PASS/FAIL
+- git diff --check: PASS/FAIL
+- route/API yang diverifikasi
+
+## Regression
+- Phase 27 auth: PASS/FAIL
+- Phase 28 caching: PASS/FAIL
+- Phase 29 SEO/metadata/PWA: PASS/FAIL
+
+## Git
+- commit hash
+- commit message
+- push: SUCCESS/FAIL
+- working tree: CLEAN/DIRTY
+- local HEAD vs origin/main
+
+## Remaining
+- task berikutnya yang belum dikerjakan
+- blocker jika ada
+
+Jangan berhenti hanya karena implementasi sudah selesai.
+Pastikan verification selesai, dokumentasi diperbarui, commit dibuat, dan commit berhasil di-push ke GitHub.
 
 ```
 # Prompt: Final Regression Audit + Fix + Commit Backup
