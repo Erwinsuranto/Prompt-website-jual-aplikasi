@@ -73,10 +73,618 @@
 
 
 ```
-# 
+# Phase 25 API, Audit → Implementasi → Verify → Commit → Push
 ```
 
+Lanjutkan development repository Digital Cell di:
 
+/root/toko-online
+
+MODEL: GPT-5.6 Luna
+
+==================================================
+KONDISI REPOSITORY
+==================================================
+
+Repository sudah melewati:
+
+- Phase 27 Authentication: PASS / INTACT
+- Phase 28 Caching: PASS / INTACT
+- Phase 29 SEO / Metadata / PWA: PASS / COMPLETE
+- TypeScript/build baseline sudah diperbaiki
+- Working tree terakhir sudah CLEAN
+- Commit backup terbaru:
+  0f95e04
+  feat(settings): complete admin password change
+
+PENTING:
+Commit 0f95e04 adalah checkpoint lokal yang harus dipertahankan.
+
+JANGAN:
+- git reset --hard
+- git clean -fd
+- force push
+- menghapus commit
+- menghapus database
+- menghapus credentials
+- menghapus perubahan existing
+- mengganti dependency secara massal
+- upgrade/downgrade framework tanpa kebutuhan task
+
+GitHub digunakan sebagai backup jika VPS mati.
+
+==================================================
+TUJUAN UTAMA
+==================================================
+
+Lanjutkan project sesuai ROADMAP.md.
+
+Target sekarang adalah:
+
+PHASE 25 — API
+
+JANGAN langsung coding.
+
+Pertama-tama lakukan audit repository dan tentukan dengan tepat:
+
+1. Phase 25 terdiri dari task apa saja.
+2. Task mana yang sudah selesai.
+3. Task mana yang belum selesai.
+4. Task mana yang partially implemented.
+5. Dependency setiap task.
+6. Task pertama yang paling aman untuk dikerjakan sekarang.
+
+Jangan menebak task berdasarkan percakapan sebelumnya.
+
+ROADMAP.md + kondisi source code saat ini adalah source of truth.
+
+==================================================
+STEP 1 — VALIDASI GIT
+==================================================
+
+Sebelum membaca/mengubah source:
+
+Jalankan:
+
+git status
+git status --short --branch
+git branch -vv
+git log -5 --oneline --decorate
+git diff --check
+git remote -v
+
+Periksa:
+
+- branch harus main;
+- apakah HEAD sudah sama dengan origin/main;
+- apakah local main ahead/behind;
+- apakah working tree clean;
+- apakah ada perubahan existing yang bukan pekerjaan task ini.
+
+Jika local HEAD masih lebih maju daripada origin/main:
+
+JANGAN membuat commit baru hanya untuk itu.
+
+Jika credentials GitHub tersedia:
+- push checkpoint yang sudah ada.
+
+Jika push gagal karena authentication:
+- JANGAN mengubah kode;
+- JANGAN membuat commit kosong;
+- laporkan bahwa backup GitHub belum berhasil.
+
+Jika repository sudah sama dengan origin/main:
+- lanjutkan audit.
+
+==================================================
+STEP 2 — BACA DOKUMENTASI
+==================================================
+
+Baca:
+
+- ROADMAP.md
+- CHANGELOG.md
+- package.json
+
+Kemudian cari dokumentasi yang berkaitan dengan:
+
+- Phase 25
+- API
+- admin API
+- product API
+- category API
+- banner API
+- order API
+- payment API
+- authentication middleware
+- service layer
+- database layer
+
+Jangan membuat dokumentasi baru jika dokumentasi existing sudah cukup.
+
+==================================================
+STEP 3 — AUDIT PHASE 25
+==================================================
+
+Lakukan audit menyeluruh terhadap implementasi Phase 25.
+
+Cari seluruh:
+
+- app/api/**
+- src/app/api/**
+- services
+- repositories
+- database access
+- authentication helper
+- validation/schema
+- request/response types
+- admin API
+- public API
+- mutation API
+- route handlers
+
+Untuk setiap API yang relevan, periksa:
+
+1. HTTP method.
+2. Authentication requirement.
+3. Authorization requirement.
+4. Input validation.
+5. Error handling.
+6. Response format.
+7. Database operation.
+8. Service-layer usage.
+9. Cache interaction jika ada.
+10. Cache invalidation jika mutation.
+11. Ownership/access control.
+12. Sensitive data exposure.
+13. Type safety.
+14. Empty state.
+15. Not-found behavior.
+16. Conflict behavior.
+17. Concurrent request safety jika relevan.
+
+Jangan hanya mencari apakah route file ada.
+
+Pastikan implementasinya benar-benar bekerja.
+
+==================================================
+STEP 4 — CARI REGRESSION DARI PHASE 27–29
+==================================================
+
+Phase 25 tidak boleh merusak:
+
+PHASE 27:
+- middleware
+- JWT
+- session
+- login
+- logout
+- protected routes
+- admin authorization
+
+PHASE 28:
+- unstable_cache
+- public cache tags
+- revalidateTag
+- product cache
+- category cache
+- banner cache
+- tidak ada user/session data dalam public cache
+
+PHASE 29:
+- metadataBase
+- canonical URL
+- OpenGraph
+- Twitter Card
+- sitemap
+- robots
+- manifest
+- JSON-LD
+
+Jangan mengubah sistem tersebut kecuali Phase 25 memang memiliki dependency langsung.
+
+==================================================
+STEP 5 — AUDIT EXISTING IMPLEMENTATION
+==================================================
+
+Sebelum menulis kode baru:
+
+Cari apakah functionality Phase 25 sudah sebagian ada.
+
+Gunakan pencarian codebase untuk:
+
+- route handler
+- service
+- validation
+- database function
+- related components
+- existing API calls
+
+Jika sudah ada:
+
+JANGAN membuat duplicate.
+
+Pertahankan implementation yang benar dan hanya lengkapi bagian yang kurang.
+
+Jika ada dua implementation untuk fungsi yang sama:
+
+- jangan langsung menghapus salah satunya;
+- tentukan mana yang menjadi canonical implementation;
+- pahami dependency;
+- ubah seminimal mungkin.
+
+==================================================
+STEP 6 — IMPLEMENTASI
+==================================================
+
+Setelah audit selesai, kerjakan:
+
+HANYA TASK PHASE 25 YANG PALING AWAL DAN SUDAH SIAP.
+
+Jangan mengerjakan Phase 26 atau phase berikutnya.
+
+Implementasi harus:
+
+- TypeScript strict/type-safe;
+- tidak menambahkan implicit any;
+- tidak memakai any tanpa alasan kuat;
+- mengikuti architecture existing;
+- memakai service layer yang sudah ada;
+- memakai validation yang sudah ada jika tersedia;
+- mengikuti response pattern existing;
+- mengikuti authentication pattern existing;
+- tidak membocorkan password/token/credential;
+- tidak mengembalikan field sensitif ke client;
+- tidak hardcode data database;
+- tidak menghapus functionality existing.
+
+Jika API bersifat protected:
+- gunakan authentication/authorization yang sudah ada;
+- jangan membuat authentication system baru.
+
+Jika API melakukan mutation:
+- pastikan cache invalidation sesuai pattern Phase 28;
+- jangan memasukkan user-specific data ke public cache.
+
+Jika task membutuhkan schema/database:
+- audit schema/migration terlebih dahulu;
+- jangan mengubah database secara destruktif;
+- jangan menghapus data existing.
+
+==================================================
+STEP 7 — VERIFICATION SETIAP TASK
+==================================================
+
+Setelah implementasi, WAJIB jalankan:
+
+npm run lint
+
+npm run build
+
+git diff --check
+
+Jika project memiliki test command yang relevan, jalankan.
+
+Kemudian lakukan runtime verification terhadap API yang diubah.
+
+Minimal verifikasi:
+
+- expected success response;
+- unauthorized response;
+- forbidden response jika applicable;
+- invalid input;
+- not found;
+- duplicate/conflict jika applicable;
+- mutation success;
+- database result;
+- cache invalidation jika applicable.
+
+Jangan menyatakan PASS hanya karena TypeScript compile.
+
+==================================================
+STEP 8 — REGRESSION TEST
+==================================================
+
+Setelah Phase 25 task selesai, verifikasi:
+
+Homepage:
+- HTTP 200
+
+Products:
+- HTTP 200
+
+Categories:
+- HTTP 200
+
+Product detail:
+- HTTP 200 untuk valid slug
+
+Category detail:
+- HTTP 200 untuk valid slug
+
+Protected admin route:
+- authenticated request berhasil
+
+Unauthenticated protected route:
+- redirect/401 sesuai behavior existing
+
+API products:
+- HTTP 200
+
+API categories:
+- HTTP 200
+
+API banners:
+- HTTP 200
+
+API orders:
+- authentication tetap benar
+
+Phase 27:
+- PASS
+
+Phase 28:
+- PASS
+
+Phase 29:
+- PASS
+
+==================================================
+STEP 9 — JIKA ADA ERROR
+==================================================
+
+Jika lint/build/test gagal:
+
+JANGAN langsung membuat workaround.
+
+Lakukan:
+
+1. baca error lengkap;
+2. cari root cause;
+3. tentukan apakah error:
+   - pre-existing,
+   - berasal dari task ini,
+   - atau berasal dari environment;
+4. perbaiki root cause;
+5. jalankan verification kembali.
+
+Jika error berasal dari perubahan task:
+- WAJIB diperbaiki sebelum commit.
+
+Jika error pre-existing:
+- jangan mengklaim project PASS tanpa menjelaskan error tersebut.
+
+Jika perubahan menyebabkan regression:
+- rollback hanya perubahan task tersebut secara aman;
+- jangan menyentuh baseline commit sebelumnya;
+- kemudian perbaiki dengan pendekatan yang benar.
+
+==================================================
+STEP 10 — DOKUMENTASI
+==================================================
+
+Jika Phase 25 task berhasil:
+
+Update ROADMAP.md secara akurat.
+
+Jangan menandai task selesai jika verification belum PASS.
+
+Update CHANGELOG.md:
+
+- tanggal;
+- task;
+- perubahan utama;
+- file penting;
+- verification;
+- regression status.
+
+Jangan mengubah histori dokumentasi lama secara tidak perlu.
+
+==================================================
+STEP 11 — GIT CHECKPOINT
+==================================================
+
+SEBELUM COMMIT:
+
+Jalankan:
+
+git status
+git diff --stat
+git diff --check
+
+Periksa setiap file yang berubah.
+
+Pastikan:
+
+- hanya perubahan Phase 25;
+- tidak ada .env;
+- tidak ada credential;
+- tidak ada database dump;
+- tidak ada file temporary;
+- tidak ada build artifact;
+- tidak ada perubahan unrelated.
+
+Jika ada perubahan unrelated:
+- jangan hapus;
+- pisahkan dari scope task;
+- jangan masukkan ke commit jika tidak diperlukan.
+
+==================================================
+STEP 12 — COMMIT
+==================================================
+
+Jika dan hanya jika:
+
+- TypeScript PASS
+- Lint PASS
+- Build PASS
+- Runtime verification PASS
+- Regression PASS
+- git diff --check PASS
+- dokumentasi sesuai
+- perubahan scope jelas
+
+buat SATU commit untuk task tersebut.
+
+Format:
+
+feat(api): complete phase 25 task <nomor>
+
+Gunakan nomor/nama task sebenarnya dari ROADMAP.md.
+
+JANGAN membuat commit jika verification gagal.
+
+==================================================
+STEP 13 — PUSH BACKUP
+==================================================
+
+Setelah commit:
+
+Jalankan:
+
+git status
+git log -1 --oneline --decorate
+
+Kemudian:
+
+git push origin main
+
+Jika push berhasil:
+
+git status --short --branch
+
+Pastikan:
+
+- local main = origin/main
+- working tree CLEAN
+
+Jika push gagal karena authentication:
+
+- JANGAN mengubah kode;
+- JANGAN membuat commit kedua;
+- jangan force push;
+- laporkan commit hash yang belum ter-push.
+
+==================================================
+ATURAN VPS BACKUP
+==================================================
+
+Karena VPS sebelumnya pernah mati, setiap milestone yang benar-benar PASS harus mempunyai commit.
+
+Namun jangan membuat commit setiap perubahan kecil.
+
+Gunakan checkpoint:
+
+1 task selesai
+→ verification PASS
+→ dokumentasi update
+→ commit
+→ push
+
+Dengan demikian jika VPS mati:
+
+git clone repository
+
+atau:
+
+git pull origin main
+
+dapat mengembalikan seluruh progress sampai checkpoint terakhir.
+
+==================================================
+BATASAN KERAS
+==================================================
+
+JANGAN:
+
+- mengerjakan beberapa Phase sekaligus;
+- melompat ke Phase 26;
+- mengubah Phase 27 tanpa alasan;
+- mengubah caching Phase 28 tanpa dependency;
+- mengubah SEO Phase 29 tanpa dependency;
+- upgrade dependency massal;
+- install package baru tanpa alasan;
+- menghapus file;
+- menghapus database;
+- menghapus credentials;
+- mengganti architecture;
+- mengganti framework;
+- membuat duplicate service;
+- membuat duplicate API;
+- membuat fake/mock implementation untuk production code;
+- menandai task selesai hanya karena file sudah dibuat;
+- commit ketika build gagal;
+- push force;
+- reset ke commit lama.
+
+==================================================
+JIKA PHASE 25 TERNYATA SUDAH SELESAI
+==================================================
+
+Jika setelah audit ditemukan bahwa seluruh Phase 25 memang sudah benar-benar selesai:
+
+JANGAN membuat perubahan palsu.
+
+Verifikasi seluruh Phase 25.
+
+Jika semua PASS:
+- update ROADMAP hanya jika status dokumentasinya belum sesuai;
+- update CHANGELOG bila diperlukan;
+- jangan membuat commit kosong;
+- laporkan bahwa Phase 25 sudah complete;
+- identifikasi Phase berikutnya.
+
+Tetapi JANGAN langsung mengerjakan Phase berikutnya dalam run yang sama kecuali roadmap secara eksplisit menyatakan task tersebut bagian dari Phase 25.
+
+==================================================
+FORMAT LAPORAN AKHIR
+==================================================
+
+Berikan laporan:
+
+## Phase 25 Audit
+- task yang ditemukan
+- task yang sudah selesai
+- task yang belum selesai
+- task yang dipilih
+- alasan pemilihan
+
+## Implementation
+- file berubah
+- perubahan utama
+- dependency yang digunakan
+
+## Verification
+- TypeScript: PASS/FAIL
+- Lint: PASS/FAIL
+- Build: PASS/FAIL
+- git diff --check: PASS/FAIL
+- Runtime API: PASS/FAIL
+
+## Regression
+- Phase 27 auth: PASS/FAIL
+- Phase 28 caching: PASS/FAIL
+- Phase 29 SEO/metadata/PWA: PASS/FAIL
+
+## Git
+- commit hash
+- commit message
+- push: SUCCESS/FAIL
+- HEAD
+- origin/main
+- working tree: CLEAN/DIRTY
+
+## Remaining
+- Phase 25 task berikutnya
+- blocker jika ada
+- Phase berikutnya setelah Phase 25 selesai
+
+PENTING:
+Jangan hanya memberikan rencana.
+
+Jika task aman untuk dikerjakan, IMPLEMENTASIKAN, VERIFIKASI, COMMIT, DAN PUSH.
+
+Jika ada blocker nyata, berhenti sebelum merusak baseline dan jelaskan blocker tersebut.
 
 ```
 # Prompt — Lanjut Development Aman Setelah Baseline
