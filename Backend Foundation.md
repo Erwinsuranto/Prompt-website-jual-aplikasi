@@ -55,9 +55,384 @@
 
 
 ```
-# 
+# Prompt — Phase 26.1.2 Supabase PostgreSQL Connection
 ```
+Lanjutkan project /root/toko-online.
 
+MODEL: GPT-5.6 Luna
+
+KEPUTUSAN PROVIDER:
+Gunakan SUPABASE POSTGRESQL sebagai database production project.
+
+PENTING:
+Jangan membuat database baru di VPS.
+Jangan membuat provider database lain.
+Jangan menggunakan SQLite sebagai production database.
+Jangan menggunakan MongoDB.
+Jangan mengganti architecture existing.
+Jangan mengubah Phase 27 Auth, Phase 28 Caching, atau Phase 29 SEO/Metadata/PWA.
+
+==================================================
+STATUS PROJECT
+==================================================
+
+Repository:
+ /root/toko-online
+
+Status terakhir:
+- Working tree CLEAN.
+- Phase 27 Auth: PASS.
+- Phase 28 Caching: PASS.
+- Phase 29 SEO/Metadata/PWA: PASS.
+- Phase 25 API belum dilanjutkan karena membutuhkan database.
+- Phase 26 database menjadi prerequisite untuk Phase 25 API.
+
+Git checkpoint terakhir sudah dibuat lokal dan sudah dipush jika credential tersedia.
+
+Jangan reset/revert/force-push.
+
+==================================================
+TUJUAN TASK
+==================================================
+
+Kerjakan HANYA:
+
+Phase 26.1 Task 2
+Configure database connection string menggunakan Supabase PostgreSQL.
+
+Jangan langsung mengerjakan:
+- schema lengkap
+- migration
+- seed
+- repository
+- API products
+- API categories
+- order repository
+- payment repository
+
+Task berikutnya akan dikerjakan terpisah setelah connection configuration terbukti benar.
+
+==================================================
+STEP 1 — AUDIT EXISTING DATABASE STACK
+==================================================
+
+Sebelum mengubah apa pun, periksa:
+
+package.json
+package-lock.json
+.env
+.env.example
+.env.local jika ada
+source code database yang sudah ada.
+
+Cari dependency:
+
+- prisma
+- @prisma/client
+- drizzle-orm
+- drizzle-kit
+- pg
+- postgres
+- @supabase/supabase-js
+- database adapter lain.
+
+Cari juga folder/file:
+
+prisma/
+drizzle/
+src/lib/db
+src/lib/database
+src/server/db
+src/services/database
+src/repositories
+database
+migrations
+
+Tentukan apakah project sudah memiliki database ORM atau database client.
+
+Jangan install dependency baru sebelum mengetahui stack existing.
+
+==================================================
+STEP 2 — SUPABASE CONNECTION
+==================================================
+
+Gunakan Supabase PostgreSQL sebagai database.
+
+Connection string harus berasal dari environment variable.
+
+Prioritas:
+
+DATABASE_URL
+
+Jika ORM yang dipakai membutuhkan DIRECT_URL terpisah, gunakan:
+
+DIRECT_URL
+
+Tetapi jangan membuat variable tambahan tanpa alasan teknis.
+
+JANGAN pernah hardcode:
+
+- hostname
+- username
+- password
+- database password
+- connection string
+- API key
+- service role key
+
+ke source code.
+
+==================================================
+STEP 3 — ENVIRONMENT SAFETY
+==================================================
+
+Periksa .gitignore.
+
+Pastikan file berikut tidak akan masuk commit:
+
+.env
+.env.local
+.env.production
+file credential lainnya.
+
+Jika `.env.example` perlu diperbarui, hanya masukkan placeholder:
+
+DATABASE_URL=""
+
+atau format placeholder yang sesuai stack.
+
+Jangan pernah memasukkan credential Supabase asli ke `.env.example`.
+
+Jangan print credential lengkap ke terminal.
+
+Jika perlu menunjukkan environment variable saat audit, masking value.
+
+Contoh:
+
+DATABASE_URL=postgresql://user:****@host/db
+
+==================================================
+STEP 4 — KONFIGURASI ORM
+==================================================
+
+Jika project menggunakan Prisma:
+
+- gunakan DATABASE_URL dari environment;
+- gunakan konfigurasi Prisma yang sesuai versi Prisma existing;
+- jangan membuat schema lengkap pada task ini;
+- jangan membuat migration;
+- jangan menjalankan reset database;
+- jangan menjalankan db push terhadap production.
+
+Jika project menggunakan Drizzle:
+
+- gunakan environment variable yang sesuai;
+- jangan membuat schema lengkap;
+- jangan menjalankan migration production.
+
+Jika belum ada ORM:
+
+JANGAN memilih ORM secara asal pada task ini.
+
+Berikan laporan dan berhenti jika connection layer belum memiliki dasar architecture yang cukup.
+
+==================================================
+STEP 5 — VALIDASI CONNECTION
+==================================================
+
+Setelah konfigurasi siap, lakukan validasi yang AMAN.
+
+Validasi:
+
+1. TypeScript
+2. lint
+3. build
+4. git diff --check
+
+Jika ORM memiliki command untuk memvalidasi konfigurasi tanpa mengubah database, gunakan command tersebut.
+
+Contoh prinsip:
+- validasi schema/configuration;
+- jangan migration;
+- jangan reset;
+- jangan db push;
+- jangan seed.
+
+Tujuan hanya memastikan aplikasi dapat membaca konfigurasi database dengan benar.
+
+==================================================
+STEP 6 — JANGAN MERUSAK EXISTING FEATURE
+==================================================
+
+Setelah perubahan, pastikan:
+
+Phase 27 Auth:
+PASS
+
+Phase 28 Caching:
+PASS
+
+Phase 29 SEO/Metadata/PWA:
+PASS
+
+Existing:
+- product UI tetap;
+- category UI tetap;
+- banner tetap;
+- admin tetap;
+- payment flow tetap;
+- order flow tetap;
+- authentication tetap;
+- middleware tetap.
+
+Jangan melakukan refactor yang tidak berhubungan dengan database connection.
+
+==================================================
+STEP 7 — JIKA ERROR
+==================================================
+
+Jika TypeScript/lint/build gagal:
+
+Cari ROOT CAUSE.
+
+Perbaiki hanya error yang disebabkan oleh perubahan task ini.
+
+Jangan:
+- menghapus fitur;
+- menonaktifkan TypeScript;
+- menonaktifkan lint;
+- mengubah tsconfig secara sembarangan;
+- menghapus middleware;
+- menghapus auth;
+- menghapus route;
+- menghapus component;
+- membuat workaround palsu.
+
+Jika error ternyata berasal dari baseline existing dan bukan task ini:
+
+Jangan menyentuhnya.
+
+Laporkan sebagai pre-existing issue.
+
+==================================================
+STEP 8 — GIT CHECKPOINT
+==================================================
+
+Jika semua verification PASS:
+
+jalankan:
+
+git status --short --branch
+git diff --check
+git diff --stat
+git log -1 --oneline --decorate
+
+Periksa bahwa perubahan hanya berkaitan dengan database connection configuration.
+
+Jika aman, buat SATU commit:
+
+feat(database): configure Supabase PostgreSQL connection
+
+Jangan commit:
+- .env
+- .env.local
+- credentials
+- password
+- API key
+- service role key
+- database dump
+
+==================================================
+STEP 9 — PUSH BACKUP
+==================================================
+
+Setelah commit berhasil:
+
+cek:
+
+git status --short --branch
+git log -1 --oneline --decorate
+
+Jika GitHub authentication tersedia, push commit ke origin/main.
+
+Jika push gagal karena authentication:
+
+JANGAN membuat commit tambahan.
+JANGAN mengubah kode.
+JANGAN force push.
+
+Cukup laporkan:
+- commit hash lokal;
+- branch;
+- status working tree;
+- alasan push gagal.
+
+Commit lokal tetap dianggap sebagai checkpoint backup sampai remote berhasil menerima.
+
+==================================================
+LAPORAN AKHIR
+==================================================
+
+Berikan laporan ringkas tetapi lengkap:
+
+## Database Stack
+- ORM/client yang digunakan:
+- versi:
+- existing database layer:
+
+## Supabase
+- provider: Supabase PostgreSQL
+- DATABASE_URL configuration: PASS/NOT READY
+- DIRECT_URL: digunakan/tidak diperlukan
+- credentials: tidak ditampilkan
+
+## Files Changed
+Daftar file yang benar-benar berubah.
+
+## Verification
+- TypeScript:
+- Lint:
+- Build:
+- git diff --check:
+
+## Regression
+- Phase 27 Auth:
+- Phase 28 Caching:
+- Phase 29 SEO/Metadata/PWA:
+
+## Git
+- HEAD:
+- commit:
+- push:
+- working tree:
+
+## NEXT STEP
+
+Jika Task 26.1.2 PASS:
+→ rekomendasikan lanjut Phase 26.1 Task 3 — Prisma schema.
+
+Jika Task 26.1.2 belum bisa dilakukan karena DATABASE_URL/credential Supabase belum tersedia:
+→ STOP dan jelaskan apa yang masih diperlukan.
+
+JANGAN membuat schema atau migration sebelum connection configuration benar-benar siap.
+
+==================================================
+ATURAN PALING PENTING
+==================================================
+
+1. Supabase PostgreSQL adalah provider yang dipilih.
+2. Jangan membuat database di VPS.
+3. Jangan hardcode credentials.
+4. Jangan menampilkan secret.
+5. Jangan migration pada task ini.
+6. Jangan seed pada task ini.
+7. Jangan mengerjakan Phase 25 dulu.
+8. Jangan merusak Phase 27/28/29.
+9. Jangan reset/revert/force-push.
+10. Jika PASS, buat commit checkpoint.
+11. Jika bisa, push ke GitHub.
+12. Jika push gagal, pertahankan commit lokal.
+13. Jangan membuat perubahan di luar scope task.
 
 
 ```
