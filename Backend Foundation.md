@@ -85,10 +85,265 @@
 
 
 ```
-# 
+# Prompt: Final Regression Audit + Fix + Commit Backup
 ```
 
+Prompt: Final Regression Audit — Fix All Errors Before Commit
 
+Kita sedang memulihkan baseline repository Digital Cell.
+JANGAN mengerjakan Phase 25–29 atau fitur baru apa pun.
+
+Tujuan utama sekarang hanya:
+1. Audit kondisi working tree.
+2. Temukan seluruh regression/error yang menghalangi baseline.
+3. Perbaiki semuanya dengan perubahan minimal.
+4. Pastikan TypeScript, lint, build, dan diff semuanya PASS.
+5. Baru setelah benar-benar PASS, commit dan push ke origin/main sebagai backup.
+
+KONDISI VERIFIKASI TERAKHIR:
+
+- Lint: PASS
+- git diff --check: PASS
+- Error invoice sebelumnya sudah tidak muncul.
+- Build sekarang berhenti pada:
+  src/app/(shop)/components/admin/BannerEditContent.tsx
+  Error: Button tidak memiliki prop `asChild`.
+- Jangan menganggap ini satu-satunya error. Setelah diperbaiki, jalankan build ulang dan periksa error berikutnya sampai benar-benar bersih.
+- Working tree memiliki perubahan existing yang harus dipertahankan.
+- package-lock.json memiliki perubahan existing.
+- Ada perubahan sebelumnya pada layout.tsx, search page, invoice page, dan file lain yang sudah ada di working tree.
+- Jangan menghapus perubahan existing hanya untuk membuat build PASS.
+
+ATURAN KERJA:
+
+1. MULAI DENGAN AUDIT, BUKAN LANGSUNG EDIT.
+
+Jalankan:
+
+git status --short --branch
+git diff --check
+git diff --stat
+git diff --name-only
+
+Kemudian periksa diff untuk memahami perubahan existing.
+
+JANGAN:
+- git reset --hard
+- git checkout -- .
+- git restore .
+- menghapus package-lock.json
+- menghapus database
+- menghapus .env
+- menghapus credentials
+- force push
+- upgrade/downgrade dependency tanpa alasan kuat
+- mengerjakan fitur baru
+- mengubah behavior bisnis yang tidak berkaitan dengan error
+
+2. PERBAIKI ERROR CURRENT BUILD
+
+Periksa:
+
+src/app/(shop)/components/admin/BannerEditContent.tsx
+
+Cari penggunaan Button dengan prop:
+
+asChild
+
+Periksa implementasi Button yang sebenarnya digunakan repository.
+Jangan asal mengganti kode.
+
+Tentukan apakah:
+- Button memang wrapper shadcn yang seharusnya mendukung `asChild`,
+- import Button salah,
+- versi/implementasi Button berbeda,
+- atau penggunaan `asChild` memang tidak kompatibel dengan Button repository saat ini.
+
+Gunakan pola yang konsisten dengan komponen lain di repository.
+
+Jika `asChild` memang tidak didukung, ubah penggunaan tersebut dengan solusi paling kecil dan aman tanpa merusak UI/behavior.
+
+JANGAN membuat refactor besar.
+
+3. SETELAH MEMPERBAIKI ERROR TERSEBUT:
+
+Jalankan:
+
+npx tsc --noEmit
+
+Jika FAIL:
+- perbaiki error TypeScript yang nyata.
+- jangan memakai `any` sebagai jalan pintas.
+- jangan mematikan strict checking.
+- jangan menambahkan @ts-ignore/@ts-expect-error hanya untuk menyembunyikan error.
+- perbaiki root cause.
+
+Setelah TypeScript PASS, jalankan:
+
+npm run lint
+
+Jika FAIL:
+- perbaiki semua error blocking.
+- warning non-blocking boleh tetap jika memang pre-existing.
+- jangan mengubah konfigurasi lint hanya untuk menghilangkan error.
+
+Setelah lint PASS, jalankan:
+
+npm run build
+
+PENTING:
+Build harus dijalankan sampai selesai.
+
+Jika build menemukan error baru:
+- audit error tersebut,
+- perbaiki root cause,
+- ulangi TypeScript,
+- ulangi lint,
+- ulangi build.
+
+Jangan berhenti setelah error pertama saja.
+
+Ulangi sampai:
+
+TypeScript = PASS
+Lint = PASS
+Build = PASS
+
+4. JAGA REGRESSION
+
+Selama memperbaiki baseline, pastikan jangan merusak:
+
+- authentication Phase 27
+- middleware
+- JWT/session
+- protected routes
+- payment/order flow
+- admin routes
+- product management
+- category management
+- banner management
+- reports
+- existing API
+- caching Phase 28
+- product/category data
+- existing UI behavior
+
+Jangan mengerjakan Phase 25–29.
+
+5. SETELAH SEMUA PASS:
+
+Jalankan:
+
+git diff --check
+git status --short --branch
+git diff --stat
+
+Periksa diff secara menyeluruh.
+
+Pastikan:
+- tidak ada credentials
+- tidak ada .env
+- tidak ada secret
+- tidak ada database yang tidak sengaja berubah
+- tidak ada file besar/temp/debug
+- tidak ada perubahan dependency yang tidak diperlukan
+- tidak ada perubahan Phase 25–29
+- tidak ada perubahan yang hanya dibuat untuk menyembunyikan error
+
+6. JIKA SEMUA VERIFIKASI PASS:
+
+Buat SATU commit untuk menyimpan baseline yang sudah diperbaiki.
+
+Commit message:
+
+fix: restore clean build baseline
+
+Kemudian:
+
+git status --short --branch
+git log -1 --oneline --decorate
+
+7. PUSH KE GITHUB UNTUK BACKUP VPS:
+
+Jalankan:
+
+git push origin main
+
+JANGAN force push.
+
+Setelah push berhasil, verifikasi:
+
+git status --short --branch
+git log -1 --oneline --decorate
+git ls-remote --heads origin main
+
+Pastikan commit lokal dan origin/main menunjuk ke commit yang sama.
+
+8. JIKA ADA MASALAH:
+
+Jika TypeScript, lint, atau build masih FAIL:
+- JANGAN commit.
+- JANGAN push.
+- Laporkan error lengkap dan file/fungsi penyebabnya.
+
+Jika ada perubahan existing yang tidak jelas:
+- JANGAN menghapusnya.
+- Laporkan terlebih dahulu.
+
+Jika build PASS tetapi git diff mengandung perubahan yang mencurigakan:
+- JANGAN commit.
+- STOP dan laporkan.
+
+9. LAPORAN AKHIR WAJIB:
+
+Tampilkan:
+
+=== BASELINE VERIFICATION ===
+
+TypeScript: PASS/FAIL
+Lint: PASS/FAIL
+Build: PASS/FAIL
+git diff --check: PASS/FAIL
+
+=== FILES FIXED ===
+Daftar file yang benar-benar diperbaiki.
+
+=== ROOT CAUSE ===
+Jelaskan penyebab error BannerEditContent dan error lain jika ditemukan.
+
+=== REGRESSION CHECK ===
+Auth: PASS/FAIL
+Admin: PASS/FAIL
+Payment/Order: PASS/FAIL
+Product: PASS/FAIL
+Category: PASS/FAIL
+Banner: PASS/FAIL
+Reports: PASS/FAIL
+Caching: PASS/FAIL
+
+=== GIT ===
+Commit: <hash>
+Commit message: fix: restore clean build baseline
+Push: PASS/FAIL
+origin/main: <hash>
+Working tree: CLEAN/NOT CLEAN
+
+PENTING TERAKHIR:
+
+Jangan menyatakan "aman" hanya karena satu error sudah diperbaiki.
+
+"Aman untuk commit" hanya jika:
+- TypeScript PASS
+- Lint PASS
+- Build PASS
+- git diff --check PASS
+- diff sudah diaudit
+- tidak ada secret/credential yang ikut
+- tidak ada fitur Phase 25–29 yang dikerjakan
+- commit berhasil
+- push origin/main berhasil
+
+Jika salah satu gagal, jangan commit dan jangan push.
 
 ```
 
