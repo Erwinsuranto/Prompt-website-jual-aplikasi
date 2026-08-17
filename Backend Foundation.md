@@ -51,7 +51,82 @@
 ```
 # 
 ```
+DATABASE_URL Supabase PostgreSQL sudah tersedia di .env.local.
 
+Lanjutkan Phase 26.1 Task 2 dari titik terakhir.
+
+PENTING:
+- Jangan tampilkan atau bocorkan DATABASE_URL/credential.
+- Jangan mengubah nilai credential.
+- Jangan membuat database baru.
+- Jangan menjalankan migration.
+- Jangan menjalankan prisma db push.
+- Jangan menjalankan prisma migrate.
+- Jangan menjalankan seed.
+- Jangan reset database.
+- Jangan mengubah Phase 27 Auth.
+- Jangan mengubah Phase 28 Caching.
+- Jangan mengubah Phase 29 SEO/Metadata/PWA.
+
+TUJUAN:
+Validasi bahwa konfigurasi Prisma/database connection dapat membaca DATABASE_URL Supabase dengan benar.
+
+LANGKAH:
+
+1. Audit package.json dan package-lock.json.
+2. Pastikan ORM yang digunakan project adalah Prisma dan gunakan konfigurasi existing.
+3. Periksa prisma/schema.prisma atau konfigurasi Prisma yang sudah ada.
+4. Pastikan datasource menggunakan environment variable DATABASE_URL, bukan hardcoded URL.
+5. Jika konfigurasi sudah benar, jangan ubah file tanpa alasan.
+6. Jalankan validasi Prisma yang TIDAK mengubah database.
+7. Jalankan:
+   npm run lint
+   npm run build
+   git diff --check
+
+8. Pastikan:
+   - TypeScript PASS
+   - Prisma/configuration validation PASS
+   - Lint PASS
+   - Build PASS
+   - git diff --check PASS
+
+9. Regression check:
+   - Phase 27 Auth tetap PASS
+   - Phase 28 Caching tetap PASS
+   - Phase 29 SEO/Metadata/PWA tetap PASS
+
+10. Jika semuanya PASS dan memang ada perubahan konfigurasi yang perlu disimpan:
+   buat SATU commit:
+
+   feat(database): configure Supabase PostgreSQL connection
+
+11. Pastikan .env.local/.env tidak masuk commit.
+
+12. Setelah commit:
+   git status --short --branch
+   git log -1 --oneline --decorate
+
+13. Push ke origin/main jika authentication GitHub tersedia.
+   Jika push gagal karena credential:
+   jangan membuat commit tambahan, jangan force push, dan laporkan commit hash lokal.
+
+JANGAN lanjut ke Phase 26.1 Task 3/schema.
+Berhenti setelah Task 2 selesai dan berikan laporan lengkap.
+
+LAPORAN:
+- Prisma status
+- DATABASE_URL configuration status (tanpa menampilkan secret)
+- files changed
+- TypeScript
+- Prisma validation
+- Lint
+- Build
+- regression Phase 27/28/29
+- commit hash
+- push status
+- working tree status
+- next step: Phase 26.1 Task 3 jika Task 2 PASS
 
 
 ```
