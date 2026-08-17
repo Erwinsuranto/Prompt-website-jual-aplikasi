@@ -37,10 +37,344 @@
 
 
 ```
-# 
+# Phase 26.1 Task 4
 ```
 
+# Prompt: Phase 26.1 Task 4 — Initial Database Migration
 
+Lanjutkan development repository `/root/toko-online`.
+
+Kita sekarang berada di:
+
+Phase 26 — Database
+Phase 26.1 — Database Setup
+Task 4 — Run Initial Database Migration
+
+IMPORTANT:
+- Repository sudah memiliki commit backup dan sudah di-push ke GitHub.
+- Jangan menghapus pekerjaan yang sudah ada.
+- Jangan melakukan reset/revert.
+- Jangan mengubah fitur yang tidak berkaitan dengan database.
+- Jangan upgrade/downgrade dependency.
+- Jangan menghapus credentials.
+- Jangan menampilkan isi credential/secret ke output.
+- `.env.local` harus tetap tidak masuk Git.
+- Jangan pernah commit DATABASE_URL asli.
+- Jangan menjalankan migration ke production secara otomatis jika target database belum dapat dipastikan aman.
+
+TUJUAN:
+Menyelesaikan Phase 26.1 Task 4 dengan aman berdasarkan Prisma schema yang sudah dibuat pada Task 3.
+
+==================================================
+1. AUDIT KONDISI SAAT INI
+==================================================
+
+Sebelum mengubah apa pun, periksa:
+
+- git status
+- git branch -vv
+- git log -5 --oneline --decorate
+- package.json
+- prisma/schema.prisma
+- prisma.config.* jika ada
+- .env.example
+- .env.local hanya untuk membaca keberadaan variable, JANGAN CETAK NILAI SECRET
+- konfigurasi Prisma
+- scripts database di package.json
+
+Pastikan:
+- working tree awalnya clean atau jelaskan jika tidak;
+- schema Prisma valid;
+- DATABASE_URL tersedia atau tidak;
+- provider database yang digunakan;
+- migration directory sudah ada atau belum;
+- apakah database sudah pernah memiliki migration.
+
+Jangan mengarang DATABASE_URL.
+
+==================================================
+2. VALIDASI PRISMA
+==================================================
+
+Jalankan validasi Prisma yang sesuai dengan versi Prisma yang benar-benar digunakan repository.
+
+Minimal:
+
+- Prisma schema validation
+- Prisma generate jika diperlukan
+- pemeriksaan konfigurasi datasource
+- pemeriksaan migration state
+
+Gunakan command yang kompatibel dengan versi Prisma yang sudah terpasang.
+
+Jangan mengubah package.json atau lockfile hanya karena ingin memakai command Prisma versi lain.
+
+Jika command gagal karena konfigurasi Prisma, perbaiki hanya konfigurasi yang memang diperlukan.
+
+==================================================
+3. PERIKSA DATABASE TARGET
+==================================================
+
+Sebelum migration, tentukan dengan jelas database target.
+
+Kemungkinan provider:
+- Supabase PostgreSQL
+- PostgreSQL biasa
+- provider PostgreSQL lain
+
+Jangan memilih provider berdasarkan tebakan.
+
+DATABASE_URL harus berasal dari environment/secret manager yang memang tersedia.
+
+Jika DATABASE_URL tidak tersedia:
+- JANGAN membuat credential palsu.
+- JANGAN mengarang connection string.
+- JANGAN menjalankan migration.
+- Berhenti pada tahap konfigurasi dan laporkan bahwa database connection belum tersedia.
+
+Jika DATABASE_URL tersedia:
+- jangan tampilkan nilainya;
+- hanya tampilkan informasi non-secret seperti provider/host yang aman bila diperlukan.
+
+==================================================
+4. BEDAKAN LOCAL / STAGING / PRODUCTION
+==================================================
+
+Sebelum menjalankan migration, tentukan apakah DATABASE_URL menunjuk ke:
+
+- local development database,
+- staging/test database,
+- atau production database.
+
+Jika tidak dapat dipastikan, JANGAN menjalankan destructive atau irreversible migration.
+
+Untuk database production:
+- jangan menggunakan reset;
+- jangan menggunakan prisma migrate reset;
+- jangan menghapus database;
+- jangan drop table;
+- jangan force migration;
+- jangan melakukan perubahan schema di luar migration.
+
+Jika migration terhadap production memang diperlukan tetapi target belum terkonfirmasi:
+STOP dan laporkan kondisi tersebut.
+
+==================================================
+5. BUAT INITIAL MIGRATION
+==================================================
+
+Jika database target aman untuk migration dan schema sudah valid:
+
+Buat initial migration berdasarkan `prisma/schema.prisma`.
+
+Gunakan workflow Prisma yang sesuai dengan versi repository.
+
+Migration harus:
+- berasal dari schema aktual;
+- reproducible;
+- tersimpan di `prisma/migrations/`;
+- tidak mengandung credential;
+- tidak menghapus data existing tanpa alasan yang jelas;
+- tidak melakukan perubahan di luar kebutuhan schema.
+
+Jika migration directory sudah memiliki migration sebelumnya:
+JANGAN membuat migration duplicate.
+Audit migration yang sudah ada terlebih dahulu.
+
+==================================================
+6. JANGAN MENGHANCURKAN DATA
+==================================================
+
+Sangat penting:
+
+JANGAN menjalankan:
+
+- prisma migrate reset
+- DROP DATABASE
+- DROP TABLE secara manual
+- delete existing records
+- truncate existing tables
+
+kecuali memang diperlukan dan telah mendapat instruksi eksplisit.
+
+Jika schema Prisma tidak cocok dengan database existing dan migration berpotensi merusak data:
+STOP.
+
+Laporkan:
+- tabel yang konflik;
+- perubahan schema;
+- potensi kehilangan data;
+- solusi migration yang aman.
+
+==================================================
+7. JALANKAN MIGRATION DENGAN AMAN
+==================================================
+
+Jika target database sudah terverifikasi aman:
+
+- jalankan initial migration;
+- cek hasil migration;
+- cek migration status;
+- pastikan schema database sesuai dengan Prisma schema.
+
+Jangan menggunakan reset.
+
+Jika Prisma meminta confirmation atau migration berpotensi destructive:
+JANGAN bypass confirmation.
+STOP dan laporkan.
+
+==================================================
+8. VERIFIKASI PROJECT
+==================================================
+
+Setelah migration berhasil, jalankan:
+
+- TypeScript check
+- lint
+- build
+- Prisma validation/generate
+- migration status
+
+Pastikan tidak ada regression pada:
+
+Phase 25:
+- API
+
+Phase 27:
+- authentication
+
+Phase 28:
+- caching
+
+Phase 29:
+- SEO/metadata/PWA
+
+Jangan mengubah fitur-fitur tersebut.
+
+Jika build gagal:
+- cari root cause;
+- perbaiki hanya jika berkaitan langsung dengan perubahan Task 4;
+- jangan melakukan refactor besar.
+
+==================================================
+9. GIT AUDIT
+==================================================
+
+Setelah semua verification PASS:
+
+Jalankan:
+
+git status
+git diff --check
+git diff --stat
+
+Pastikan hanya file yang memang berkaitan dengan Task 4 yang berubah.
+
+Periksa terutama:
+- prisma/schema.prisma
+- prisma/migrations/*
+- package.json
+- package-lock.json
+- konfigurasi Prisma
+
+Jika package-lock berubah tanpa alasan yang diperlukan:
+jangan commit perubahan tersebut.
+
+Pastikan:
+- `.env.local` tidak tracked;
+- DATABASE_URL tidak masuk commit;
+- credential tidak masuk commit;
+- tidak ada secret di migration;
+- tidak ada file temporary/debug.
+
+==================================================
+10. COMMIT CHECKPOINT
+==================================================
+
+Jika:
+
+- Prisma validation PASS
+- migration PASS
+- migration status PASS
+- TypeScript PASS
+- lint PASS
+- build PASS
+- git diff --check PASS
+- tidak ada secret
+- working tree hanya berisi perubahan Task 4
+
+buat checkpoint commit.
+
+Commit message:
+
+feat(database): run initial prisma migration
+
+Setelah commit:
+
+git log -1 --oneline --decorate
+git status --short --branch
+
+==================================================
+11. PUSH BACKUP
+==================================================
+
+Setelah commit berhasil, push ke:
+
+origin main
+
+Gunakan authentication yang memang sudah dikonfigurasi.
+
+Jangan force push.
+
+Jangan:
+
+git push --force
+git reset --hard
+git push --force-with-lease
+
+Jika push gagal karena authentication:
+- JANGAN mengubah commit;
+- JANGAN membuat commit duplicate;
+- jangan force push;
+- laporkan commit hash lokal yang sudah tersimpan sebagai backup.
+
+==================================================
+12. HASIL AKHIR
+==================================================
+
+Berikan laporan ringkas:
+
+### Database
+- Provider:
+- DATABASE_URL tersedia: YES/NO
+- Target: local/staging/production/unknown
+- Prisma validation:
+- Migration:
+- Migration status:
+
+### Verification
+- TypeScript:
+- Lint:
+- Build:
+- git diff --check:
+
+### Git
+- Commit hash:
+- Commit message:
+- Push:
+- Working tree:
+
+### Remaining
+Sebutkan task berikutnya berdasarkan ROADMAP.md.
+
+IMPORTANT:
+Jangan menyatakan PASS jika command benar-benar belum dijalankan.
+
+Jangan membuat asumsi bahwa migration production aman.
+
+Jika ada blocker yang membutuhkan credential/provider/database decision, STOP pada titik tersebut dan laporkan blocker secara jelas.
+
+Kerjakan Task 4 saja. Jangan lanjut ke Task 5 sebelum Task 4 benar-benar terverifikasi dan checkpoint commit berhasil.
 
 ```
 # Prompt — Phase 26.1 Task 3: Prisma Schema
