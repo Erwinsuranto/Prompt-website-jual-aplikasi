@@ -61,9 +61,393 @@
 
 
 ```
-# 
+# Phase 26.1 Task 2 → connection string → schema → migration → seed → repositories → kembali Phase 25 API.
 ```
+PROMPT — Phase 26 Database Provider Audit & Safe Preparation
 
+Lanjutkan dari audit terakhir.
+
+Repository:
+ /root/toko-online
+
+Model:
+ GPT-5.6 Luna
+
+STATUS TERAKHIR:
+- Working tree: CLEAN
+- HEAD lokal: 0f95e04
+- Commit terakhir:
+  feat(settings): complete admin password change
+- Phase 27 Auth: PASS
+- Phase 28 Caching: PASS
+- Phase 29 SEO/Metadata/PWA: PASS
+- Phase 25 belum dilanjutkan karena dependency database.
+- Push GitHub sebelumnya gagal hanya karena credential HTTPS tidak tersedia.
+- Jangan membuat commit baru hanya karena push gagal.
+- Jangan reset/revert/force-push.
+- Jangan menghapus data, credentials, .env, database, atau perubahan existing.
+
+HASIL AUDIT SEBELUMNYA:
+Phase 25 Task 1 — GET /api/products memiliki dependency:
+1. Database/repository layer belum siap.
+2. Route Handler tidak boleh menggunakan pola `export default` yang tidak kompatibel.
+3. Backend authentication/JWT harus menggunakan infrastructure auth yang sudah ada.
+4. Phase 26 Database merupakan prerequisite nyata.
+
+NEXT STEP DARI AUDIT:
+Phase 26.1 Task 2 — Configure database connection string.
+
+TAPI:
+JANGAN LANGSUNG MEMBUAT DATABASE.
+JANGAN MEMILIH PROVIDER SECARA ASAL.
+JANGAN MEMBUAT DATABASE BARU.
+JANGAN MENGGANTI ARCHITECTURE EXISTING.
+
+==================================================
+TUJUAN
+==================================================
+
+Lakukan audit khusus untuk menentukan database provider yang PALING SESUAI berdasarkan repository yang sudah ada.
+
+Provider yang mungkin:
+- PostgreSQL
+- Supabase PostgreSQL
+- Neon PostgreSQL
+- provider PostgreSQL lain
+- database existing yang sudah digunakan project
+
+Prioritas:
+1. Gunakan database/provider yang sudah tersedia.
+2. Gunakan environment variable yang sudah ada jika memang valid.
+3. Jangan meminta user membuat akun/provider baru jika sebenarnya project sudah memiliki database.
+4. Jangan memasukkan credential asli ke source code.
+5. Jangan mengubah `.env` tanpa kepastian.
+6. Jangan membuat schema/migration sebelum provider dipastikan.
+
+==================================================
+1. AUDIT PACKAGE.JSON
+==================================================
+
+Periksa:
+
+package.json
+package-lock.json
+
+Cari dependency:
+
+- prisma
+- @prisma/client
+- drizzle-orm
+- drizzle-kit
+- pg
+- postgres
+- @supabase/supabase-js
+- @neondatabase/serverless
+- mongodb
+- mongoose
+- sqlite
+- better-sqlite3
+- database adapter lainnya.
+
+Jelaskan dependency database yang BENAR-BENAR sudah terpasang.
+
+Jangan install dependency baru pada tahap audit.
+
+==================================================
+2. AUDIT ENVIRONMENT
+==================================================
+
+Periksa:
+
+.env
+.env.local
+.env.example
+environment references di source code
+
+Cari nama variable seperti:
+
+DATABASE_URL
+DIRECT_URL
+POSTGRES_URL
+POSTGRES_PRISMA_URL
+POSTGRES_URL_NON_POOLING
+SUPABASE_URL
+SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+NEON_DATABASE_URL
+DB_URL
+DB_HOST
+DB_USER
+DB_PASSWORD
+DB_NAME
+
+PENTING:
+
+- Jangan menampilkan secret/token/password/API key lengkap pada laporan.
+- Masking semua credential.
+- Jangan menghapus atau mengubah env.
+- Jangan commit `.env`.
+- Jangan mencetak secret ke terminal jika tidak diperlukan.
+
+Tentukan apakah DATABASE_URL atau credential database sudah tersedia.
+
+==================================================
+3. AUDIT SOURCE CODE
+==================================================
+
+Cari seluruh penggunaan:
+
+DATABASE_URL
+process.env.*
+database client
+PrismaClient
+Drizzle
+Pool
+postgres()
+createClient()
+supabase
+repository
+database service
+data access layer
+
+Gunakan grep/search yang aman.
+
+Cari juga apakah project sudah memiliki:
+
+- `lib/db`
+- `lib/database`
+- `services/database`
+- `repositories`
+- `server/db`
+- `prisma/`
+- `drizzle/`
+- `migrations/`
+
+Jelaskan struktur aktual.
+
+==================================================
+4. AUDIT EXISTING DATA
+==================================================
+
+Cari bagaimana data berikut saat ini disimpan:
+
+- products
+- categories
+- banners
+- users
+- orders
+- payments
+- settings
+- notifications
+- admin users
+
+Tentukan apakah data saat ini berasal dari:
+
+- API
+- JSON
+- local file
+- in-memory
+- mock
+- database
+- service layer
+
+Jangan mengubah data.
+
+==================================================
+5. AUDIT AUTH
+==================================================
+
+Phase 27 sudah PASS.
+
+Periksa infrastructure auth existing:
+
+- JWT
+- jose
+- cookie
+- middleware
+- user/session
+- admin authentication
+
+Tentukan data user/admin apa yang nantinya membutuhkan database.
+
+JANGAN membuat sistem auth baru.
+
+==================================================
+6. AUDIT NEXT.JS VERSION
+==================================================
+
+Periksa versi Next.js.
+
+Tentukan apakah project menggunakan:
+
+- App Router
+- Route Handlers
+- Server Components
+- Server Actions
+
+Pastikan rekomendasi database kompatibel dengan architecture tersebut.
+
+==================================================
+7. TENTUKAN PROVIDER
+==================================================
+
+Setelah seluruh audit selesai, buat keputusan:
+
+### CASE A
+Jika database provider sudah tersedia:
+→ gunakan provider tersebut.
+
+### CASE B
+Jika dependency dan environment jelas menunjukkan PostgreSQL:
+→ rekomendasikan PostgreSQL yang sesuai dengan architecture existing.
+
+### CASE C
+Jika Supabase sudah digunakan:
+→ gunakan Supabase, jangan membuat PostgreSQL kedua.
+
+### CASE D
+Jika Neon sudah digunakan:
+→ gunakan Neon.
+
+### CASE E
+Jika tidak ada database/provider sama sekali:
+→ JANGAN membuat database.
+→ JANGAN install dependency.
+→ JANGAN mengarang DATABASE_URL.
+→ berhenti pada audit dan laporkan apa yang harus disediakan user.
+
+==================================================
+8. TASK 26.1 TASK 2
+==================================================
+
+Jika provider dan DATABASE_URL SUDAH tersedia dan architecture sudah jelas:
+
+Implementasikan konfigurasi connection string SECARA MINIMAL.
+
+Ketentuan:
+
+- gunakan environment variable;
+- jangan hardcode credential;
+- jangan commit `.env`;
+- jangan mengubah auth;
+- jangan mengubah caching;
+- jangan mengubah SEO/metadata/PWA;
+- jangan mengubah product UI;
+- jangan mengerjakan migration/schema/seed sekaligus.
+
+Hanya kerjakan connection configuration yang memang diperlukan.
+
+Jika provider belum tersedia:
+STOP setelah audit.
+Jangan coding.
+
+==================================================
+9. VERIFICATION
+==================================================
+
+Jika ada perubahan:
+
+npm run lint
+npm run build
+git diff --check
+
+Pastikan:
+
+- TypeScript PASS
+- Lint PASS
+- Build PASS
+- Phase 27 auth tetap PASS
+- Phase 28 caching tetap PASS
+- Phase 29 SEO/metadata/PWA tetap PASS
+
+Jika ada error:
+perbaiki hanya root cause task ini.
+
+Jangan melakukan refactor besar.
+
+==================================================
+10. GIT CHECKPOINT
+==================================================
+
+Jika dan HANYA JIKA semua verification PASS:
+
+git status --short --branch
+git diff --stat
+git diff --check
+git log -1 --oneline --decorate
+
+Jika perubahan memang layak menjadi checkpoint:
+
+buat SATU commit:
+
+feat(database): configure database connection
+
+Gunakan message yang sesuai dengan perubahan aktual.
+
+Jangan commit `.env`, credentials, secret, database dump, atau file sensitif.
+
+Push hanya jika credential GitHub tersedia.
+
+Jika push gagal:
+- jangan mengulang coding;
+- jangan membuat commit tambahan;
+- laporkan commit hash lokal.
+
+==================================================
+11. LAPORAN AKHIR
+==================================================
+
+Berikan laporan:
+
+## Database Audit
+- database dependency
+- database provider
+- env configuration
+- existing database layer
+- existing data source
+- auth dependency
+
+## Decision
+- provider yang dipilih
+- alasan
+- apakah sudah tersedia atau belum
+
+## Implementation
+Jika ada:
+- file berubah
+- perubahan
+
+Jika tidak ada:
+- jelaskan kenapa berhenti.
+
+## Verification
+- TypeScript
+- Lint
+- Build
+- git diff --check
+
+## Regression
+- Phase 27
+- Phase 28
+- Phase 29
+
+## Git
+- HEAD
+- commit
+- working tree
+- push status
+
+## NEXT STEP
+Tentukan task berikutnya berdasarkan kondisi aktual.
+
+ATURAN UTAMA:
+Jangan membuat database/provider baru tanpa alasan.
+Jangan mengarang credential.
+Jangan hardcode DATABASE_URL.
+Jangan mengerjakan schema sebelum connection provider jelas.
+Jangan melompat langsung ke Phase 25.
+Jangan mengejar progress roadmap jika dependency belum siap.
+Prioritaskan architecture yang benar dan checkpoint Git yang aman.
 
 
 ```
