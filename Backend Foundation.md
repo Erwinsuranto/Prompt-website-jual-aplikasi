@@ -37,9 +37,501 @@
 
 
 ```
-# 
+# Prompt: Integrasi Core Backend & Frontend Digital Cell
 ```
+Prompt: Integrasi Core Backend & Frontend Digital Cell
 
+Project: Digital Cell / toko-online
+
+KONDISI SAAT INI
+
+Project sudah melewati audit database dan runtime development.
+
+Status yang sudah diverifikasi:
+- Next.js production runtime aktif pada port 3000.
+- localhost:3000/ -> HTTP 200.
+- localhost:3000/api/products -> HTTP 200.
+- PostgreSQL terhubung melalui Prisma.
+- Semua migration Prisma yang diperlukan sudah diterapkan.
+- Prisma schema valid.
+- Database saat ini masih kosong.
+- /api/products sudah menggunakan Prisma/PostgreSQL, bukan mock/static data.
+- Payment webhook sudah menggunakan POST.
+- Payment webhook tidak melewati login user biasa.
+- Bypass authentication hanya berlaku pada exact webhook path.
+- Webhook memiliki validasi payload/signature sesuai implementasi.
+- /api/payments/webhook berhasil diverifikasi.
+- npm run typecheck -> PASS.
+- npm run build -> PASS.
+- Cloudflare Tunnel tetap berjalan untuk kebutuhan development/testing.
+- VPS ini hanya DEVELOPMENT sementara, bukan production.
+- Tidak perlu melakukan optimasi production VPS.
+- Nantinya project akan dipindahkan ke VPS production baru.
+
+HASIL AUDIT SERVICE SEBELUMNYA
+
+Service inti sudah terhubung atau disiapkan untuk Prisma/PostgreSQL.
+
+Service tambahan seperti:
+- favorites
+- reviews
+- addresses
+- coupons
+- admin user management
+- email delivery
+- notifications
+- reports
+- legacy auth integration
+
+belum semuanya menjadi prioritas dan tidak boleh dipaksakan untuk dibuat jika belum diperlukan oleh flow utama.
+
+TUJUAN TAHAP INI
+
+Sekarang fokus pada integrasi CORE E-COMMERCE.
+
+Jangan membuat ulang project.
+Jangan mengubah desain UI yang sudah ada.
+Jangan mengganti database.
+Jangan menggunakan mock data sebagai pengganti database.
+Gunakan Prisma/PostgreSQL sebagai sumber data utama untuk data dinamis.
+
+==================================================
+TAHAP 1 — AUDIT FRONTEND TERHADAP BACKEND
+==================================================
+
+1. Audit seluruh frontend yang berhubungan dengan:
+   - products
+   - categories
+   - product detail
+   - cart
+   - checkout
+   - orders
+   - payment
+   - account/user
+
+2. Cari:
+   - fetch()
+   - axios
+   - server actions
+   - API client
+   - hardcoded product
+   - hardcoded category
+   - local JSON
+   - dummy array
+   - placeholder response
+   - localStorage yang digunakan sebagai pengganti database
+
+3. Buat mapping:
+
+   FRONTEND FEATURE
+   -> API/SERVER LOGIC
+   -> SERVICE
+   -> PRISMA MODEL
+
+4. Jangan langsung mengubah kode sebelum memahami mapping tersebut.
+
+==================================================
+TAHAP 2 — PRODUCT
+==================================================
+
+Pastikan product catalog benar-benar berasal dari PostgreSQL.
+
+Implementasikan/verifikasi:
+
+- daftar produk
+- pagination
+- category filter
+- search
+- product detail
+- stock/status produk
+- price
+- promo/discount jika schema mendukung
+- sold count jika schema mendukung
+- product image
+- active/inactive
+
+Rules:
+
+- Jangan membuat dummy product.
+- Jika database kosong, UI harus menampilkan empty state yang benar.
+- Jangan memasukkan seed data otomatis.
+- Jangan mengubah Prisma schema jika model existing sudah mencukupi.
+- Gunakan query Prisma yang sesuai.
+- Hindari N+1 query.
+- Validasi pagination dan search input.
+
+Pastikan:
+
+GET /api/products
+
+tetap HTTP 200.
+
+==================================================
+TAHAP 3 — CATEGORY
+==================================================
+
+Audit category flow.
+
+Pastikan kategori:
+
+- berasal dari database jika memang dinamis
+- dapat digunakan untuk filter produk
+- tidak bergantung pada hardcoded category list
+- memiliki empty state jika tidak ada kategori
+
+Jika API category belum ada tetapi frontend memang membutuhkannya:
+
+- buat endpoint yang diperlukan saja
+- gunakan Prisma
+- jangan membuat endpoint formalitas yang tidak digunakan frontend.
+
+==================================================
+TAHAP 4 — PRODUCT DETAIL
+==================================================
+
+Pastikan ketika user membuka produk:
+
+- product diambil berdasarkan identifier yang benar
+- data berasal dari PostgreSQL
+- produk tidak ditemukan menghasilkan response yang sesuai
+- produk inactive tidak dapat dibeli
+- stock diperiksa sebelum checkout
+- harga berasal dari database
+
+Jangan percaya harga yang dikirim oleh browser.
+
+Harga final checkout harus diverifikasi ulang dari database/server.
+
+==================================================
+TAHAP 5 — CART
+==================================================
+
+Audit implementasi cart.
+
+Tentukan apakah cart saat ini:
+
+- hanya client-side state
+- localStorage
+- database
+- atau kombinasi keduanya.
+
+Jangan mengubah arsitektur cart secara besar-besaran jika belum diperlukan.
+
+Yang penting:
+
+- quantity divalidasi
+- product identifier divalidasi
+- harga tidak dipercaya dari client
+- product inactive tidak dapat ditambahkan
+- product yang sudah tidak tersedia ditangani dengan benar.
+
+Jika cart memang sengaja client-side, pertahankan.
+
+==================================================
+TAHAP 6 — CHECKOUT
+==================================================
+
+Ini bagian penting.
+
+Pastikan checkout menggunakan server-side validation.
+
+Saat checkout:
+
+1. Client mengirim product identifier dan quantity.
+2. Server mengambil product dari PostgreSQL.
+3. Server memeriksa:
+   - product exists
+   - active
+   - stock
+   - quantity valid
+4. Server mengambil harga terbaru dari database.
+5. Server menghitung subtotal.
+6. Server menghitung discount jika memang tersedia.
+7. Server menghitung total final.
+8. Server membuat order menggunakan Prisma.
+9. Order item dibuat berdasarkan data database.
+10. Snapshot checkout yang sudah tersedia harus digunakan sesuai schema.
+
+Jangan menerima:
+- total harga dari client
+- harga produk dari client
+- discount final dari client
+sebagai sumber kebenaran.
+
+Gunakan database sebagai source of truth.
+
+==================================================
+TAHAP 7 — ORDER
+==================================================
+
+Audit order-service.
+
+Pastikan order:
+
+- dibuat melalui Prisma
+- memiliki order identifier
+- memiliki status
+- memiliki total
+- memiliki customer information sesuai schema
+- memiliki order items
+- memiliki snapshot data checkout jika model mendukungnya
+
+Gunakan transaction Prisma jika pembuatan order membutuhkan beberapa operasi database yang harus atomik.
+
+Jangan membuat order dummy saat testing.
+
+Untuk testing:
+
+- gunakan database kosong
+- gunakan read-only verification jika memungkinkan
+- jangan membuat transaksi nyata tanpa instruksi eksplisit.
+
+==================================================
+TAHAP 8 — PAYMENT
+==================================================
+
+Audit payment-service setelah webhook selesai.
+
+Pastikan:
+
+- payment terkait dengan order yang benar
+- payment status tidak dapat diubah sembarang dari frontend
+- callback provider masuk melalui webhook
+- webhook melakukan validasi signature/secret
+- status order/payment diperbarui secara transactional jika diperlukan
+- duplicate webhook aman/idempotent
+- retry provider tidak membuat payment/order duplikat
+
+Jangan menghubungkan provider payment nyata hanya untuk testing.
+
+Jangan mengirim pembayaran nyata.
+
+Jangan membuat mock payment yang terlihat seperti transaksi sukses.
+
+==================================================
+TAHAP 9 — AUTH & USER
+==================================================
+
+Audit auth-service dan user-service.
+
+Pastikan:
+
+- authentication tetap menggunakan mekanisme existing
+- user session tetap berjalan
+- endpoint protected tetap protected
+- webhook tetap menjadi pengecualian exact path saja
+- user tidak dapat mengakses order milik user lain
+- user ID diambil dari session/server authentication, bukan dipercaya dari request body.
+
+Jangan mengganti sistem authentication secara besar-besaran.
+
+==================================================
+TAHAP 10 — ERROR HANDLING
+==================================================
+
+Periksa response API.
+
+Gunakan status HTTP yang masuk akal:
+
+200:
+successful read/update
+
+201:
+successful creation
+
+400:
+invalid input
+
+401:
+unauthenticated
+
+403:
+authenticated tetapi tidak memiliki akses
+
+404:
+resource tidak ditemukan
+
+409:
+conflict seperti stock berubah atau duplicate operation
+
+500:
+unexpected server error
+
+Jangan mengembalikan stack trace atau secret ke browser.
+
+==================================================
+TAHAP 11 — SECURITY
+==================================================
+
+Audit:
+
+- authentication
+- authorization
+- input validation
+- price manipulation
+- quantity manipulation
+- IDOR
+- order ownership
+- payment webhook
+- secret exposure
+- DATABASE_URL exposure
+- environment variables
+- API error leakage
+
+Pastikan:
+
+- DATABASE_URL tidak masuk client bundle.
+- secret tidak dikirim ke frontend.
+- webhook secret tidak dikirim ke frontend.
+- user hanya dapat melihat order miliknya sendiri.
+- admin endpoint tetap protected.
+
+==================================================
+TAHAP 12 — PERFORMANCE UNTUK VPS DEVELOPMENT
+==================================================
+
+VPS ini hanya development dan memiliki RAM terbatas.
+
+Jangan menjalankan proses berat secara paralel.
+
+Jangan:
+- menjalankan banyak Next.js instance
+- menjalankan build berulang-ulang tanpa kebutuhan
+- menjalankan migration reset
+- menjalankan database seed besar
+- menjalankan load test
+- menjalankan stress test
+- menjalankan browser automation berat.
+
+Gunakan pemeriksaan ringan terlebih dahulu.
+
+==================================================
+TAHAP 13 — TESTING
+==================================================
+
+Setelah implementasi:
+
+1. Jalankan typecheck.
+2. Jika typecheck PASS, lanjutkan build satu kali.
+3. Pastikan production build PASS.
+4. Pastikan runtime development tetap berjalan.
+5. Verifikasi:
+
+GET /
+GET /api/products
+
+6. Verifikasi endpoint category jika memang tersedia.
+7. Verifikasi product detail dengan data kosong tanpa membuat dummy data.
+8. Verifikasi checkout validation menggunakan request invalid yang aman.
+9. Verifikasi payment webhook dengan payload test yang tidak memicu transaksi nyata.
+
+Jangan membuat data dummy.
+
+Jika database kosong, hasil seperti:
+
+data: []
+total: 0
+
+adalah hasil yang valid.
+
+==================================================
+TAHAP 14 — JANGAN MENGUBAH HAL DI LUAR SCOPE
+==================================================
+
+Jangan mengubah:
+
+- UI design
+- warna
+- layout
+- branding Digital Cell
+- Cloudflare DNS
+- Cloudflare Tunnel
+- port development
+- VPS configuration
+- database provider
+- migration lama
+
+kecuali perubahan tersebut benar-benar diperlukan untuk memperbaiki core integration.
+
+Jangan melakukan:
+- prisma migrate reset
+- database drop
+- database replacement
+- migration deletion
+- Git commit
+- Git push
+
+==================================================
+TAHAP 15 — HASIL AKHIR
+==================================================
+
+Sebelum berhenti, berikan laporan:
+
+A. FRONTEND
+- Product
+- Category
+- Product detail
+- Cart
+- Checkout
+- Order
+- Payment
+- Account
+
+Status masing-masing:
+CONNECTED / PARTIAL / NOT CONNECTED
+
+B. BACKEND
+- Product service
+- Category service
+- Order service
+- Payment service
+- User service
+- Auth service
+
+Status masing-masing.
+
+C. DATABASE
+- Prisma connection
+- Migration
+- Model yang digunakan
+- Apakah schema berubah
+
+D. SECURITY
+- Authentication
+- Authorization
+- Webhook
+- Price validation
+- Order ownership
+
+E. TEST
+- typecheck
+- build
+- GET /
+- GET /api/products
+- endpoint lain yang diverifikasi
+
+F. FILE CHANGED
+Tampilkan:
+- file yang diubah
+- perubahan utama
+- alasan perubahan
+
+G. REMAINING
+Tampilkan fitur yang sengaja belum dikerjakan dan alasannya.
+
+PENTING:
+
+Kerjakan secara bertahap.
+Jangan melakukan perubahan besar tanpa audit terlebih dahulu.
+Jika menemukan masalah yang membutuhkan perubahan Prisma schema, BERHENTI dan laporkan terlebih dahulu sebelum membuat migration baru.
+
+Jika semua schema yang ada sudah mencukupi, jangan membuat schema baru.
+
+Jika ada fitur yang belum dibutuhkan oleh core flow, jangan dipaksakan.
+
+Jangan commit atau push GitHub.
+
+Berhenti setelah laporan akhir diberikan agar hasil dapat diverifikasi sebelum tahap berikutnya.
 
 
 ```
