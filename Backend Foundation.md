@@ -47,9 +47,54 @@
 
 
 ```
-# 
+# Prompt: Integrasi Prisma dan Backend Toko Online
 ```
+## Audit & Perbaiki Integrasi Backend Prisma
 
+Project: Digital Cell / toko-online
+
+Lakukan audit menyeluruh terhadap project yang sedang aktif. Jangan membuat ulang project dan jangan menghapus fitur yang sudah ada.
+
+Temuan awal:
+- Next.js 14.2.33
+- TypeScript
+- Prisma 5.22
+- Database migration sudah ada di app/prisma/migrations/
+- npm run typecheck berhasil
+- npm run build berhasil
+- npm run start gagal karena next.config menggunakan output: "export"
+- Pencarian PrismaClient di src tidak menemukan penggunaan Prisma.
+- Project memiliki service seperti auth-service, banner-service, category-service, order-service, payment-service, product-service, user-service, dll.
+
+Tugas:
+
+1. Audit seluruh struktur project terlebih dahulu.
+2. Tentukan apakah project memang membutuhkan Next.js server runtime untuk Prisma/database.
+3. Jika Prisma belum terintegrasi, implementasikan integrasi Prisma dengan benar.
+4. Jika output: "export" tidak sesuai dengan arsitektur aplikasi, perbaiki next.config agar aplikasi dapat berjalan menggunakan npm run start.
+5. Buat/revisi Prisma client singleton yang aman untuk development dan production.
+6. Hubungkan service yang memang membutuhkan database ke Prisma tanpa merusak UI/store yang sudah ada.
+7. Periksa authentication, user, product, category, banner, order, order item, payment, notification dan data settings agar siap menggunakan database sesuai schema Prisma yang sudah ada.
+8. Jangan membuat API route hanya untuk formalitas. Buat endpoint/server logic yang memang diperlukan oleh frontend.
+9. Jangan menyimpan DATABASE_URL, secret, atau .env.local ke Git.
+10. Jangan mengubah desain UI kecuali diperlukan untuk memperbaiki integrasi.
+11. Jangan menghapus migration yang sudah dibuat.
+12. Pastikan semua perubahan modular dan mudah dikembangkan.
+13. Jalankan:
+   - npm run typecheck
+   - npm run build
+   - npm run start atau validasi production server dengan cara yang sesuai arsitektur.
+14. Jika ditemukan error, perbaiki sampai ketiga tahap tersebut valid.
+15. Setelah selesai, tampilkan ringkasan file yang diubah dan alasan setiap perubahan.
+
+PENTING:
+- Jangan hanya menghilangkan output: "export" tanpa memastikan seluruh aplikasi tetap berfungsi.
+- Jangan mengganti database.
+- Jangan menggunakan mock data sebagai pengganti database production.
+- Jangan menghapus fitur existing.
+- Gunakan schema Prisma yang sudah tersedia sebagai sumber data utama.
+- Jika ada bagian yang ternyata memang sengaja static, pertahankan bagian tersebut dan integrasikan backend hanya pada fitur yang membutuhkan database.
+- Setelah perubahan selesai, jangan commit atau push ke GitHub. Berhenti dan laporkan hasilnya agar bisa diverifikasi terlebih dahulu.
 
 
 ```
