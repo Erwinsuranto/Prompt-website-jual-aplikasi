@@ -182,6 +182,196 @@
 # 
 ```
 
+Lanjutkan project toko-online dari hasil audit terakhir.
+
+Fokus tahap ini pada FINALISASI ENVIRONMENT PRODUCTION DAN INSTALASI UNIT SYSTEMD PAYMENT EXPIRY.
+
+Kondisi terakhir:
+
+* Deployment path: `/root/toko-online/app`
+* Systemd direkomendasikan sebagai process manager.
+* Scheduler belum aktif.
+* Screenshot verification menunjukkan:
+
+  * `toko-online-payment-expiry.timer` belum ter-install;
+  * `toko-online-payment-expiry.service` belum ter-install;
+  * file `/etc/systemd/system/toko-online-payment-expiry.service` belum ada;
+  * file `/etc/systemd/system/toko-online-payment-expiry.timer` belum ada.
+* `/etc/toko-online/toko-online.env` belum dibuat karena source `DATABASE_URL` production belum dikonfirmasi.
+* Web process existing JANGAN disentuh.
+
+Tujuan:
+Menentukan source `DATABASE_URL` production secara aman, lalu memasang service + timer systemd tanpa mengaktifkannya.
+
+Tugas:
+
+1. Audit process toko-online yang sedang berjalan secara READ-ONLY.
+
+   * Cari PID/process `next-server` yang merupakan toko-online.
+   * Tentukan working directory dan port.
+   * Jangan kill/restart process.
+
+2. Identifikasi environment yang sedang digunakan process production.
+
+   * Periksa environment process melalui mekanisme Linux yang tersedia, misalnya `/proc/<PID>/environ`.
+   * Jangan pernah print nilai `DATABASE_URL`, password, API key, token, cookie, atau secret.
+   * Hanya laporkan:
+
+     * apakah `DATABASE_URL` tersedia;
+     * hostname/database yang sudah dimasking;
+     * atau fingerprint/hash non-reversible untuk perbandingan.
+
+3. Bandingkan dengan environment project:
+
+   * `.env.local`
+   * `.env`
+   * `.env.production`
+   * file environment deployment lain jika ada.
+
+   Tujuan hanya untuk menentukan apakah salah satu file tersebut benar-benar merupakan source production.
+
+4. Jika `DATABASE_URL` dari process production dapat dipastikan sama dengan salah satu source environment:
+
+   * gunakan source tersebut sebagai dasar `/etc/toko-online/toko-online.env`;
+   * jangan tampilkan nilainya;
+   * jangan menyalin secret yang tidak diperlukan worker;
+   * minimal masukkan variable yang memang diperlukan worker.
+
+5. Jika tidak dapat dipastikan:
+
+   * JANGAN menebak;
+   * JANGAN membuat DATABASE_URL palsu;
+   * JANGAN memasang service yang dapat terhubung ke database yang salah;
+   * berhenti dan laporkan bahwa source production perlu dikonfirmasi.
+
+6. Jika source production berhasil dipastikan:
+   Buat:
+   `/etc/toko-online/`
+
+   lalu:
+   `/etc/toko-online/toko-online.env`
+
+   Ketentuan:
+
+   * permission ketat;
+   * tidak berada di Git;
+   * tidak mencetak isi file;
+   * jangan memasukkan secret yang tidak dibutuhkan worker.
+
+7. Tentukan user systemd berdasarkan deployment existing.
+
+   * Jangan otomatis mengganti ownership project.
+   * Jangan membuat user baru tanpa kebutuhan.
+   * Jika production existing berjalan sebagai root dan tidak aman untuk dipindahkan pada tahap ini, gunakan root untuk worker dan laporkan sebagai technical debt.
+   * Jangan mengubah user web process existing.
+
+8. Setelah environment valid, buat DAN INSTALL unit:
+   `/etc/systemd/system/toko-online-payment-expiry.service`
+
+   dan:
+   `/etc/systemd/system/toko-online-payment-expiry.timer`
+
+   Service harus:
+
+   * WorkingDirectory `/root/toko-online/app`;
+   * menggunakan command worker production yang sudah diverifikasi;
+   * menggunakan `EnvironmentFile=/etc/toko-online/toko-online.env`;
+   * tidak menyimpan secret langsung dalam unit;
+   * Type=oneshot jika worker memang one-shot;
+   * logging melalui journalctl;
+   * aman dijalankan berulang;
+   * tidak menjalankan web server.
+
+9. Timer:
+
+   * memanggil service worker;
+   * menggunakan interval yang sudah ditentukan oleh aturan expiry existing;
+   * tidak membuat overlapping worker;
+   * jangan mengubah expiry duration;
+   * jangan menggunakan setInterval.
+
+10. Setelah unit dibuat:
+    Jalankan:
+
+* `systemd-analyze verify /etc/systemd/system/toko-online-payment-expiry.service`
+* `systemd-analyze verify /etc/systemd/system/toko-online-payment-expiry.timer`
+
+Jika valid, lakukan `systemctl daemon-reload` hanya agar systemd membaca unit baru.
+
+11. PENTING:
+    JANGAN:
+
+* `systemctl enable`
+* `systemctl start`
+* `systemctl restart`
+* `systemctl stop`
+* `systemctl enable --now`
+* mengaktifkan timer
+* mengaktifkan service
+
+Pada tahap ini status harus tetap DISABLED/NOT STARTED.
+
+12. Validasi worker secara manual:
+
+* gunakan environment production yang sudah dikonfirmasi;
+* jalankan worker secara manual;
+* pastikan database connection berhasil;
+* pastikan worker scan database;
+* pastikan worker exit normal;
+* jangan membuat payment baru;
+* jangan mengubah data payment hanya untuk testing.
+
+13. Pastikan file environment aman:
+
+* cek permission;
+* cek owner;
+* cek bahwa file tidak tracked Git;
+* jangan tampilkan isi secret.
+
+14. Jalankan verification project:
+
+* payment expiry tests;
+* webhook regression tests;
+* typecheck;
+* lint;
+* build;
+* git diff --check.
+
+Warning berikut tetap jangan disentuh:
+`src/components/ui/select.tsx`
+ARIA warning tersebut di luar scope.
+
+PENTING:
+
+* Jangan mengubah frontend.
+* Jangan mengubah webhook idempotency.
+* Jangan mengubah expiry logic.
+* Jangan migration.
+* Jangan reset database.
+* Jangan mengubah port.
+* Jangan kill/restart process web existing.
+* Jangan commit.
+* Jangan push GitHub.
+* Jangan membuat README baru.
+* Jangan menampilkan secret.
+
+Jika `DATABASE_URL` production tidak bisa diverifikasi, berhenti sebelum membuat environment file dan unit yang aktif. Tampilkan hanya blocker tersebut.
+
+Jika berhasil, tampilkan:
+
+1. Process production yang menjadi sumber environment.
+2. Source environment yang terverifikasi, tanpa secret.
+3. User systemd.
+4. Permission `/etc/toko-online/toko-online.env`.
+5. Service path.
+6. Timer path.
+7. Hasil `systemd-analyze verify`.
+8. Hasil manual worker.
+9. Hasil test/typecheck/lint/build.
+10. Status service dan timer — HARUS DISABLED/NOT STARTED.
+11. Command yang nanti digunakan untuk mengaktifkan scheduler setelah deployment owner menyetujui.
+
+Berhenti setelah konfigurasi terpasang dan tervalidasi.:::
 
 
 ```
