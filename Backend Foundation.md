@@ -206,6 +206,134 @@
 # 
 ```
 
+Lanjutkan project toko-online dari kondisi terakhir.
+
+Sekarang fokus pada FINALISASI PRODUCTION SCHEDULER di VPS untuk Payment Expiry Worker.
+
+Kondisi saat ini:
+
+* Payment expiry worker sudah selesai.
+* Worker runner sudah diuji: 3 tests passed.
+* Webhook regression: 3 tests passed.
+* Manual worker smoke test PASS.
+* Worker dapat start, scan, finish, dan disconnect secara normal.
+* `expiresAt` sudah tersedia dan legacy backfill sudah selesai.
+* Scheduler production belum aktif.
+* Deployment menggunakan VPS.
+* Jangan mengubah logic bisnis expiry yang sudah selesai.
+
+Tugas:
+
+1. Audit environment VPS terlebih dahulu.
+
+   * Periksa apakah PM2 tersedia dan digunakan.
+   * Periksa systemd service yang relevan.
+   * Periksa cron yang sudah ada.
+   * Periksa bagaimana aplikasi toko-online saat ini dijalankan.
+   * Jangan membuat duplicate process untuk web server yang sudah berjalan.
+
+2. Pilih scheduler berdasarkan infrastructure yang benar-benar ditemukan.
+   Prioritas:
+
+   * gunakan PM2 jika aplikasi existing memang dikelola PM2;
+   * gunakan systemd jika deployment existing menggunakan systemd;
+   * gunakan cron hanya jika itu pilihan paling sederhana dan aman.
+
+3. Jangan langsung mengaktifkan scheduler production sebelum konfigurasi diverifikasi.
+   Pastikan:
+
+   * `DATABASE_URL` tersedia untuk worker;
+   * environment production yang benar digunakan;
+   * worker dapat dijalankan manual menggunakan environment production;
+   * worker tidak memakai database development secara tidak sengaja.
+
+4. Worker production harus berjalan sebagai process terpisah dari web server jika architecture existing mengharuskannya.
+
+   * Jangan menjalankan worker di frontend.
+   * Jangan membuat dua scheduler berbeda.
+   * Jangan menggunakan `setInterval` sebagai satu-satunya production scheduler.
+
+5. Jika PM2 digunakan:
+
+   * tambahkan konfigurasi worker ke ecosystem configuration existing jika memang ada;
+   * gunakan environment yang benar;
+   * pastikan restart tidak membuat duplicate worker;
+   * gunakan graceful shutdown yang sudah tersedia.
+
+6. Jika systemd digunakan:
+
+   * buat service worker yang modular;
+   * gunakan environment production dengan aman;
+   * restart policy harus wajar;
+   * pastikan SIGTERM/SIGINT ditangani dengan benar.
+
+7. Jika cron digunakan:
+
+   * panggil worker runner secara berkala;
+   * gunakan absolute path;
+   * pastikan environment `DATABASE_URL` tersedia;
+   * cegah overlapping worker jika worker sebelumnya belum selesai;
+   * logging diarahkan ke lokasi yang jelas.
+
+8. Interval:
+
+   * gunakan interval yang sesuai dengan aturan expiry existing;
+   * scheduler hanya menjalankan worker;
+   * jangan mengubah durasi expiry payment.
+
+9. Verifikasi deployment:
+
+   * jalankan worker manual menggunakan environment production;
+   * pastikan database connection berhasil;
+   * pastikan worker dapat scan database;
+   * pastikan worker exit normal;
+   * pastikan scheduler dapat menjalankannya;
+   * cek process/service status;
+   * cek log worker.
+
+10. Jika ditemukan bahwa konfigurasi deployment belum cukup untuk mengaktifkan scheduler dengan aman:
+
+* jangan menebak;
+* jangan mengubah service production;
+* tampilkan command yang diperlukan dan konfigurasi yang masih kurang.
+
+11. Jalankan verification:
+
+* test payment expiry;
+* webhook regression test;
+* typecheck;
+* build;
+* status scheduler/process;
+* manual worker smoke test.
+
+Jangan memperbaiki warning:
+`src/components/ui/select.tsx`
+karena warning tersebut di luar scope.
+
+PENTING:
+
+* Jangan reset database.
+* Jangan mengubah frontend.
+* Jangan mengubah webhook idempotency.
+* Jangan mengintegrasikan payment provider nyata.
+* Jangan membuat README baru.
+* Jangan membuat scheduler kedua.
+* Jangan commit.
+* Jangan push GitHub.
+* Jangan menghapus process/service production yang sudah ada.
+* Jangan menjalankan migration destructive.
+
+Setelah selesai tampilkan:
+
+* scheduler yang ditemukan/dipilih;
+* konfigurasi yang dibuat;
+* interval;
+* command worker;
+* status process/service;
+* hasil log manual;
+* hasil test/build;
+* apakah scheduler sudah aktif atau masih menunggu konfigurasi manual;
+* masalah yang masih tersisa.
 
 
 ```
