@@ -115,7 +115,190 @@
 ```
 # 
 ```
+PROMPT: Implementasi Adapter Midtrans
 
+Lanjutkan project toko-online dari hasil audit provider terakhir.
+
+Fokus tahap ini HANYA pada IMPLEMENTASI ADAPTER MIDTRANS di atas provider abstraction yang sudah dibuat.
+
+Kondisi terakhir:
+- Payment expiry scheduler production AKTIF dan jangan diubah.
+- Payment expiry worker PASS.
+- Webhook idempotency PASS.
+- Create payment idempotency sudah tersedia.
+- Provider abstraction foundation sudah dibuat.
+- Network boundary/mock provider sudah tersedia.
+- Build/typecheck/lint sebelumnya PASS.
+- Gap terakhir:
+  - belum ada adapter Midtrans;
+  - registry production masih kosong;
+  - credential production belum dihubungkan;
+  - network request production belum digunakan;
+  - cancellation/refund nyata belum tersedia;
+  - durable provider operation store belum tersedia.
+- Jangan mengubah systemd scheduler.
+
+TUJUAN:
+Implementasikan adapter Midtrans secara modular menggunakan contract/provider abstraction yang sudah ada, tanpa mengubah core payment lifecycle.
+
+TUGAS:
+
+1. AUDIT PROVIDER FOUNDATION
+- Baca implementation provider contract, registry, credential abstraction, network client, webhook normalization, dan mock provider yang baru dibuat.
+- Jangan membuat abstraction kedua jika yang existing sudah sesuai.
+- Gunakan struktur project existing.
+
+2. ADAPTER MIDTRANS
+Buat adapter Midtrans yang mengimplementasikan contract existing.
+
+Minimal siapkan:
+- create payment;
+- get/check transaction status;
+- webhook verification/parsing;
+- mapping status Midtrans → internal payment status;
+- mapping error Midtrans → internal provider error.
+
+Cancellation/refund:
+- jika contract/capability sudah tersedia tetapi belum aman untuk production, tandai unsupported.
+- JANGAN membuat fake refund/cancel success.
+
+3. CREDENTIAL
+Gunakan environment/config abstraction existing.
+
+Credential Midtrans harus:
+- tidak hardcode;
+- tidak masuk Git;
+- tidak muncul di log;
+- dapat dibedakan antara sandbox/production jika architecture existing mendukung.
+
+Jangan meminta atau memasukkan credential nyata.
+
+4. NETWORK
+Gunakan network boundary yang sudah dibuat.
+Jangan langsung menggunakan fetch/axios dari core payment service.
+
+Pastikan:
+- timeout;
+- HTTP error;
+- network error;
+- response parsing;
+- provider error mapping.
+
+5. REGISTRY
+Daftarkan Midtrans pada provider registry existing.
+
+Behavior:
+- provider ID/name jelas;
+- adapter dapat ditemukan registry;
+- capability tersedia;
+- provider disabled/credential tidak tersedia menghasilkan error yang jelas;
+- jangan fallback diam-diam ke provider lain.
+
+6. WEBHOOK
+Hubungkan webhook Midtrans ke normalized internal event.
+
+Pastikan:
+- signature/security verification menggunakan abstraction existing;
+- order/transaction identifier dipetakan dengan benar;
+- status event dipetakan ke internal state;
+- duplicate webhook tetap aman menggunakan idempotency existing;
+- event tidak boleh mengubah terminal state secara ilegal.
+
+Jangan merusak legacy webhook parsing yang sudah ada.
+
+7. CORE PAYMENT
+Integrasikan adapter hanya melalui provider abstraction.
+
+Core payment service TIDAK boleh:
+- import SDK Midtrans langsung;
+- mengetahui detail response Midtrans;
+- mengetahui credential Midtrans;
+- memiliki logic status Midtrans.
+
+8. SDK / DEPENDENCY
+Jika project sudah memiliki dependency Midtrans, gunakan yang existing.
+
+Jika belum:
+- audit apakah SDK benar-benar diperlukan;
+- jangan menambahkan dependency besar tanpa alasan;
+- jika HTTP API existing sudah cukup, gunakan network abstraction yang sudah tersedia.
+
+9. TEST MOCK
+Jangan melakukan transaksi Midtrans nyata.
+
+Tambahkan test menggunakan mock HTTP/provider untuk:
+- create payment success;
+- create payment error;
+- status pending;
+- status paid;
+- status expired/cancelled sesuai mapping yang valid;
+- invalid response;
+- network timeout;
+- HTTP error;
+- invalid webhook;
+- valid webhook;
+- duplicate webhook;
+- unsupported refund/cancel jika belum tersedia.
+
+10. SECURITY
+Pastikan:
+- secret tidak masuk log;
+- secret tidak masuk test fixture;
+- signature verification tidak dilewati;
+- jangan membuat mode "always valid" di production;
+- jangan hardcode sandbox credential.
+
+11. PRODUCTION SAFETY
+JANGAN:
+- melakukan transaksi payment nyata;
+- menggunakan API key nyata;
+- mengubah database production;
+- mengubah migration existing kecuali benar-benar diperlukan;
+- mengubah systemd timer/service;
+- restart/kill web process;
+- mengubah port;
+- mengubah frontend;
+- mengubah expiry worker;
+- mengubah create idempotency;
+- commit;
+- push GitHub;
+- membuat README baru.
+
+12. VERIFICATION
+Jalankan:
+- seluruh payment tests;
+- Midtrans adapter tests;
+- webhook regression tests;
+- create idempotency tests;
+- expiry tests;
+- typecheck;
+- lint;
+- build;
+- git diff --check.
+
+Warning existing:
+src/components/ui/select.tsx
+jangan disentuh.
+
+13. LAPORAN AKHIR
+
+Tampilkan:
+1. File adapter Midtrans yang dibuat/diubah.
+2. Contract yang digunakan.
+3. Registry yang digunakan.
+4. Credential source tanpa menampilkan secret.
+5. Endpoint/API abstraction yang digunakan.
+6. Mapping status Midtrans → internal status.
+7. Mapping webhook.
+8. Capability cancel/refund.
+9. Test yang ditambahkan dan hasilnya.
+10. Typecheck/lint/build/git diff --check.
+11. Gap provider yang masih tersisa.
+12. Konfirmasi systemd payment expiry scheduler tetap AKTIF dan tidak diubah.
+13. Konfirmasi TIDAK ada transaksi Midtrans nyata.
+14. Jangan commit atau push.
+
+BERHENTI setelah adapter Midtrans dan seluruh verification selesai.
 
 
 ```
