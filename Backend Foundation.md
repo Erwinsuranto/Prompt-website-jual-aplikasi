@@ -175,6 +175,127 @@
 ```
 # 
 ```
+Lanjutkan project toko-online dari kondisi terakhir.
+
+Semua konfigurasi production environment dan systemd payment expiry worker sudah tervalidasi. Sekarang lakukan FINAL ACTIVATION scheduler production.
+
+Kondisi:
+
+* Deployment path: `/root/toko-online/app`
+* systemd service payment expiry sudah tersedia.
+* systemd timer sudah tersedia.
+* Production environment sudah dikonfirmasi.
+* Worker manual smoke test berhasil.
+* Payment expiry tests 10/10 PASS.
+* Worker tests 3/3 PASS.
+* Webhook regression 3/3 PASS.
+* Typecheck PASS.
+* Build PASS.
+* git diff --check PASS.
+* Service dan timer masih disabled/inactive.
+* Jangan mengubah logic payment, webhook idempotency, atau expiry worker.
+
+Tugas:
+
+1. Sebelum aktivasi, lakukan final read-only verification:
+
+   * `systemctl cat toko-online-payment-expiry.service`
+   * `systemctl cat toko-online-payment-expiry.timer`
+   * `systemctl status toko-online-payment-expiry.service`
+   * `systemctl status toko-online-payment-expiry.timer`
+   * pastikan EnvironmentFile yang digunakan benar;
+   * jangan tampilkan secret.
+
+2. Pastikan service dan timer valid:
+
+   * `systemd-analyze verify`
+   * pastikan dependency dan WorkingDirectory benar;
+   * pastikan command worker benar.
+
+3. Aktifkan scheduler production:
+
+   * `systemctl daemon-reload`
+   * `systemctl enable --now toko-online-payment-expiry.timer`
+
+   HANYA timer yang perlu di-enable/start.
+   Jangan menjalankan web service toko-online.
+
+4. Setelah timer aktif:
+
+   * cek `systemctl status toko-online-payment-expiry.timer`;
+   * cek `systemctl list-timers`;
+   * pastikan timer memiliki NEXT RUN yang valid;
+   * pastikan service belum mengalami restart loop.
+
+5. Lakukan satu verifikasi execution.
+
+   * Jalankan service secara manual SATU KALI jika diperlukan untuk memastikan production execution.
+   * Pastikan DATABASE_URL production digunakan.
+   * Pastikan worker berhasil connect ke database.
+   * Pastikan worker selesai normal.
+   * Jangan membuat payment baru.
+   * Jangan mengubah data payment hanya untuk testing.
+
+6. Periksa log:
+
+   * `journalctl -u toko-online-payment-expiry.service -n 100 --no-pager`
+   * pastikan tidak ada error;
+   * jangan tampilkan credential/secret dalam laporan.
+
+7. Pastikan scheduler tidak overlapping:
+
+   * timer hanya memanggil service;
+   * service one-shot selesai sebelum execution berikutnya;
+   * worker tetap aman jika execution sebelumnya masih berjalan.
+
+8. Jalankan verification akhir:
+
+   * payment expiry tests;
+   * worker tests;
+   * webhook regression tests;
+   * typecheck;
+   * lint;
+   * build;
+   * git diff --check.
+
+9. Warning berikut tetap jangan disentuh:
+   `src/components/ui/select.tsx`
+   karena bukan bagian scope.
+
+PENTING:
+
+* Jangan mengubah frontend.
+* Jangan mengubah webhook idempotency.
+* Jangan mengubah expiry logic.
+* Jangan migration.
+* Jangan reset database.
+* Jangan mengubah port.
+* Jangan kill/restart process web existing.
+* Jangan membuat scheduler kedua.
+* Jangan membuat cron tambahan.
+* Jangan commit.
+* Jangan push GitHub.
+* Jangan menampilkan secret.
+
+Jika aktivasi gagal:
+
+* jangan melakukan perubahan destruktif;
+* tampilkan error systemd yang sebenarnya;
+* jangan mematikan process web existing;
+* jangan menebak konfigurasi.
+
+Setelah selesai tampilkan laporan:
+
+1. Service status.
+2. Timer status.
+3. NEXT RUN.
+4. LAST RUN jika sudah ada.
+5. Hasil manual worker execution.
+6. Log worker tanpa secret.
+7. Semua test/build verification.
+8. Apakah scheduler production sudah benar-benar aktif.
+
+Berhenti setelah verifikasi selesai.:::
 
 
 
