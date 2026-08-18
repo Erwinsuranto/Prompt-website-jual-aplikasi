@@ -18,9 +18,824 @@
 
 
 ```
-# 
+# Prompt: Payment System Foundation
 ```
+PROMPT — PAYMENT SYSTEM FOUNDATION & PAYMENT LIFECYCLE
 
+Project: Digital Cell / toko-online
+
+KONDISI TERKINI
+
+Tahap sebelumnya sudah selesai dan diverifikasi:
+
+- Prisma/PostgreSQL menjadi sumber data utama.
+- Catalog menggunakan database.
+- Admin catalog/product management sudah terhubung database.
+- Product price dan stock berasal dari database.
+- Checkout melakukan validasi server-side.
+- Order dibuat menggunakan transaction.
+- Stock handling sudah atomic sesuai implementasi existing.
+- Order ownership protection aktif.
+- Order status transition tervalidasi.
+- Payment dipisahkan dari order.
+- Payment webhook sudah memiliki exact-path dan signature-aware foundation.
+- Authentication tetap server-side.
+- Authorization tetap server-side.
+- npm run typecheck PASS.
+- npm run build PASS.
+- Runtime development sehat.
+- Database development boleh kosong.
+- Tidak ada transaksi payment nyata.
+- VPS ini hanya DEVELOPMENT dan nantinya dipindahkan ke VPS production.
+
+CATATAN:
+
+Ada kemungkinan idempotency key untuk duplicate order belum tersedia karena membutuhkan perubahan schema/migration. Jangan memaksakan perubahan schema pada tahap ini.
+
+==================================================
+TUJUAN
+==================================================
+
+Sekarang bangun PAYMENT SYSTEM FOUNDATION yang aman dan modular.
+
+Flow target:
+
+ORDER
+ ↓
+PAYMENT CREATION
+ ↓
+PENDING PAYMENT
+ ↓
+PAYMENT STATUS
+ ↓
+PAYMENT CONFIRMATION
+ ↓
+ORDER STATUS UPDATE
+
+Payment provider nyata BELUM diintegrasikan.
+
+Tahap ini fokus pada:
+
+- payment model/service existing
+- payment lifecycle
+- payment status
+- payment/order relationship
+- payment amount integrity
+- payment authorization
+- payment webhook foundation
+- admin payment visibility
+- security
+- idempotent state transition jika dapat dilakukan tanpa migration.
+
+==================================================
+1. AUDIT PAYMENT EXISTING
+==================================================
+
+Audit terlebih dahulu seluruh:
+
+- payment-service
+- payment API
+- payment webhook
+- payment UI
+- order payment relation
+- payment status
+- payment settings
+- admin payment page
+- provider configuration
+- AppSettings terkait payment.
+
+Cari:
+
+- mock payment
+- fake payment success
+- hardcoded payment status
+- localStorage payment
+- dummy payment provider
+- client-side payment confirmation
+- endpoint yang mengubah payment status tanpa authorization
+- payment amount dari browser yang dipercaya server.
+
+Jangan langsung membuat sistem baru sebelum memahami kode existing.
+
+==================================================
+2. PRISMA SCHEMA
+==================================================
+
+Audit model Prisma yang berkaitan dengan:
+
+- Order
+- Payment
+- User
+- OrderItem
+- AppSettings
+- PaymentMethod
+- provider configuration jika tersedia.
+
+Gunakan schema existing.
+
+Jika schema sudah cukup:
+
+JANGAN ubah schema.
+
+Jika schema tidak cukup untuk kebutuhan minimum:
+
+STOP sebelum migration.
+
+Laporkan:
+
+- model
+- field
+- relation
+- alasan
+- dampak.
+
+Jangan membuat migration tanpa approval.
+
+==================================================
+3. PAYMENT LIFECYCLE
+==================================================
+
+Gunakan status existing jika tersedia.
+
+Jika enum/status sudah ada, jangan membuat enum baru.
+
+Lifecycle harus jelas.
+
+Contoh konsep:
+
+PENDING
+→ PAID
+→ FAILED
+
+atau:
+
+PENDING
+→ EXPIRED
+
+atau:
+
+PENDING
+→ CANCELLED
+
+Gunakan status yang memang sudah tersedia di project.
+
+Jangan memaksakan status baru jika tidak diperlukan.
+
+==================================================
+4. ORDER VS PAYMENT STATUS
+==================================================
+
+Pastikan status order dan payment tidak dicampur.
+
+Contoh:
+
+Order:
+PENDING
+
+Payment:
+PENDING
+
+Setelah payment confirmed:
+
+Payment:
+PAID
+
+Order:
+PAID / PROCESSING
+
+Gunakan status existing sesuai arsitektur.
+
+Customer tidak boleh mengubah status tersebut melalui browser.
+
+==================================================
+5. CREATE PAYMENT
+==================================================
+
+Implementasikan payment creation server-side.
+
+Saat membuat payment:
+
+1. Authenticate user.
+2. Ambil order dari database.
+3. Pastikan order milik user.
+4. Pastikan order masih dapat dibayar.
+5. Ambil total order dari database.
+6. Jangan percaya amount dari request.
+7. Create payment menggunakan amount dari order.
+8. Set initial payment status sesuai schema.
+9. Return payment information yang aman.
+
+Jangan menerima:
+
+amount dari client sebagai sumber kebenaran.
+
+Client hanya boleh mengirim:
+
+order identifier
+dan data yang memang diperlukan.
+
+==================================================
+6. PAYMENT AMOUNT INTEGRITY
+==================================================
+
+WAJIB.
+
+Payment amount harus berasal dari:
+
+DATABASE ORDER TOTAL
+
+Bukan:
+
+- cart total
+- frontend total
+- hidden input
+- query parameter
+- request body amount.
+
+Server harus memastikan:
+
+payment.amount === order.total
+
+sesuai representasi numeric yang digunakan schema.
+
+Jangan menggunakan floating point secara sembarangan jika project menggunakan Decimal.
+
+Gunakan tipe/utility existing untuk money calculation.
+
+==================================================
+7. PAYMENT OWNERSHIP
+==================================================
+
+User hanya boleh membuat atau melihat payment untuk order miliknya.
+
+Server harus:
+
+- membaca session
+- mengambil order
+- memverifikasi ownership
+- baru mengakses payment.
+
+Jangan percaya:
+
+userId dari request body.
+
+Jangan percaya:
+
+customerId dari frontend.
+
+Admin boleh mengakses payment sesuai authorization admin.
+
+==================================================
+8. PAYMENT STATUS TRANSITION
+==================================================
+
+Status payment tidak boleh diubah bebas.
+
+Contoh:
+
+PENDING → PAID
+
+boleh jika kondisi valid.
+
+Tetapi:
+
+PAID → PENDING
+
+tidak boleh sembarangan.
+
+PAID → FAILED
+
+jangan diizinkan kecuali lifecycle existing memang mendukung.
+
+Buat transition validation menggunakan logic/service yang modular.
+
+Jangan menyebarkan status transition logic ke banyak API route.
+
+==================================================
+9. PAYMENT WEBHOOK FOUNDATION
+==================================================
+
+Audit webhook existing.
+
+Pastikan:
+
+- exact endpoint path
+- method POST
+- payload validation
+- provider identification
+- signature/token validation jika provider dikonfigurasi
+- tidak ada auth user biasa yang dibutuhkan untuk callback provider
+- callback tidak dapat digunakan sebagai endpoint umum.
+
+Jika provider belum dikonfigurasi:
+
+webhook harus gagal dengan status yang sesuai.
+
+Jangan membuat webhook menerima callback palsu tanpa validasi.
+
+==================================================
+10. WEBHOOK SECURITY
+==================================================
+
+Webhook harus memiliki:
+
+- exact path
+- method restriction
+- payload validation
+- provider validation
+- signature/token verification sesuai mekanisme existing
+- replay/idempotency handling jika schema existing memungkinkan.
+
+Jangan membuat:
+
+/api/payments/webhook/:anything
+
+sebagai catch-all.
+
+Jangan menerima webhook di endpoint umum.
+
+Jangan log:
+
+- API secret
+- webhook secret
+- authorization token
+- full sensitive payload.
+
+==================================================
+11. WEBHOOK STATE UPDATE
+==================================================
+
+Jika webhook valid menyatakan payment berhasil:
+
+Server harus:
+
+1. menemukan payment
+2. memverifikasi payment/order relationship
+3. memastikan amount/reference sesuai jika provider menyediakan
+4. memastikan status saat ini masih dapat diproses
+5. update payment
+6. update order sesuai lifecycle
+7. menggunakan transaction jika lebih dari satu database write.
+
+Jika webhook dikirim dua kali:
+
+hasil akhirnya harus tetap konsisten.
+
+Jangan membuat order/payment berubah dua kali secara tidak aman.
+
+==================================================
+12. DUPLICATE WEBHOOK
+==================================================
+
+Audit apakah schema existing memiliki:
+
+- provider transaction ID
+- webhook event ID
+- external reference
+- payment reference.
+
+Jika sudah ada:
+
+gunakan sebagai idempotency key.
+
+Jika belum ada dan membutuhkan migration:
+
+JANGAN membuat migration.
+
+Laporkan:
+
+"Webhook idempotency membutuhkan schema change."
+
+Tetap buat logic seaman mungkin menggunakan state transition yang tersedia.
+
+==================================================
+13. PAYMENT CONFIRMATION
+==================================================
+
+PENTING:
+
+Jangan membuat endpoint seperti:
+
+POST /api/payments/:id/confirm
+
+yang memungkinkan customer mengatakan:
+
+"payment saya sudah dibayar"
+
+dan server langsung mengubah status menjadi PAID.
+
+Customer tidak boleh menentukan payment success.
+
+Payment success harus berasal dari mekanisme payment yang tervalidasi.
+
+Jika provider belum ada:
+
+payment tetap PENDING.
+
+==================================================
+14. PAYMENT METHODS
+==================================================
+
+Audit existing payment method architecture.
+
+Jika project sudah memiliki payment methods:
+
+gunakan existing.
+
+Contoh:
+
+- QRIS
+- transfer bank
+- e-wallet
+- manual payment
+
+Tetapi jangan mengintegrasikan provider nyata dulu.
+
+Jika UI sudah memiliki payment method selector:
+
+hubungkan ke backend secara aman.
+
+Jangan membuat payment method baru tanpa schema/config yang sesuai.
+
+==================================================
+15. MANUAL PAYMENT FOUNDATION
+==================================================
+
+Jika project memang sudah memiliki flow manual payment:
+
+pastikan foundation-nya aman.
+
+Contoh:
+
+Order:
+PENDING
+
+Payment:
+PENDING
+
+Customer melakukan pembayaran manual.
+
+Tetapi:
+
+PAID tidak boleh ditentukan oleh client.
+
+Admin verification atau provider callback menjadi sumber perubahan status.
+
+Jangan membuat admin verification UI baru jika di luar scope existing.
+
+Cukup pastikan backend siap.
+
+==================================================
+16. PAYMENT ADMIN VIEW
+==================================================
+
+Jika admin payment UI existing tersedia:
+
+hubungkan dengan database.
+
+Admin dapat melihat:
+
+- payment ID
+- order ID
+- amount
+- method
+- status
+- createdAt
+- updatedAt
+- external reference jika ada.
+
+Jangan expose secret.
+
+Jangan expose webhook secret.
+
+Jangan expose provider API key.
+
+Jangan membuat refund system.
+
+==================================================
+17. PAYMENT API
+==================================================
+
+Audit endpoint existing.
+
+Minimal logic:
+
+CREATE PAYMENT
+GET PAYMENT
+WEBHOOK
+
+Gunakan struktur API existing.
+
+Jangan membuat endpoint hanya untuk formalitas.
+
+Pastikan private payment endpoint membutuhkan authentication.
+
+Webhook menggunakan mekanisme authentication/signature khusus provider.
+
+==================================================
+18. ERROR HANDLING
+==================================================
+
+Gunakan status HTTP yang sesuai.
+
+400:
+invalid payment request
+
+401:
+unauthenticated
+
+403:
+unauthorized
+
+404:
+order/payment tidak ditemukan
+
+409:
+payment state conflict
+
+422:
+invalid provider payload jika pola project menggunakan 422
+
+500:
+unexpected error
+
+Webhook invalid:
+
+gunakan response yang konsisten dengan implementation existing.
+
+Jangan mengembalikan secret atau stack trace.
+
+==================================================
+19. SECURITY AUDIT
+==================================================
+
+Periksa:
+
+- IDOR payment
+- payment amount manipulation
+- order ownership
+- status manipulation
+- webhook bypass
+- webhook catch-all
+- replay webhook
+- duplicate callback
+- secret leakage
+- provider token leakage
+- mass assignment.
+
+Pastikan request seperti:
+
+{
+  "status": "PAID"
+}
+
+tidak dapat digunakan customer untuk membayar order secara palsu.
+
+==================================================
+20. DATABASE TRANSACTION
+==================================================
+
+Jika webhook sukses membutuhkan:
+
+Payment update
++
+Order update
+
+gunakan transaction.
+
+Pastikan tidak terjadi kondisi:
+
+Payment = PAID
+Order = PENDING
+
+karena salah satu update gagal.
+
+Atau:
+
+Payment = PENDING
+Order = PROCESSING
+
+tanpa alasan valid.
+
+Gunakan transaction sesuai Prisma architecture existing.
+
+==================================================
+21. FRONTEND PAYMENT PAGE
+==================================================
+
+Audit payment page existing.
+
+Jangan redesign.
+
+Pastikan halaman mengambil:
+
+- order
+- total
+- payment status
+- payment method
+
+dari server.
+
+Jangan percaya total dari client.
+
+Jika payment masih PENDING:
+
+tampilkan status pending.
+
+Jangan menampilkan "berhasil" hanya karena endpoint create payment berhasil.
+
+CREATE PAYMENT ≠ PAYMENT SUCCESS.
+
+==================================================
+22. PAYMENT POLLING / REFRESH
+==================================================
+
+Jika frontend existing melakukan polling:
+
+audit agar tidak terlalu agresif.
+
+Jangan membuat infinite polling.
+
+Jika belum ada polling:
+
+tidak wajib menambahkan sistem polling kompleks pada tahap ini.
+
+Cukup pastikan GET payment status aman.
+
+==================================================
+23. NO REAL PROVIDER
+==================================================
+
+PENTING:
+
+Jangan:
+
+- menghubungkan Midtrans production
+- menghubungkan Xendit production
+- menghubungkan QRIS production
+- menghubungkan bank API production
+- menggunakan API key payment production
+- mengirim uang
+- membuat transaksi finansial nyata.
+
+Tahap ini hanya foundation.
+
+Provider nyata akan dilakukan pada tahap terpisah setelah backend payment stabil.
+
+==================================================
+24. TESTING
+==================================================
+
+Jalankan:
+
+npm run typecheck
+
+npm run build
+
+Kemudian test:
+
+1. Create payment untuk order valid.
+2. Create payment untuk order milik user lain.
+3. Create payment dengan amount manipulasi.
+4. Create payment untuk order yang sudah tidak payable.
+5. GET payment milik user.
+6. GET payment milik user lain.
+7. POST webhook method kosong.
+8. POST malformed JSON.
+9. POST invalid payload.
+10. POST webhook tanpa signature/token.
+11. POST webhook ke exact path.
+12. POST ke /api/payments/webhook/extra.
+13. Duplicate webhook jika dapat diuji tanpa provider nyata.
+14. Payment state transition invalid.
+15. npm run typecheck.
+16. npm run build.
+
+Jangan membuat transaksi payment nyata.
+
+Jika database development kosong:
+
+jangan membuat dummy transaction hanya untuk mendapatkan status PASS.
+
+==================================================
+25. DATABASE SAFETY
+==================================================
+
+JANGAN:
+
+- prisma migrate reset
+- DROP DATABASE
+- delete migration
+- recreate database
+- seed dummy payment
+- seed dummy order
+- menghapus data
+- mengganti DATABASE_URL.
+
+Jika migration diperlukan:
+
+STOP.
+
+Jelaskan kebutuhan migration dan tunggu approval.
+
+==================================================
+26. MODULAR ARCHITECTURE
+==================================================
+
+Jangan membuat satu file besar.
+
+Pisahkan sesuai struktur existing:
+
+- payment service
+- payment validation
+- payment status transition
+- webhook handler
+- API/server action
+- database access.
+
+Gunakan Prisma client singleton existing.
+
+Jangan membuat PrismaClient baru di setiap request.
+
+Jangan menduplikasi authentication.
+
+Jangan menduplikasi order calculation.
+
+==================================================
+27. FINAL REPORT
+==================================================
+
+Setelah selesai berikan laporan:
+
+A. PAYMENT
+
+- Create payment
+- Payment amount
+- Payment status
+- Payment/order relationship
+- Payment ownership
+
+B. WEBHOOK
+
+- Exact path
+- Method restriction
+- Payload validation
+- Signature/token validation
+- State transition
+- Duplicate webhook handling
+
+C. SECURITY
+
+- IDOR
+- Amount manipulation
+- Status manipulation
+- Secret leakage
+- Authorization
+
+D. DATABASE
+
+- Prisma models digunakan
+- Transaction
+- Schema changed atau tidak
+- Migration changed atau tidak
+
+E. FRONTEND
+
+- Payment page
+- Payment status
+- Order/payment data source
+
+F. TEST
+
+- typecheck
+- build
+- webhook tests
+- authorization tests
+- payment validation tests
+
+G. FILES CHANGED
+
+Tampilkan setiap file yang diubah dan alasan perubahan.
+
+H. REMAINING
+
+Tampilkan fitur yang sengaja belum dikerjakan.
+
+PENTING:
+
+- Jangan commit.
+- Jangan push GitHub.
+- Jangan reset database.
+- Jangan membuat migration tanpa approval.
+- Jangan mengubah Cloudflare.
+- Jangan mengubah DNS.
+- Jangan mengubah port.
+- Jangan mengubah UI di luar kebutuhan payment.
+- Jangan membuat mock payment sebagai pengganti database.
+- Jangan menggunakan payment provider production.
+- Jangan melakukan transaksi finansial nyata.
+
+Setelah selesai, BERHENTI dan berikan laporan lengkap.
 
 
 ```
