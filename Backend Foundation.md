@@ -217,6 +217,104 @@
 ```
 # 
 ```
+Lanjutkan project toko-online dari hasil implementasi Payment Session Expiry Worker.
+
+Fokus tahap ini hanya pada penanganan DATA PAYMENT LAMA yang masih memiliki `expiresAt = null`.
+
+Kondisi saat ini:
+
+* Payment expiry worker sudah dibuat.
+* Worker dapat mencari payment yang sudah melewati expiry.
+* State transition expiry sudah dibuat aman.
+* Test expiry sudah tersedia.
+* Scheduler belum aktif dan akan ditangani pada tahap deployment.
+* Beberapa data/payment lama dapat memiliki `expiresAt = null`.
+
+Tugas:
+
+1. Audit seluruh penggunaan `expiresAt`.
+
+   * Model/schema database.
+   * Create payment/session.
+   * Get payment/session.
+   * Repository/service.
+   * Expiry worker.
+   * Semua query yang berkaitan dengan payment pending.
+
+2. Tentukan policy yang aman untuk data lama dengan `expiresAt = null`.
+
+   * Jangan mengarang expiry berdasarkan timestamp yang tidak jelas.
+   * Jangan langsung mengubah semua data production tanpa mengetahui sumber waktu yang benar.
+   * Jangan membuat payment lama otomatis EXPIRED jika tidak dapat dibuktikan bahwa expiry-nya sudah lewat.
+
+3. Cari apakah payment lama mempunyai field timestamp lain yang dapat digunakan secara valid, misalnya:
+
+   * createdAt;
+   * payment creation time;
+   * provider/session creation time;
+   * atau field equivalent.
+
+4. Jika terdapat sumber waktu yang valid dan aturan expiry project sudah jelas:
+
+   * buat migration/backfill yang deterministik;
+   * hanya isi `expiresAt` untuk record yang dapat dihitung dengan aman;
+   * jangan menimpa `expiresAt` yang sudah memiliki nilai;
+   * jangan mengubah status payment secara sembarangan.
+
+5. Jika tidak ada informasi yang cukup untuk menghitung expiry:
+
+   * jangan membuat nilai expiry palsu;
+   * buat policy eksplisit untuk legacy record;
+   * worker harus mengabaikan `expiresAt = null` dengan aman;
+   * dokumentasikan bahwa record tersebut membutuhkan policy/manual handling terpisah.
+
+6. Pastikan payment baru selalu mendapatkan `expiresAt`.
+
+   * Audit semua jalur pembuatan payment/session.
+   * Jangan sampai ada endpoint/service baru yang masih membuat payment pending tanpa expiry.
+   * Jika ada jalur yang belum memberikan expiry, perbaiki pada source of truth-nya.
+
+7. Testing:
+
+   * payment baru selalu memiliki `expiresAt`;
+   * payment lama dengan `expiresAt` valid diproses sesuai expiry;
+   * payment lama dengan `expiresAt = null` tidak salah menjadi EXPIRED;
+   * `expiresAt` yang sudah ada tidak tertimpa;
+   * worker tetap idempotent;
+   * payment PAID/COMPLETED tetap aman.
+
+8. Jalankan:
+
+   * test payment expiry;
+   * test payment/session;
+   * typecheck;
+   * lint;
+   * build.
+
+9. Jangan menyentuh:
+
+   * frontend/UI;
+   * payment provider nyata;
+   * scheduler production;
+   * webhook idempotency kecuali diperlukan untuk kompatibilitas;
+   * database production.
+
+PENTING:
+
+* Jangan commit.
+* Jangan push GitHub.
+* Jangan reset database.
+* Jangan membuat README baru.
+* Jangan membuat expiry palsu untuk legacy payment.
+* Pertahankan arsitektur modular existing.
+
+Setelah selesai, tampilkan:
+
+* policy yang dipilih untuk `expiresAt = null`;
+* apakah migration/backfill diperlukan;
+* file yang berubah;
+* hasil test;
+* masalah yang masih tersisa.
 
 
 
