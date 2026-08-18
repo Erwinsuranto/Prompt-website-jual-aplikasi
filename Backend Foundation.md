@@ -1,9 +1,29 @@
 
+# 
+```
 
 
 
+```
+# 
+```
 
 
+
+```
+
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
 
 # 
 ```
@@ -21,6 +41,103 @@
 ```
 
 
+
+```
+
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+
+
+```
+# 
+```
+
+Prompt: Audit Service Database Digital Cell
+
+Migration Prisma sudah berhasil dan database sekarang sinkron.
+
+Hasil verifikasi:
+- Semua migration berhasil diterapkan.
+- Prisma schema valid.
+- PostgreSQL terkoneksi.
+- /api/products HTTP 200.
+- /api/products menggunakan Prisma/PostgreSQL.
+- Database masih kosong dan tidak boleh diisi mock data.
+
+Sekarang lakukan audit tahap berikutnya.
+
+1. Audit semua service backend yang berhubungan dengan database:
+   - product-service
+   - category-service
+   - user-service
+   - auth-service
+   - order-service
+   - payment-service
+   - banner-service
+   - notification/service terkait
+   - settings/config service jika menggunakan database
+
+2. Cari apakah masih ada:
+   - mock data
+   - static data sebagai pengganti database
+   - local JSON sebagai database
+   - hardcoded product/category/order
+   - service yang belum menggunakan Prisma padahal seharusnya menggunakan database.
+
+3. Cocokkan setiap service dengan model yang tersedia di Prisma schema.
+
+4. Jangan mengubah UI.
+
+5. Jangan membuat ulang project.
+
+6. Jangan menghapus fitur existing.
+
+7. Jangan menghapus migration.
+
+8. Jika menemukan service yang belum terhubung ke database:
+   - perbaiki secara modular
+   - gunakan Prisma singleton yang sudah ada
+   - gunakan model Prisma yang sesuai
+   - jangan membuat database/model baru tanpa alasan.
+
+9. Untuk setiap service, tentukan status:
+   CONNECTED / PARTIAL / NOT CONNECTED / STATIC
+
+10. Perbaiki hanya bagian yang memang diperlukan agar backend menggunakan PostgreSQL.
+
+11. Setelah perubahan:
+   - npm run typecheck
+   - npm run build
+   - verifikasi GET /api/products
+   - verifikasi endpoint database lain yang aman dilakukan tanpa membuat transaksi nyata.
+
+12. Jangan membuat data dummy hanya untuk testing.
+
+13. Jangan menjalankan migrate reset.
+
+14. Jangan commit atau push GitHub.
+
+Berikan laporan:
+- service yang sudah terhubung
+- service yang belum terhubung
+- file yang diubah
+- masalah yang ditemukan
+- hasil typecheck
+- hasil build
+- hasil endpoint verification.
 
 ```
 # 
