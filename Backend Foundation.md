@@ -155,10 +155,146 @@
 
 
 ```
-# 
+# Prompt: Idempotency Retention & Cleanup
 ```
 
+Lanjutkan project toko-online dari hasil audit Payment Flow End-to-End terakhir.
 
+Fokus tahap ini HANYA pada RETENTION DAN CLEANUP PAYMENT CREATE IDEMPOTENCY RECORD.
+
+Kondisi saat ini:
+- Duplicate create payment/order idempotency sudah diimplementasikan.
+- Idempotency key sudah persisted di database.
+- Duplicate request tidak membuat payment/order ganda.
+- Concurrent duplicate request sudah memiliki protection.
+- Webhook idempotency sudah selesai.
+- Payment expiry worker sudah selesai.
+- Production systemd payment expiry scheduler SUDAH AKTIF dan harus tetap aktif.
+- Gap audit saat ini:
+  "Idempotency record belum memiliki retention/cleanup policy; record disimpan permanen untuk menjamin replay konsisten."
+
+Tujuan:
+Mencegah tabel idempotency record tumbuh tanpa batas, tetapi tetap menjaga keamanan retry/replay dalam window yang wajar dan tidak menyebabkan duplicate payment/order.
+
+Tugas:
+
+1. Audit implementasi idempotency record yang sekarang.
+   - Temukan model/schema database.
+   - Temukan endpoint/service create payment.
+   - Temukan bagaimana request lama direplay.
+   - Temukan field timestamp yang tersedia.
+   - Tentukan apakah record menyimpan request fingerprint/hash, response/reference, status, atau metadata lain.
+
+2. Tentukan retention policy yang aman berdasarkan architecture existing.
+   - Jangan menghapus record terlalu cepat.
+   - Jangan mengubah behavior duplicate request selama retention window.
+   - Gunakan timestamp database yang sudah tersedia atau tambahkan field timestamp jika memang diperlukan.
+   - Jangan menggunakan in-memory cache sebagai pengganti persisted idempotency.
+
+3. Implementasikan cleanup secara modular.
+   - Buat service/job khusus untuk membersihkan idempotency record yang sudah melewati retention period.
+   - Cleanup harus menggunakan query database yang aman dan efisien.
+   - Gunakan batch deletion jika jumlah record berpotensi besar.
+   - Jangan melakukan full table scan yang tidak perlu.
+   - Jika memungkinkan, gunakan index pada field timestamp yang digunakan cleanup.
+
+4. PENTING:
+   - Jangan membuat cleanup yang dapat menghapus idempotency record yang masih dibutuhkan untuk replay.
+   - Jangan menghapus record berdasarkan status saja.
+   - Jangan menghapus record yang masih berada dalam retention window.
+   - Jangan menghapus Order/Payment hanya karena idempotency record dibersihkan.
+   - Cleanup idempotency record tidak boleh mengubah status payment/order.
+
+5. Tentukan behavior setelah idempotency record sudah expired dari retention:
+   - Request dengan key lama boleh dianggap sebagai request baru HANYA setelah retention window benar-benar lewat.
+   - Pastikan behavior tersebut tidak memungkinkan duplicate business operation untuk payment yang masih aktif.
+   - Jika desain existing tidak dapat menjamin hal tersebut, jangan memaksakan cleanup. Laporkan alasan dan buat policy yang lebih aman.
+
+6. Race condition:
+   - Cleanup yang berjalan bersamaan dengan create request harus aman.
+   - Jangan sampai cleanup menghapus record yang sedang PROCESSING.
+   - Jangan sampai request retry yang sedang diproses kehilangan idempotency protection.
+   - Gunakan conditional query/transaction sesuai PostgreSQL + Prisma architecture existing.
+
+7. Scheduler:
+   - JANGAN mengubah systemd payment expiry scheduler yang sudah aktif.
+   - Jangan mematikan/restart timer payment expiry.
+   - Jangan mengubah interval expiry payment.
+   - Jika cleanup membutuhkan scheduler sendiri, JANGAN langsung mengaktifkan production scheduler baru pada tahap ini.
+   - Buat cleanup worker/command modular yang siap dijadwalkan kemudian.
+   - Jangan menggunakan scheduler yang sama dengan expiry worker kecuali architecture existing memang secara jelas mendukungnya.
+
+8. Testing:
+   Tambahkan test:
+   - idempotency record masih dalam retention → tetap dapat replay;
+   - record sudah melewati retention → dapat dibersihkan;
+   - PROCESSING record tidak dibersihkan;
+   - cleanup tidak mengubah Order/Payment;
+   - cleanup aman ketika create request berjalan bersamaan;
+   - duplicate request selama retention tetap tidak membuat duplicate;
+   - idempotency key berbeda tetap normal;
+   - cleanup dijalankan dua kali → aman/idempotent;
+   - tidak ada duplicate business effect.
+
+9. Database:
+   - Migration hanya jika diperlukan.
+   - Jangan reset database.
+   - Jangan migration destructive.
+   - Jangan menghapus data production.
+   - Jangan menjalankan cleanup terhadap database production untuk testing.
+   - Pastikan index yang diperlukan benar-benar dibuat melalui migration.
+
+10. Jangan mengintegrasikan:
+   - payment provider nyata;
+   - refund provider;
+   - authorization integration test;
+   - PostgreSQL HTTP concurrency infrastructure baru.
+
+11. Jalankan verification:
+   - idempotency tests;
+   - payment tests;
+   - webhook regression tests;
+   - expiry tests;
+   - typecheck;
+   - lint;
+   - build;
+   - git diff --check.
+
+12. Warning UI berikut jangan disentuh:
+   src/components/ui/select.tsx
+
+PENTING:
+- Jangan mengubah frontend.
+- Jangan mengubah webhook idempotency kecuali diperlukan untuk kompatibilitas.
+- Jangan mengubah expiry worker.
+- Jangan mengubah payment expiry systemd timer.
+- Jangan restart/kill web process.
+- Jangan reset database.
+- Jangan commit.
+- Jangan push GitHub.
+- Jangan membuat README baru.
+- Pertahankan arsitektur modular existing.
+
+Jika retention cleanup ternyata berisiko terhadap replay payment:
+- jangan memaksakan implementasi;
+- pertahankan record permanen;
+- jelaskan risiko storage growth;
+- berikan rekomendasi retention yang aman untuk tahap berikutnya.
+
+Setelah selesai tampilkan:
+1. Retention period yang dipilih dan alasannya.
+2. Model/table idempotency yang digunakan.
+3. Field timestamp yang digunakan.
+4. Cleanup service/worker yang dibuat.
+5. Index/migration yang dibuat.
+6. Cara mencegah cleanup terhadap PROCESSING record.
+7. Cara race condition dicegah.
+8. Test yang ditambahkan dan hasilnya.
+9. Typecheck/lint/build.
+10. Konfirmasi systemd payment expiry scheduler tetap aktif dan tidak diubah.
+11. Gap payment lifecycle yang masih tersisa.
+
+Jangan commit atau push.
 
 ```
 # 
