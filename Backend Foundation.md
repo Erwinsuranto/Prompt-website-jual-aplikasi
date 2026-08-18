@@ -193,6 +193,123 @@
 ```
 # 
 ```
+Lanjutkan project toko-online dari hasil audit deployment VPS terakhir.
+
+Fokus hanya pada MEMBUAT KONFIGURASI SYSTEMD UNTUK PAYMENT EXPIRY WORKER.
+
+Kondisi:
+
+* Deployment path yang direkomendasikan: `/root/toko-online/app`
+* Process manager yang direkomendasikan: systemd.
+* Scheduler production belum aktif.
+* Payment expiry worker sudah selesai dan seluruh test sebelumnya PASS.
+* Jangan mengubah logic payment, webhook idempotency, atau expiry worker.
+
+Tugas:
+
+1. Audit ulang secara read-only:
+
+   * pastikan `/root/toko-online/app` benar-benar project production;
+   * pastikan script worker expiry tersedia;
+   * pastikan Node.js/npm yang digunakan project;
+   * pastikan Prisma/database client tersedia;
+   * jangan tampilkan nilai secret.
+
+2. Buat systemd service khusus untuk payment expiry worker.
+
+   * Gunakan nama service yang jelas, misalnya `toko-online-payment-expiry.service`.
+   * WorkingDirectory harus menggunakan deployment path yang sudah diverifikasi.
+   * Gunakan command worker yang benar dari package.json/project.
+   * Gunakan environment production yang benar.
+   * Jangan hardcode API key/password/DATABASE_URL ke repository atau unit file jika environment file existing dapat digunakan.
+   * Jalankan sebagai user yang sesuai dengan deployment existing; jangan otomatis menggunakan root jika tidak diperlukan.
+
+3. Service harus:
+
+   * berjalan satu kali untuk menjalankan expiry worker lalu exit normal jika worker memang designed sebagai one-shot job;
+   * aman dipanggil ulang;
+   * tidak membuat duplicate worker;
+   * menangani SIGTERM/SIGINT;
+   * memiliki restart behavior yang tidak menyebabkan infinite rapid restart;
+   * logging dapat dilihat melalui `journalctl`.
+
+4. Jika worker membutuhkan build/compile terlebih dahulu:
+
+   * gunakan artifact/build existing;
+   * jangan membuat proses TypeScript compiler permanen jika production seharusnya menjalankan JavaScript hasil build.
+   * Jangan mengubah arsitektur build tanpa alasan.
+
+5. Buat konfigurasi scheduler berikutnya secara terpisah hanya jika diperlukan.
+
+   * Jika menggunakan systemd timer, buat `toko-online-payment-expiry.timer`.
+   * Timer harus memanggil service worker secara berkala.
+   * Jangan gunakan `setInterval`.
+   * Gunakan interval yang sesuai dengan aturan expiry existing.
+   * Pastikan timer tidak membuat overlapping execution.
+   * `Persistent=true` hanya jika memang sesuai kebutuhan deployment.
+
+6. PENTING:
+
+   * Buat unit/service dan timer sebagai konfigurasi, tetapi JANGAN enable/start service atau timer production pada tahap ini.
+   * Jangan stop/restart process toko-online yang sedang berjalan.
+   * Jangan mengubah port.
+   * Jangan mengubah reverse proxy.
+   * Jangan mengubah DNS/Cloudflare.
+   * Jangan mengubah database.
+
+7. Validasi konfigurasi secara aman:
+
+   * `systemd-analyze verify` terhadap unit yang dibuat.
+   * Validasi command worker secara manual tanpa mengaktifkan timer.
+   * Jika aman, lakukan dry-run worker menggunakan environment production.
+   * Pastikan database connection berhasil.
+   * Pastikan worker exit normal.
+   * Jangan membuat perubahan data payment nyata hanya untuk testing.
+
+8. Jalankan:
+
+   * payment expiry tests;
+   * webhook regression tests;
+   * typecheck;
+   * lint;
+   * build;
+   * git diff --check.
+
+9. Warning berikut tetap jangan disentuh:
+   `src/components/ui/select.tsx`
+   ARIA warning tersebut di luar scope.
+
+PENTING:
+
+* Jangan enable systemd service.
+* Jangan start systemd service.
+* Jangan enable timer.
+* Jangan start timer.
+* Jangan kill/restart process existing.
+* Jangan reset database.
+* Jangan menjalankan migration.
+* Jangan mengubah frontend.
+* Jangan mengubah webhook idempotency.
+* Jangan mengubah expiry logic.
+* Jangan commit.
+* Jangan push GitHub.
+* Jangan membuat README baru.
+* Jangan menaruh secret di repository.
+
+Setelah selesai tampilkan:
+
+1. Nama service.
+2. Nama timer jika dibuat.
+3. File/unit yang dibuat.
+4. Command worker yang digunakan.
+5. Environment source yang digunakan tanpa menampilkan secret.
+6. Hasil `systemd-analyze verify`.
+7. Hasil manual worker smoke test.
+8. Hasil test/typecheck/lint/build.
+9. Status: harus tetap DISABLED/NOT STARTED.
+10. Command yang nantinya diperlukan untuk mengaktifkan scheduler production.
+
+Berhenti setelah konfigurasi dan validasi. Jangan mengaktifkan scheduler.
 
 
 
