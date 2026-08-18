@@ -119,9 +119,331 @@
 
 
 ```
-# 
+# belum mengintegrasikan provider nyata
 ```
+Lanjutkan project toko-online dari kondisi terakhir.
 
+Fokus tahap ini: IMPLEMENTASI PAYMENT PROVIDER ABSTRACTION FOUNDATION berdasarkan hasil audit terakhir.
+
+Kondisi saat ini:
+- Payment expiry scheduler production SUDAH AKTIF dan berjalan normal.
+- Systemd timer payment expiry tetap aktif.
+- Payment expiry worker sudah selesai dan teruji.
+- Webhook idempotency sudah selesai.
+- Create payment idempotency sudah ditangani.
+- Typecheck/build/lint sebelumnya PASS dengan warning ARIA existing di src/components/ui/select.tsx.
+- Payment lifecycle dasar sudah tersedia.
+- Audit terakhir menemukan gap utama pada provider abstraction:
+  - belum ada adapter Midtrans/Xendit/provider lain;
+  - registry provider masih kosong;
+  - credential provider belum diabstraksikan;
+  - network request boundary belum tersedia;
+  - provider cancellation belum tersedia;
+  - provider refund belum tersedia;
+  - belum ada outbox/Saga/durable provider operation record;
+  - belum ada mapping webhook provider-specific untuk lifecycle baru;
+  - provider nyata belum digunakan.
+
+TUJUAN:
+Bangun FOUNDATION provider abstraction yang modular dan aman sehingga provider nyata seperti Midtrans/Xendit dapat ditambahkan kemudian tanpa mengubah core payment lifecycle.
+
+PENTING:
+JANGAN mengintegrasikan provider payment nyata pada tahap ini.
+JANGAN menggunakan credential/API key provider nyata.
+JANGAN melakukan transaksi uang nyata.
+JANGAN mengubah systemd scheduler yang sudah aktif.
+
+1. AUDIT ARSITEKTUR EXISTING
+
+Cari dan pahami:
+- model Payment;
+- model Order;
+- payment service;
+- payment repository;
+- webhook handler;
+- create payment flow;
+- payment status/state transition;
+- konfigurasi/environment provider yang sudah ada;
+- struktur module/service existing.
+
+Jangan melakukan refactor besar jika tidak diperlukan.
+
+2. BUAT PROVIDER CONTRACT
+
+Buat interface/type contract modular untuk payment provider.
+
+Minimal konsep operation:
+- create payment;
+- get/check payment status;
+- cancellation jika provider mendukung;
+- refund jika provider mendukung;
+- webhook verification/parsing.
+
+Gunakan capability-based design jika cocok sehingga provider yang tidak mendukung refund/cancel tidak dipaksa mengimplementasikan method palsu.
+
+Core payment domain tidak boleh bergantung langsung kepada SDK provider tertentu.
+
+3. BUAT PROVIDER ADAPTER LAYER
+
+Buat struktur modular, misalnya:
+
+payment/
+  providers/
+    core/
+    registry/
+    adapters/
+
+Gunakan nama folder/file yang mengikuti struktur project existing jika berbeda.
+
+Adapter harus bertanggung jawab atas:
+- request ke provider;
+- mapping response provider ke internal payment model;
+- mapping provider error ke internal error;
+- credential/config abstraction;
+- webhook event mapping.
+
+Jangan menaruh logic provider-specific langsung di controller payment.
+
+4. PROVIDER REGISTRY
+
+Implementasikan registry/factory provider.
+
+Contoh konsep:
+- provider name/id;
+- provider adapter;
+- capabilities;
+- enabled/disabled state.
+
+Core payment service cukup meminta provider berdasarkan identifier.
+
+Jika provider belum tersedia:
+- return error internal yang jelas;
+- jangan crash;
+- jangan fallback diam-diam ke provider lain.
+
+Registry jangan menggunakan hardcoded credential.
+
+5. CREDENTIAL ABSTRACTION
+
+Buat abstraction untuk credential provider.
+
+Credential dapat berasal dari environment/configuration existing.
+
+Ketentuan:
+- jangan menampilkan secret di log;
+- jangan hardcode API key;
+- jangan menyimpan secret dalam source code;
+- jangan membuat credential provider nyata;
+- jangan mengubah production secret.
+
+Untuk tahap ini cukup buat interface/config abstraction dan mock/test provider.
+
+6. NETWORK BOUNDARY
+
+Buat abstraction untuk HTTP/network client yang digunakan adapter.
+
+Tujuannya:
+- provider adapter tidak langsung bergantung kepada global fetch/axios tanpa boundary;
+- mudah dibuat mock;
+- timeout dapat dikontrol;
+- error network dapat dipetakan secara konsisten.
+
+Minimal dukung:
+- request;
+- timeout;
+- response status;
+- response body;
+- network error.
+
+Jangan melakukan request ke provider nyata.
+
+7. MOCK PROVIDER
+
+Buat mock/fake provider untuk testing.
+
+Mock provider harus dapat mensimulasikan:
+- create success;
+- create failure;
+- status success;
+- status pending;
+- cancellation unsupported;
+- refund unsupported;
+- webhook event.
+
+Jangan menggunakan provider payment nyata.
+
+8. PROVIDER OPERATION RECORD
+
+Audit apakah payment provider operation membutuhkan durable record.
+
+Jika memang diperlukan untuk menjaga retry/idempotency:
+- buat abstraction/model/service yang modular;
+- gunakan stable operation key;
+- jangan menggunakan in-memory state;
+- jangan membuat schema besar yang belum diperlukan.
+
+Jika database schema baru benar-benar diperlukan:
+- buat migration non-destructive;
+- jangan reset database;
+- jangan menghapus data existing.
+
+Jangan membuat outbox/Saga kompleks jika belum diperlukan oleh current scope. Cukup siapkan abstraction/foundation yang jelas.
+
+9. CANCELLATION DAN REFUND
+
+Jangan membuat refund provider nyata.
+
+Buat contract/capability saja jika diperlukan.
+
+Behavior harus jelas:
+- provider yang tidak mendukung refund → PAYMENT_PROVIDER_OPERATION_UNSUPPORTED;
+- provider yang tidak mendukung cancellation → PAYMENT_PROVIDER_OPERATION_UNSUPPORTED;
+- jangan pura-pura sukses.
+
+Core state machine tidak boleh menganggap refund berhasil hanya karena adapter belum tersedia.
+
+10. WEBHOOK ABSTRACTION
+
+Buat provider webhook abstraction yang dapat:
+- verify signature melalui adapter;
+- parse provider event;
+- menghasilkan internal normalized event;
+- menjaga webhook idempotency existing.
+
+Jangan merusak PaymentWebhookEvent atau mekanisme idempotency yang sudah ada.
+
+Provider-specific event tidak boleh tersebar di business logic.
+
+11. TESTING
+
+Buat test minimal untuk:
+
+Provider registry:
+- provider ditemukan;
+- provider tidak ditemukan;
+- provider disabled;
+- capability detection.
+
+Mock provider:
+- create success;
+- create failure;
+- status mapping;
+- unsupported cancellation;
+- unsupported refund.
+
+Network boundary:
+- success;
+- HTTP error;
+- timeout/network error.
+
+Webhook:
+- valid normalized event;
+- invalid signature;
+- unknown event;
+- duplicate event tetap aman melalui idempotency existing.
+
+Provider operation:
+- operation key stabil;
+- retry tidak membuat duplicate operation jika abstraction memang sudah digunakan.
+
+12. INTEGRATION DENGAN CORE PAYMENT
+
+Integrasikan foundation hanya pada titik yang memang diperlukan.
+
+Core payment flow harus tetap:
+CREATE
+→ PENDING
+→ provider operation
+→ webhook/status update
+→ PAID/COMPLETED
+atau
+→ EXPIRED/CANCELLED/FAILED sesuai state machine existing.
+
+Jangan mengubah aturan expiry.
+
+Jangan mengubah systemd timer.
+
+Jangan mengubah frontend.
+
+13. DATABASE
+
+Sebelum membuat migration:
+- audit schema existing;
+- pastikan benar-benar diperlukan.
+
+Jika tidak diperlukan, jangan membuat migration.
+
+Jika diperlukan:
+- migration harus non-destructive;
+- jangan reset database;
+- jangan mengubah data production;
+- jangan menghapus kolom existing.
+
+14. VERIFICATION
+
+Jalankan:
+- seluruh payment tests;
+- provider abstraction tests;
+- webhook regression tests;
+- expiry tests;
+- create idempotency tests;
+- typecheck;
+- lint;
+- build;
+- git diff --check.
+
+Warning existing:
+src/components/ui/select.tsx
+jangan disentuh karena di luar scope dan tidak menyebabkan build gagal.
+
+15. PRODUCTION SAFETY
+
+JANGAN:
+- stop systemd timer;
+- restart systemd timer;
+- disable scheduler;
+- restart/kill web process;
+- mengubah port;
+- mengubah database production;
+- menjalankan migration destructive;
+- menghapus data;
+- mengubah frontend;
+- menggunakan credential provider nyata;
+- melakukan transaksi payment nyata;
+- commit;
+- push GitHub;
+- membuat README baru.
+
+Jika menemukan bug pada payment lifecycle existing:
+- perbaiki hanya jika benar-benar diperlukan agar provider abstraction aman;
+- tambahkan regression test;
+- jangan melakukan refactor besar tanpa alasan.
+
+SETELAH SELESAI LAPORKAN:
+
+1. Struktur provider abstraction yang dibuat.
+2. Contract/interface yang dibuat.
+3. Provider registry.
+4. Credential abstraction.
+5. Network boundary.
+6. Mock provider.
+7. Provider operation abstraction/record jika dibuat.
+8. Webhook normalization.
+9. File yang berubah.
+10. Migration yang dibuat jika ada.
+11. Test yang ditambahkan.
+12. Hasil semua test.
+13. Hasil typecheck.
+14. Hasil lint.
+15. Hasil build.
+16. Hasil git diff --check.
+17. Gap provider yang masih tersisa.
+18. Konfirmasi systemd payment expiry scheduler tetap AKTIF dan tidak diubah.
+19. Konfirmasi TIDAK ada provider payment nyata yang dipanggil.
+
+JANGAN COMMIT.
+JANGAN PUSH GITHUB.
+BERHENTI SETELAH IMPLEMENTASI DAN VERIFIKASI SELESAI.
 
 
 ```
