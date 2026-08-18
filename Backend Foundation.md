@@ -149,10 +149,103 @@
 
 
 ```
-# 
+# Authorization Payment
 ```
 
+Lanjutkan project toko-online dari hasil audit Payment Flow End-to-End terakhir.
 
+Fokus tahap ini HANYA pada AUTHORIZATION DAN OWNERSHIP PAYMENT/ORDER.
+
+Jangan mengubah systemd payment expiry scheduler yang sudah aktif.
+
+Tujuan:
+Pastikan user tidak dapat membaca atau mengubah payment/order milik user lain, dan endpoint admin/webhook tetap menggunakan authorization boundary yang benar.
+
+Tugas:
+
+1. Audit semua endpoint terkait:
+   - create payment/order
+   - get payment/order
+   - payment status/session
+   - cancel jika tersedia
+   - admin payment operation jika tersedia
+   - webhook provider
+
+2. Audit ownership:
+   - User A tidak boleh GET payment milik User B.
+   - User A tidak boleh mengubah/cancel payment User B.
+   - Payment ID/order ID saja tidak boleh menjadi security boundary.
+   - Pastikan query database selalu mempertimbangkan authenticated user/owner sesuai architecture existing.
+
+3. Audit authorization:
+   - User biasa tidak boleh menjalankan admin-only operation.
+   - Admin operation harus memiliki authorization check yang benar.
+   - Webhook provider tidak boleh dipaksa melewati user authorization biasa.
+   - Jangan mengubah authentication architecture secara besar.
+
+4. Tambahkan integration/unit tests sesuai infrastructure existing:
+   - User A dapat mengakses payment miliknya.
+   - User B tidak dapat mengakses payment User A.
+   - User B tidak dapat mengubah/cancel payment User A.
+   - Anonymous request ditolak jika endpoint membutuhkan authentication.
+   - User biasa ditolak dari admin operation.
+   - Admin dapat menjalankan operation yang memang diizinkan.
+   - Webhook tetap dapat diproses melalui mekanisme authentication/signature yang existing.
+
+5. Jika integration test database penuh belum tersedia:
+   - gunakan test/helper infrastructure existing;
+   - jangan membuat PostgreSQL infrastructure besar;
+   - jangan menggunakan database production;
+   - jangan reset database development.
+
+6. Jika ditemukan authorization bug:
+   - perbaiki hanya bug yang diperlukan;
+   - tambahkan regression test;
+   - jangan refactor besar.
+
+7. Jangan menyentuh:
+   - frontend/UI;
+   - payment expiry worker;
+   - systemd scheduler;
+   - webhook idempotency kecuali diperlukan untuk authorization compatibility;
+   - payment provider nyata;
+   - refund provider.
+
+8. Jalankan:
+   - authorization tests;
+   - payment tests terkait;
+   - webhook regression tests;
+   - expiry tests;
+   - typecheck;
+   - lint;
+   - build;
+   - git diff --check.
+
+Warning berikut jangan diperbaiki:
+src/components/ui/select.tsx
+
+PENTING:
+- Jangan restart/kill web process.
+- Jangan mengubah port.
+- Jangan reset database.
+- Jangan migration destructive.
+- Jangan commit.
+- Jangan push GitHub.
+- Jangan membuat README baru.
+- Systemd payment expiry scheduler harus tetap aktif dan tidak disentuh.
+
+Setelah selesai tampilkan:
+1. Endpoint yang diaudit.
+2. Ownership rule yang diterapkan.
+3. Authorization rule yang diterapkan.
+4. Test yang ditambahkan.
+5. Bug yang ditemukan/diperbaiki.
+6. File yang berubah.
+7. Hasil test/typecheck/lint/build.
+8. Gap payment lifecycle yang masih tersisa.
+9. Konfirmasi scheduler payment expiry tetap aktif.
+
+Jangan commit atau push.
 
 ```
 # Prompt: Idempotency Retention & Cleanup
