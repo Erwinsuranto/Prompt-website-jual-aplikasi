@@ -127,7 +127,265 @@
 ```
 # 
 ```
+Lanjutkan project toko-online dari kondisi terakhir.
 
+Fokus tahap ini HANYA pada PAYMENT PROVIDER ADAPTER FOUNDATION / ABSTRAKSI PROVIDER.
+
+Jangan mengintegrasikan provider payment nyata pada tahap ini.
+
+Kondisi saat ini:
+- Payment create idempotency sudah selesai.
+- Webhook idempotency sudah selesai.
+- Payment expiry worker sudah selesai.
+- Production payment expiry scheduler/systemd timer sudah AKTIF dan berjalan normal.
+- Jangan mengubah atau mematikan scheduler tersebut.
+- Payment expiry tests PASS.
+- Worker tests PASS.
+- Webhook regression tests PASS.
+- Typecheck/build sebelumnya PASS.
+- Audit menemukan gap:
+  - belum ada adapter Midtrans/Xendit/provider lain;
+  - belum ada network call provider;
+  - belum ada credential provider abstraction;
+  - belum ada provider cancellation nyata;
+  - belum ada provider refund nyata;
+  - belum ada outbox/Saga untuk koordinasi remote side effect dengan local transaction;
+  - payment provider registry production masih kosong.
+- Jangan mengimplementasikan provider nyata pada tahap ini.
+
+Tujuan:
+Membuat fondasi abstraksi provider payment yang modular sehingga provider seperti Midtrans, Xendit, atau provider lain nantinya dapat ditambahkan tanpa mengubah core payment lifecycle.
+
+TUGAS:
+
+1. Audit arsitektur payment saat ini.
+   Temukan:
+   - model Payment;
+   - model Order;
+   - payment service;
+   - create payment flow;
+   - webhook flow;
+   - expiry worker;
+   - status/state transition;
+   - repository/database layer;
+   - konfigurasi provider jika sudah ada.
+
+   Jangan mengubah behavior existing sebelum memahami flow.
+
+2. Buat interface/provider contract yang bersifat generic.
+
+   Minimal dukung operasi konseptual:
+   - create/initiate payment;
+   - get payment/status;
+   - cancellation;
+   - refund.
+
+   Gunakan interface/type yang tidak bergantung pada Midtrans, Xendit, atau provider tertentu.
+
+   Contoh konsep:
+   PaymentProviderAdapter
+   PaymentProviderRequest
+   PaymentProviderResult
+   PaymentProviderStatus
+   PaymentProviderError
+
+   Sesuaikan nama dengan arsitektur project existing.
+
+3. Provider adapter harus modular.
+
+   Struktur harus memungkinkan nantinya:
+   - MidtransAdapter
+   - XenditAdapter
+   - Provider lain
+
+   ditambahkan tanpa mengubah core payment service secara besar.
+
+   Jangan membuat semua provider logic di satu file besar.
+
+4. Buat provider registry/resolver.
+
+   Registry harus dapat:
+   - mencari provider berdasarkan provider code;
+   - memastikan provider yang diminta terdaftar;
+   - menolak provider yang tidak tersedia dengan error yang jelas;
+   - tidak menyimpan credential provider secara hardcoded.
+
+   Jangan membuat provider dummy seolah-olah provider nyata sudah aktif.
+
+5. Credential abstraction.
+
+   Buat abstraction/config contract untuk credential provider.
+
+   Ketentuan:
+   - credential tidak boleh hardcoded;
+   - credential tidak boleh masuk Git;
+   - credential tidak boleh ditampilkan dalam log;
+   - credential harus dapat berasal dari environment/configuration yang sesuai deployment;
+   - core payment service tidak boleh mengetahui detail secret provider.
+
+   Jangan membuat atau memasukkan API key nyata.
+
+6. Pisahkan core payment lifecycle dari provider adapter.
+
+   Core payment harus hanya bergantung pada interface provider.
+
+   Jangan membuat:
+   if provider === "midtrans"
+   if provider === "xendit"
+
+   berulang di seluruh payment service.
+
+   Provider-specific behavior harus berada di adapter masing-masing.
+
+7. Status mapping.
+
+   Buat mapping generic dari status provider ke status internal project.
+
+   Pastikan:
+   - pending tidak menjadi paid secara sembarangan;
+   - success hanya menghasilkan transition yang valid;
+   - failed/cancelled tidak dapat menghidupkan kembali payment terminal secara ilegal;
+   - expired tetap mengikuti expiry worker;
+   - refund/cancel tidak boleh mengubah state secara sembarangan.
+
+   Jangan mengubah state machine existing jika tidak diperlukan.
+
+8. Network boundary.
+
+   Buat abstraction untuk network call provider tanpa melakukan HTTP request ke provider nyata.
+
+   Jika diperlukan:
+   - buat HTTP client interface;
+   - timeout;
+   - error normalization;
+   - response validation;
+   - jangan retry sembarangan untuk operasi yang memiliki side effect.
+
+   Jangan memanggil API Midtrans/Xendit/provider nyata.
+
+9. Idempotency untuk operasi provider.
+
+   Pastikan desain adapter mendukung stable operation key/idempotency key.
+
+   Minimal konsep harus dapat menangani:
+   - create payment retry;
+   - cancellation retry;
+   - refund retry.
+
+   Jangan menganggap retry HTTP otomatis aman.
+
+10. Cancellation dan refund.
+
+   Jangan mengimplementasikan remote cancellation/refund nyata.
+
+   Hanya siapkan contract/interface dan state boundary.
+
+   Jika flow cancellation/refund belum tersedia secara aman:
+   - jangan membuat fake success;
+   - jangan mengubah payment menjadi REFUNDED hanya karena method dipanggil;
+   - return error/status yang jelas seperti unsupported/not implemented sesuai pola project.
+
+11. Outbox/Saga.
+
+   Audit apakah project sudah mempunyai outbox/event/job infrastructure.
+
+   Jangan langsung membuat sistem Saga besar.
+
+   Jika belum ada:
+   - dokumentasikan boundary yang diperlukan untuk remote side effect;
+   - jangan membuat database migration besar hanya untuk tahap ini;
+   - jangan mengubah transaction architecture existing tanpa kebutuhan nyata.
+
+   Pastikan desain tidak mengklaim transaksi database lokal dan HTTP provider sebagai satu atomic transaction.
+
+12. Testing.
+
+   Buat unit test untuk provider abstraction:
+
+   - provider registry menemukan provider yang terdaftar;
+   - provider yang tidak terdaftar ditolak;
+   - credential tidak bocor ke log/error;
+   - request contract tervalidasi;
+   - response provider dapat dipetakan ke internal status;
+   - unsupported cancellation ditangani dengan benar;
+   - unsupported refund ditangani dengan benar;
+   - stable operation/idempotency key diteruskan ke adapter;
+   - provider error dinormalisasi;
+   - timeout/error network dapat dipetakan dengan aman.
+
+   Gunakan fake/mock adapter.
+
+   JANGAN melakukan HTTP request ke provider nyata.
+
+13. Regression verification.
+
+   Pastikan perubahan tidak merusak:
+   - create payment idempotency;
+   - webhook idempotency;
+   - payment expiry;
+   - payment expiry worker;
+   - order state;
+   - authorization existing.
+
+14. Jalankan verification:
+
+   - seluruh test payment;
+   - provider abstraction tests;
+   - webhook regression tests;
+   - expiry tests;
+   - typecheck;
+   - lint;
+   - build;
+   - git diff --check.
+
+   Warning existing berikut jangan disentuh:
+   src/components/ui/select.tsx
+
+15. Production safety.
+
+   PENTING:
+   - Jangan mengubah systemd payment expiry timer.
+   - Jangan disable scheduler.
+   - Jangan restart/kill web process.
+   - Jangan mengubah port.
+   - Jangan reset database.
+   - Jangan migration destructive.
+   - Jangan mengubah frontend.
+   - Jangan memanggil provider payment nyata.
+   - Jangan memasukkan API key/provider credential.
+   - Jangan membuat fake payment success.
+   - Jangan membuat fake refund success.
+   - Jangan commit.
+   - Jangan push GitHub.
+   - Jangan membuat README baru.
+
+16. Arsitektur harus tetap modular.
+
+   Provider adapter, registry, contract, credential abstraction, dan error mapping harus berada pada module/file yang jelas.
+
+   Jangan membuat satu file payment besar yang menampung seluruh provider logic.
+
+Setelah selesai tampilkan:
+
+1. Arsitektur provider abstraction yang dibuat.
+2. Interface/contract yang dibuat.
+3. Provider registry/resolver.
+4. Credential abstraction.
+5. Status mapping.
+6. Network boundary.
+7. Cancellation/refund boundary.
+8. Apakah outbox/Saga sudah tersedia atau masih menjadi gap.
+9. File yang berubah.
+10. Migration yang dibuat jika ada.
+11. Test yang ditambahkan.
+12. Hasil seluruh test.
+13. Typecheck/lint/build/git diff --check.
+14. Konfirmasi systemd payment expiry scheduler tetap aktif dan tidak diubah.
+15. Gap yang masih tersisa sebelum provider nyata dapat diintegrasikan.
+
+Berhenti setelah provider abstraction foundation selesai dan tervalidasi.
+
+Jangan commit atau push.
 
 
 ```
