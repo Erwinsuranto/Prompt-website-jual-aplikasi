@@ -223,6 +223,110 @@
 ```
 # 
 ```
+Lanjutkan project toko-online dari kondisi terakhir setelah implementasi webhook idempotency.
+
+Fokus tahap ini hanya pada PAYMENT SESSION EXPIRY dan WORKER/JOB PROCESSING.
+
+Kondisi saat ini:
+
+* Webhook idempotency sudah diimplementasikan.
+* Model PaymentWebhookEvent dan unique constraint sudah tersedia.
+* Duplicate webhook sudah diuji.
+* PostgreSQL concurrency integration test belum tersedia karena belum ada isolated PostgreSQL test database.
+* Jangan mengubah bagian tersebut pada tahap ini.
+
+Tugas:
+
+1. Audit terlebih dahulu payment session yang sudah ada.
+
+   * Cari model/schema payment session.
+   * Cari field expiry/expiresAt atau equivalent.
+   * Cari status payment yang tersedia.
+   * Cari endpoint create/get payment session.
+   * Cari service yang menangani perubahan status payment.
+
+2. Implementasikan mekanisme expiry yang modular.
+
+   * Payment session yang melewati waktu expiry harus berubah menjadi EXPIRED.
+   * Jangan mengubah payment yang sudah PAID/COMPLETED menjadi EXPIRED.
+   * Jangan mengubah REFUNDED/CANCELLED atau terminal state lain secara tidak semestinya.
+   * Gunakan waktu server/database yang konsisten dengan arsitektur project.
+   * Hindari pengecekan expiry hanya di frontend.
+
+3. Buat worker/job yang aman dijalankan berulang.
+
+   * Worker harus mencari payment session yang sudah expired.
+   * Proses harus idempotent.
+   * Menjalankan worker dua kali tidak boleh menghasilkan efek samping tambahan.
+   * Gunakan update/transaction yang aman terhadap race condition.
+   * Jangan menggunakan in-memory state sebagai sumber kebenaran.
+   * Jangan membuat worker yang hanya berjalan sekali saat startup tanpa mekanisme scheduler yang sesuai existing project.
+
+4. Jika project sudah mempunyai scheduler/job infrastructure:
+
+   * Integrasikan menggunakan infrastructure tersebut.
+   * Jangan membuat scheduler kedua yang tidak diperlukan.
+
+   Jika belum ada scheduler:
+
+   * Buat worker/service modular yang dapat dipanggil scheduler/process manager di kemudian hari.
+   * Jangan menambahkan dependency scheduler besar tanpa alasan.
+
+5. Pastikan race condition dengan webhook:
+
+   * Jika worker mencoba EXPIRED ketika webhook payment datang hampir bersamaan, state transition harus aman.
+   * Worker tidak boleh mengubah payment menjadi EXPIRED setelah payment sudah berhasil menjadi PAID.
+   * Gunakan conditional update atau transaction sesuai ORM/database existing.
+
+6. Testing:
+   Tambahkan test untuk:
+
+   * session belum expired → tetap pending;
+   * session tepat/benar-benar melewati expiry → menjadi EXPIRED;
+   * session sudah PAID → tidak berubah menjadi EXPIRED;
+   * session CANCELLED/REFUNDED → tidak berubah secara salah;
+   * worker dijalankan dua kali → hasil tetap sama;
+   * session yang sudah expired tidak diproses berulang kali;
+   * kondisi race antara expiry worker dan payment success bila dapat diuji dengan aman.
+
+7. Jangan menggunakan provider payment nyata.
+
+   * Tidak perlu credential provider.
+   * Tidak perlu transaksi uang nyata.
+   * Gunakan mock/helper/test fixture yang sesuai architecture existing.
+
+8. Jalankan verification:
+
+   * test payment/session;
+   * test webhook terkait jika diperlukan untuk memastikan tidak regression;
+   * typecheck;
+   * lint;
+   * build.
+
+9. Jangan memperbaiki warning UI:
+   `src/components/ui/select.tsx`
+   kecuali warning tersebut menyebabkan build/test gagal.
+
+10. Setelah selesai tampilkan laporan:
+
+* file yang berubah;
+* model/status yang digunakan;
+* bagaimana expiry ditentukan;
+* bagaimana worker dijalankan;
+* bagaimana race condition dicegah;
+* hasil seluruh test;
+* masalah yang masih tersisa.
+
+PENTING:
+
+* Jangan commit.
+* Jangan push GitHub.
+* Jangan reset database.
+* Jangan mengubah frontend/UI.
+* Jangan mengintegrasikan provider payment nyata.
+* Jangan membuat README baru.
+* Jangan mengubah webhook idempotency yang sudah selesai kecuali diperlukan agar expiry worker aman.
+* Pertahankan arsitektur modular project existing.
 
 
 
