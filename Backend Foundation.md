@@ -26,7 +26,39 @@
 # 
 ```
 
+Prompt: Terapkan Migration Prisma
 
+Hasil audit sebelumnya:
+- DATABASE_URL tersedia
+- Koneksi Prisma berhasil
+- /api/products sudah membaca PostgreSQL
+- Database saat ini kosong
+- Migration yang belum diterapkan:
+  20260818090000_add_order_checkout_snapshot
+
+Sekarang fokus hanya pada migration database.
+
+1. Pastikan DATABASE_URL menunjuk ke database Digital Cell yang benar.
+2. Periksa isi migration 20260818090000_add_order_checkout_snapshot sebelum menjalankannya.
+3. Pastikan migration hanya melakukan perubahan yang sesuai dengan Prisma schema.
+4. Jika target database benar dan aman, jalankan:
+   npx prisma migrate deploy
+5. Jangan gunakan prisma migrate reset.
+6. Jangan menghapus database.
+7. Jangan menghapus migration lama.
+8. Setelah migration selesai, jalankan verifikasi Prisma read-only.
+9. Pastikan kolom buyerName, buyerPhone, buyerEmail, dan notes sudah tersedia pada tabel Order.
+10. Verifikasi /api/products tetap mengembalikan HTTP 200.
+11. Jangan mengubah UI, Cloudflare, port, atau fitur lain.
+12. Jangan commit atau push ke GitHub.
+
+Laporkan:
+- migration sebelum dijalankan
+- hasil migrate deploy
+- migration setelah dijalankan
+- status schema database
+- hasil /api/products
+- apakah database sekarang sinkron dengan Prisma schema.
 
 ```
 # 
