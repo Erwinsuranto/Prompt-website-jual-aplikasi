@@ -212,6 +212,126 @@
 # 
 ```
 
+Lanjutkan project toko-online dari kondisi terakhir.
+
+Fokus tahap ini hanya pada INTEGRASI SCHEDULER PRODUCTION untuk menjalankan Payment Expiry Worker yang sudah selesai dibuat.
+
+Kondisi saat ini:
+
+* Payment expiry worker sudah tersedia dan modular.
+* Worker sudah diuji dan idempotent.
+* `expiresAt` sudah tersedia untuk payment baru.
+* Backfill/policy legacy sudah selesai.
+* PostgreSQL `expiresAt = NULL` count sudah 0.
+* Typecheck PASS.
+* Build PASS.
+* Lint PASS dengan warning UI existing.
+* Scheduler production belum aktif.
+* Jangan mengubah logic expiry worker kecuali memang diperlukan agar scheduler dapat memanggilnya dengan aman.
+
+Tugas:
+
+1. Audit struktur project dan cara deployment existing.
+
+   * Cari entrypoint server.
+   * Cari package scripts.
+   * Cari process manager/deployment configuration jika sudah ada.
+   * Cari apakah project menggunakan cron, systemd, PM2, BullMQ, node-cron, atau scheduler lain.
+   * Jangan menambahkan scheduler baru jika infrastructure yang sesuai sudah tersedia.
+
+2. Pilih mekanisme scheduler paling sederhana dan sesuai architecture existing.
+
+Jika project menggunakan process manager:
+
+* integrasikan worker melalui mekanisme process manager yang sudah digunakan.
+
+Jika project tidak memiliki scheduler:
+
+* buat entrypoint worker terpisah yang dapat menjalankan expiry job.
+* Worker harus dapat dijalankan secara berkala oleh cron/systemd/process manager.
+* Jangan membuat scheduler yang bergantung pada browser/frontend.
+* Jangan menggunakan setInterval sebagai satu-satunya mekanisme production scheduling jika deployment dapat menjalankan lebih dari satu instance.
+
+3. Pastikan worker aman apabila terdapat lebih dari satu process/instance.
+
+   * Dua worker yang berjalan bersamaan tidak boleh menyebabkan payment berubah dua kali.
+   * Gunakan conditional database update/transaction yang sudah digunakan expiry worker.
+   * Jangan menggunakan global/in-memory mutex sebagai protection utama.
+
+4. Tentukan interval scheduler yang masuk akal berdasarkan expiry payment yang sudah ada.
+
+   * Jangan mengubah aturan expiry payment.
+   * Scheduler hanya bertugas memanggil worker.
+   * Jangan membuat expiry lebih cepat/lambat dari aturan bisnis yang sudah ditentukan.
+
+5. Tambahkan logging yang cukup:
+
+   * worker mulai;
+   * jumlah payment yang ditemukan;
+   * jumlah payment yang berhasil di-expire;
+   * jumlah yang dilewati karena state sudah berubah;
+   * error database jika terjadi.
+
+   Jangan log credential, payment secret, API key, signature, atau data sensitif.
+
+6. Tambahkan graceful shutdown jika entrypoint worker berjalan sebagai process terpisah.
+
+   * Tangani SIGTERM/SIGINT.
+   * Jangan meninggalkan transaction/database connection terbuka.
+   * Pastikan process dapat dihentikan oleh PM2/systemd/container dengan aman.
+
+7. Tambahkan script package.json yang jelas, misalnya sesuai pola project existing:
+
+   * command untuk menjalankan expiry worker;
+   * command untuk menjalankan test expiry.
+
+   Jangan menghapus script existing.
+
+8. Testing:
+
+   * worker tetap dapat dijalankan secara manual;
+   * scheduler/entrypoint memanggil worker yang benar;
+   * worker kedua yang berjalan bersamaan tetap aman;
+   * payment expired berubah menjadi EXPIRED;
+   * PAID/COMPLETED tidak berubah;
+   * worker kedua tidak menghasilkan duplicate effect.
+
+9. Jalankan verification:
+
+   * test payment expiry;
+   * test scheduler/worker jika tersedia;
+   * typecheck;
+   * lint;
+   * build.
+
+10. Jangan memperbaiki warning:
+    `src/components/ui/select.tsx`
+    karena warning tersebut tidak berkaitan dengan scope scheduler.
+
+PENTING:
+
+* Jangan commit.
+* Jangan push GitHub.
+* Jangan reset database.
+* Jangan mengubah frontend/UI.
+* Jangan mengintegrasikan provider payment nyata.
+* Jangan mengubah webhook idempotency.
+* Jangan membuat README baru.
+* Jangan menginstal dependency baru jika tidak benar-benar diperlukan.
+* Jangan mengaktifkan cron/systemd production secara langsung dari prompt ini jika environment deployment belum pasti.
+* Jika deployment menggunakan VPS tetapi konfigurasi process manager belum diketahui, buat entrypoint/script yang siap dipanggil dan jelaskan command deployment yang diperlukan, tanpa mengubah service production.
+
+Setelah selesai tampilkan:
+
+* mekanisme scheduler yang dipilih;
+* interval yang digunakan;
+* file yang berubah;
+* command untuk menjalankan worker;
+* cara deployment production;
+* hasil test/typecheck/lint/build;
+* masalah yang masih tersisa.
+
+Jangan commit atau push.
 
 
 ```
