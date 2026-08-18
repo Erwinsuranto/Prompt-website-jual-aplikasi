@@ -200,6 +200,146 @@
 # 
 ```
 
+Lanjutkan project toko-online dari kondisi terakhir.
+
+Fokus tahap ini hanya pada AUDIT DAN STANDARDISASI DEPLOYMENT VPS. Jangan mengaktifkan scheduler production dan jangan mematikan process existing pada tahap ini.
+
+Kondisi yang sudah diketahui:
+
+* Typecheck PASS.
+* Lint PASS dengan warning UI existing.
+* Build PASS.
+* git diff --check PASS.
+* Payment expiry worker sudah selesai dan sudah diuji.
+* Scheduler production belum aktif.
+* Tidak ditemukan konfigurasi PM2/systemd deployment yang jelas.
+* Root crontab kosong.
+* Terdapat beberapa process `next-server` unmanaged pada port berbeda.
+* Environment production belum teridentifikasi dengan jelas.
+* Jangan mengubah logic payment/expiry/webhook.
+
+Tugas:
+
+1. Audit process yang sedang berjalan di VPS.
+
+   * Identifikasi setiap process `next-server`.
+   * Catat PID, command line, working directory, user, port, dan waktu process jika tersedia.
+   * Tentukan process mana yang kemungkinan merupakan toko-online.
+   * Jangan kill, restart, stop, atau modify process apa pun.
+
+2. Audit port.
+
+   * Cari port yang digunakan oleh toko-online.
+   * Cari process yang listen pada port tersebut.
+   * Bedakan antara toko-online, service lain, dan process orphan/duplicate.
+   * Jangan mengubah port existing.
+
+3. Audit deployment path.
+
+   * Tentukan directory project toko-online yang benar.
+   * Periksa apakah process production dijalankan dari directory tersebut.
+   * Periksa package.json scripts yang tersedia.
+   * Periksa apakah ada `.env`, `.env.production`, environment file, ecosystem config, systemd unit, Docker config, atau konfigurasi deployment lain.
+   * Jangan menampilkan secret/API key/database password ke output.
+
+4. Audit environment production.
+
+   * Pastikan apakah `DATABASE_URL` tersedia untuk process production.
+   * Jangan mencetak nilai rahasia.
+   * Hanya tampilkan apakah variable tersedia atau tidak.
+   * Tentukan dari mana environment production seharusnya dimuat berdasarkan deployment existing.
+
+5. Audit process manager.
+   Periksa secara read-only:
+
+   * PM2;
+   * systemd;
+   * supervisor;
+   * Docker;
+   * cron;
+   * service manager lain yang relevan.
+
+   Jangan menginstal atau mengaktifkan service baru pada tahap ini.
+
+6. Audit apakah terdapat duplicate deployment.
+
+   * Beberapa `next-server` mungkin merupakan process lama/duplicate.
+   * Jangan menyimpulkan process mana yang aman dimatikan hanya berdasarkan nama.
+   * Jangan melakukan cleanup otomatis.
+   * Jika ditemukan duplicate, tampilkan bukti dan rekomendasi saja.
+
+7. Setelah audit, buat rancangan deployment standar yang aman untuk toko-online.
+
+Target akhirnya:
+
+* satu deployment web toko-online yang jelas;
+* satu lokasi project production yang jelas;
+* environment production yang jelas;
+* satu process manager yang jelas;
+* payment expiry worker dapat dijalankan sebagai process/job terpisah;
+* scheduler nantinya dapat memanggil worker tanpa mengganggu web server.
+
+8. Jika belum ada process manager yang digunakan:
+
+   * jangan langsung menginstal/menjalankan PM2;
+   * buat hanya konfigurasi yang diperlukan untuk deployment standar;
+   * jangan mengganti process existing;
+   * jelaskan command yang diperlukan untuk migrasi setelah mapping sudah dikonfirmasi.
+
+9. Buat konfigurasi deployment hanya jika aman dan tidak mengaktifkan service.
+
+   * Jika membuat ecosystem config atau deployment config, gunakan environment variable reference, bukan secret hardcoded.
+   * Jangan memasukkan API key/password/DATABASE_URL literal ke file repository.
+   * Pastikan worker dan web server dapat dipisahkan.
+
+10. Verifikasi setelah perubahan:
+
+* typecheck;
+* lint;
+* build;
+* git diff --check.
+
+JANGAN:
+
+* kill process;
+* stop/restart service existing;
+* mengubah port;
+* mengaktifkan PM2;
+* mengaktifkan systemd;
+* membuat cron aktif;
+* menjalankan migration;
+* reset database;
+* mengubah frontend;
+* mengubah webhook idempotency;
+* mengubah payment expiry logic;
+* commit;
+* push GitHub.
+
+Setelah selesai tampilkan laporan:
+
+1. Process toko-online yang ditemukan:
+
+   * PID
+   * port
+   * directory
+   * command
+   * status
+
+2. Process duplicate/orphan yang ditemukan, tanpa mematikannya.
+
+3. Process manager yang tersedia.
+
+4. Sumber environment production yang ditemukan, tanpa menampilkan secret.
+
+5. Deployment path yang direkomendasikan.
+
+6. Konfigurasi yang dibuat jika ada.
+
+7. Langkah berikutnya yang diperlukan untuk mengaktifkan deployment secara aman.
+
+8. Hasil typecheck/lint/build/git diff --check.
+
+Berhenti setelah audit dan standardisasi. Jangan mengaktifkan production scheduler pada tahap ini.
 
 
 ```
