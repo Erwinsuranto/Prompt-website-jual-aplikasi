@@ -228,10 +228,96 @@
 
 ```
 
-# 
+# PostgreSQL untuk dua HTTP request concurrent
 ```
 
 
+Lanjutkan project toko-online dari hasil implementasi webhook idempotency sebelumnya.
+
+Fokus tahap ini hanya pada VERIFIKASI CONCURRENCY WEBHOOK DENGAN DATABASE PostgreSQL yang digunakan project. Jangan mengimplementasikan fitur payment baru.
+
+Kondisi saat ini:
+
+* Webhook idempotency sudah memiliki 3 test yang passed.
+* Duplicate concurrent secara helper/claim behavior sudah diuji.
+* Event berbeda tetap dapat diproses.
+* Processing failure masih dapat di-retry.
+* Duplicate claim ditolak secara atomic.
+* Belum ada integration test langsung terhadap PostgreSQL untuk dua HTTP request concurrent.
+
+Tugas:
+
+1. Audit implementasi webhook idempotency yang baru dibuat.
+
+   * Temukan endpoint HTTP webhook.
+   * Temukan service/handler idempotency.
+   * Temukan schema/model database yang digunakan untuk menyimpan claim/event.
+   * Pastikan unique constraint/index benar-benar berada di database, bukan hanya pengecekan di application memory.
+
+2. Buat integration test PostgreSQL hanya jika test infrastructure project sudah mendukung database test.
+
+   * Jangan mengubah database production.
+   * Jangan menggunakan credential production.
+   * Jangan mereset database development yang sedang digunakan.
+   * Jika project belum mempunyai PostgreSQL test infrastructure yang aman, jangan memaksakan setup besar. Laporkan bahwa integration test belum dapat dijalankan dan lakukan static/database-level verification yang tersedia.
+
+3. Jika integration test PostgreSQL dapat dibuat dengan aman, uji:
+
+   * dua HTTP webhook identik dikirim hampir bersamaan;
+   * hanya satu request yang memperoleh claim;
+   * hanya satu request yang boleh menjalankan efek pemrosesan;
+   * request lainnya diperlakukan sebagai duplicate;
+   * tidak terjadi duplicate payment/order/stock update;
+   * event berbeda tetap dapat diproses;
+   * apabila processing pertama gagal dan status memungkinkan retry, webhook berikutnya dapat memproses ulang.
+
+4. Pastikan atomicity benar-benar dijamin database:
+
+   * gunakan unique constraint/index;
+   * gunakan transaction atau atomic insert/upsert yang sesuai ORM/database existing;
+   * jangan mengganti dengan lock global atau in-memory mutex;
+   * jangan membuat solusi yang hanya bekerja pada single-process server.
+
+5. Periksa state idempotency:
+
+   * PROCESSING
+   * COMPLETED
+   * FAILED atau state equivalent jika memang digunakan project.
+
+   Pastikan crash/retry tidak menyebabkan event dianggap COMPLETED sebelum seluruh efek bisnis selesai.
+
+6. Jalankan:
+
+   * test webhook terkait;
+   * integration test PostgreSQL jika tersedia;
+   * typecheck;
+   * lint;
+   * build.
+
+7. Jangan memperbaiki warning UI yang tidak berkaitan dengan payment/webhook pada tahap ini, termasuk warning:
+   `src/components/ui/select.tsx`
+   kecuali warning tersebut menyebabkan build/test gagal.
+
+8. Setelah selesai tampilkan:
+
+   * hasil test;
+   * apakah concurrency PostgreSQL berhasil diverifikasi;
+   * jumlah request concurrent yang diuji;
+   * hasil claim;
+   * file yang berubah;
+   * migration/schema yang digunakan;
+   * masalah yang masih tersisa.
+
+PENTING:
+
+* Jangan commit.
+* Jangan push GitHub.
+* Jangan menghapus/reset database.
+* Jangan mengubah frontend.
+* Jangan implement expiry worker.
+* Jangan implement provider payment nyata.
+* Jangan membuat README baru.
+* Pertahankan struktur dan arsitektur project existing.
 
 ```
 
