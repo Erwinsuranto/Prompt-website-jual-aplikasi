@@ -50,10 +50,23 @@
 
 
 ```
-# 
+# Prompt: Verifikasi Payment Webhook
 ```
 
+Verifikasi hasil implementasi payment webhook yang baru.
 
+1. Periksa route /api/payments/webhook.
+2. Pastikan method POST tersedia.
+3. Pastikan exact path webhook melewati bypass auth yang benar.
+4. Kirim POST test aman tanpa transaksi nyata dan tanpa memanggil provider payment nyata.
+5. Pastikan request tanpa signature/secret ditolak jika validasi signature memang diwajibkan.
+6. Pastikan request test yang valid dapat mencapai handler webhook.
+7. Jangan membuat order/payment baru.
+8. Jangan mengubah database schema.
+9. Jangan mengubah UI.
+10. Jalankan npm run typecheck dan npm run build.
+11. Laporkan HTTP status dan hasil masing-masing test.
+12. Jangan commit atau push GitHub.
 
 ```
 # 
