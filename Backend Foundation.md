@@ -131,9 +131,236 @@
 
 
 ```
-# 
+# Prompt: Payment Provider Registry & Operation Boundary
 ```
+Lanjutkan project toko-online dari hasil implementasi Payment Provider Cancellation & Refund Abstraction terakhir.
 
+Fokus tahap ini HANYA pada PAYMENT PROVIDER REGISTRY dan OPERATION BOUNDARY.
+
+Kondisi saat ini:
+- Payment expiry scheduler production SUDAH AKTIF dan berjalan normal.
+- Payment expiry worker sudah selesai.
+- Create payment idempotency sudah selesai.
+- Webhook idempotency sudah selesai.
+- Cancellation/refund abstraction sudah dibuat.
+- Provider nyata belum diintegrasikan.
+- Belum ada adapter Midtrans/Xendit/provider nyata.
+- Refund nyata belum tersedia.
+- Cancellation provider nyata belum tersedia.
+- Endpoint refund harus tetap menolak operation jika tidak ada provider operation yang tersedia.
+- Jangan membuat fake provider success.
+
+Tujuan:
+Merapikan boundary antara core payment lifecycle dan provider adapter agar provider nyata nantinya dapat ditambahkan tanpa mengubah core payment logic.
+
+Tugas:
+
+1. Audit abstraction provider yang baru dibuat.
+   - Temukan interface/type provider.
+   - Temukan cancellation operation.
+   - Temukan refund operation.
+   - Temukan capability detection.
+   - Temukan payment provider registry jika sudah ada.
+   - Pastikan core payment service tidak mengetahui detail HTTP/API provider.
+
+2. Buat atau rapikan provider registry modular.
+
+Registry minimal harus dapat:
+- register provider;
+- mendapatkan provider berdasarkan provider ID;
+- mengetahui capability provider;
+- menolak provider yang tidak terdaftar;
+- tidak membuat provider palsu.
+
+Contoh capability:
+- CREATE_PAYMENT
+- CANCEL_PAYMENT
+- REFUND_PAYMENT
+- WEBHOOK
+
+Gunakan type/interface yang sesuai architecture existing.
+Jangan memaksakan nama tersebut jika project sudah mempunyai terminology sendiri.
+
+3. Provider resolution:
+
+Buat satu boundary yang jelas untuk:
+- mencari provider berdasarkan payment.provider;
+- memastikan provider terdaftar;
+- memastikan operation yang diminta didukung;
+- mengembalikan error yang konsisten jika provider/operation tidak tersedia.
+
+Jika provider tidak terdaftar:
+- jangan fallback diam-diam ke provider lain;
+- jangan menjalankan operation;
+- jangan mengubah status payment.
+
+Jika capability tidak didukung:
+- jangan menjalankan operation;
+- jangan mengubah status payment menjadi sukses/refunded/cancelled;
+- gunakan error seperti PAYMENT_PROVIDER_OPERATION_UNSUPPORTED atau equivalent existing.
+
+4. Cancellation:
+
+Pastikan flow:
+
+PENDING
+→ local cancellation hanya jika business rule mengizinkan.
+
+Jika provider cancellation nyata belum tersedia:
+- jangan mengklaim provider transaction telah cancelled;
+- jangan membuat network request;
+- jangan mengubah payment menjadi provider-cancelled secara palsu.
+
+Jika nanti adapter provider tersedia:
+- core service cukup memanggil abstraction;
+- hasil provider menentukan transition berikutnya.
+
+5. Refund:
+
+Pastikan flow:
+
+PAID/COMPLETED
+→ request refund
+→ resolve provider
+→ cek capability REFUND_PAYMENT
+→ jalankan adapter refund jika tersedia
+→ hanya setelah provider benar-benar sukses, core boleh melakukan transition REFUNDED.
+
+Jika provider belum tersedia:
+- endpoint/service harus menolak operation dengan error yang jelas;
+- payment tetap PAID/COMPLETED;
+- jangan mengubah menjadi REFUNDED.
+
+6. Jangan membuat:
+- adapter Midtrans;
+- adapter Xendit;
+- adapter provider lain;
+- API credential;
+- HTTP request ke provider;
+- fake provider;
+- fake refund SUCCESS;
+- fake cancellation SUCCESS.
+
+Tahap ini hanya boundary/registry.
+
+7. Idempotency operation:
+
+Audit operation cancellation/refund.
+
+Pastikan operation dapat mempunyai stable operation key/reference sehingga nanti provider side effect dapat dikaitkan dengan local operation.
+
+Jangan membuat duplicate refund jika request yang sama diulang.
+
+Jika architecture existing sudah mempunyai idempotency layer yang cukup:
+- gunakan kembali;
+- jangan membuat sistem kedua yang duplikat.
+
+8. Error handling:
+
+Gunakan error yang dapat dibedakan minimal untuk:
+- provider tidak ditemukan;
+- operation tidak didukung;
+- provider belum dikonfigurasi;
+- provider operation gagal;
+- invalid payment state;
+- duplicate operation.
+
+Jangan membocorkan credential atau detail secret provider.
+
+9. Testing:
+
+Tambahkan test untuk:
+
+- provider registry register;
+- provider lookup berhasil;
+- provider tidak ditemukan;
+- capability CREATE_PAYMENT tersedia/tidak;
+- capability CANCEL_PAYMENT tersedia/tidak;
+- capability REFUND_PAYMENT tersedia/tidak;
+- cancellation pada provider yang tidak tersedia;
+- refund pada provider yang tidak tersedia;
+- refund PAID tetap PAID ketika provider operation unsupported;
+- cancellation PENDING tetap aman ketika provider operation unsupported;
+- invalid payment state ditolak;
+- duplicate refund operation tidak menghasilkan duplicate business effect;
+- provider adapter mock dapat dipanggil melalui registry;
+- core payment service tidak bergantung pada implementasi HTTP provider.
+
+Gunakan mock adapter/interface saja.
+
+10. Database:
+
+Jangan membuat migration jika registry dapat dibuat tanpa perubahan schema.
+
+Jika stable operation record benar-benar sudah dibutuhkan oleh architecture:
+- gunakan model/table existing jika memungkinkan;
+- migration harus non-destructive;
+- jangan reset database;
+- jangan mengubah data payment production.
+
+11. Scheduler:
+
+Jangan menyentuh:
+- toko-online-payment-expiry.service;
+- toko-online-payment-expiry.timer;
+- scheduler configuration;
+- worker expiry;
+- web process.
+
+Pastikan scheduler tetap aktif dan tidak berubah.
+
+12. Jangan menyentuh:
+- frontend;
+- payment expiry logic;
+- webhook idempotency;
+- create payment idempotency;
+- production database;
+- port;
+- deployment process.
+
+Warning existing:
+src/components/ui/select.tsx
+
+Warning ARIA tersebut jangan diperbaiki karena di luar scope.
+
+13. Verification:
+
+Jalankan:
+- seluruh payment tests yang relevan;
+- cancellation tests;
+- refund abstraction tests;
+- provider registry tests;
+- webhook regression tests;
+- payment expiry tests;
+- typecheck;
+- lint;
+- build;
+- git diff --check.
+
+14. Jangan commit atau push GitHub.
+
+Setelah selesai tampilkan:
+
+1. Struktur provider abstraction saat ini.
+2. Provider registry yang dibuat/dirapikan.
+3. Capability yang tersedia.
+4. Cara provider resolution bekerja.
+5. Behavior cancellation.
+6. Behavior refund.
+7. Error yang digunakan.
+8. Test yang ditambahkan dan hasilnya.
+9. File yang berubah.
+10. Hasil typecheck/lint/build.
+11. Konfirmasi payment expiry scheduler tetap ACTIVE dan tidak diubah.
+12. Gap yang tersisa sebelum provider nyata dapat diintegrasikan.
+
+PENTING:
+Jangan mengintegrasikan provider nyata pada tahap ini.
+Jangan membuat fake provider.
+Jangan membuat fake refund.
+Jangan mengklaim transaksi provider berhasil.
+Jangan commit.
+Jangan push GitHub.
 
 
 ```
