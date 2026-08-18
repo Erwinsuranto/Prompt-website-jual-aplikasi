@@ -14,6 +14,107 @@
 
 # 
 ```
+Lanjutkan project toko-online dari kondisi kode saat ini. Fokus hanya pada implementasi WEBHOOK IDEMPOTENCY untuk payment webhook. Jangan mengubah fitur payment lain yang belum diminta dan jangan melakukan commit/push GitHub.
+
+Tujuan:
+Webhook dari payment provider tidak boleh diproses dua kali apabila provider mengirim event/transaction yang sama berulang kali. Sistem harus aman terhadap retry webhook, duplicate delivery, dan request concurrent.
+
+Tugas:
+
+1. Audit terlebih dahulu struktur payment/webhook yang sudah ada.
+
+   * Cari endpoint webhook payment.
+   * Cari service/controller handler webhook.
+   * Cari model/schema database payment/transaction.
+   * Cari field provider transaction ID, event ID, reference ID, atau identifier webhook yang sudah tersedia.
+   * Gunakan arsitektur existing project dan jangan membuat sistem paralel yang tidak diperlukan.
+
+2. Implementasikan idempotency dengan identifier yang paling tepat dari provider.
+   Prioritas:
+
+   * event ID unik jika provider menyediakannya;
+   * jika tidak ada, gunakan kombinasi provider + provider transaction ID/reference ID + event/type yang memang menjamin event dapat dibedakan.
+   * Jangan menggunakan timestamp sebagai identifier utama.
+   * Identifier harus memiliki unique constraint/index di database.
+
+3. Pastikan race condition aman.
+
+   * Dua webhook identik yang masuk hampir bersamaan hanya boleh menghasilkan satu pemrosesan.
+   * Jangan hanya melakukan pengecekan "find lalu process" tanpa unique constraint/atomic operation.
+   * Gunakan transaction/atomic database operation sesuai ORM/database yang sudah digunakan project.
+
+4. Tentukan behavior duplicate webhook:
+
+   * Jika event sudah berhasil diproses, jangan ulangi perubahan status/payment/stock/order.
+   * Return HTTP response yang sesuai dengan pola existing API.
+   * Jangan menganggap duplicate sebagai payment baru.
+   * Logging harus membedakan webhook baru dengan duplicate webhook.
+   * Jangan membocorkan credential atau signature sensitif ke log.
+
+5. Jika webhook pertama gagal sebelum pemrosesan selesai:
+
+   * Jangan membuat sistem menganggap event sudah sukses hanya karena request pertama tercatat.
+   * Status idempotency/event harus memungkinkan retry provider diproses kembali apabila memang diperlukan.
+   * Pastikan desain tidak menyebabkan payment stuck hanya karena proses pertama crash.
+
+6. Integrasikan dengan state transition payment yang sudah ada.
+
+   * Jangan mengubah payment menjadi PAID hanya karena webhook duplicate.
+   * Jangan mengurangi stock/order balance dua kali.
+   * Jangan membuat refund/settlement dua kali.
+   * Hormati validasi status transition yang sudah ada.
+
+7. Database:
+
+   * Tambahkan migration/schema change jika diperlukan.
+   * Gunakan unique index/constraint yang benar.
+   * Jangan menghapus data existing.
+   * Jangan mereset database development.
+   * Pastikan migration dapat dijalankan pada environment existing.
+
+8. Testing:
+   Tambahkan atau sesuaikan test untuk minimal:
+
+   * webhook valid pertama → diproses sekali;
+   * webhook identik kedua → tidak diproses ulang;
+   * duplicate dengan request berurutan;
+   * duplicate/concurrent request bila test architecture memungkinkan;
+   * event berbeda untuk transaction berbeda → tetap diproses;
+   * event gagal diproses → retry masih dapat diproses;
+   * tidak ada double update pada payment/order/stock.
+
+   Jangan membuat test yang membutuhkan credential/provider production nyata.
+
+9. Jalankan verification yang relevan:
+
+   * typecheck/build;
+   * lint jika tersedia;
+   * test yang berkaitan dengan webhook/payment;
+   * syntax validation.
+
+   Jangan mengubah konfigurasi global hanya agar test lulus.
+
+10. Setelah selesai, lakukan audit singkat terhadap perubahan:
+
+* file yang diubah;
+* migration yang dibuat;
+* mekanisme unique/idempotency yang digunakan;
+* bagaimana race condition dicegah;
+* hasil test/build;
+* apakah ada masalah yang belum terselesaikan.
+
+PENTING:
+
+* Jangan melakukan commit.
+* Jangan melakukan push GitHub.
+* Jangan menghapus atau mereset database.
+* Jangan mengubah UI/frontend.
+* Jangan mengimplementasikan expiry worker atau payment provider nyata pada tahap ini.
+* Jangan membuat file README baru. Jika dokumentasi memang diperlukan, gunakan README.md yang sudah ada.
+* Pertahankan modularitas dan pola arsitektur project yang sekarang.
+* Jangan melakukan perubahan di luar scope webhook idempotency.
+
+Setelah implementasi selesai, berhenti dan tampilkan laporan hasil audit serta file yang berubah.:::
 
 
 
