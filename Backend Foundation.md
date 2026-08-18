@@ -44,10 +44,35 @@
 
 ```
 
-# 
+# Prompt: Verifikasi Production Server
 ```
 
+Prompt: Verifikasi Production Server
 
+Fokus hanya pada production runtime.
+
+1. Audit proses Next.js yang sedang berjalan dan port yang digunakan.
+2. Jangan mematikan proses yang bukan dibuat oleh task ini.
+3. Jangan mengubah port secara sembarangan.
+4. Tentukan port production yang aman digunakan aplikasi.
+5. Verifikasi aplikasi production dapat diakses secara lokal melalui localhost.
+6. Pastikan / dan /api/products merespons HTTP 200.
+7. Pastikan Cloudflare Tunnel tetap tidak terganggu.
+8. Jangan mengubah DNS atau konfigurasi Cloudflare.
+9. Jangan mengubah database.
+10. Jangan mengubah UI.
+11. Jangan commit atau push GitHub.
+
+Jika npm start tidak bisa dijalankan karena port sedang digunakan, jangan kill proses. Identifikasi proses yang menggunakan port tersebut dan laporkan.
+
+Jalankan typecheck/build hanya jika diperlukan, jangan melakukan pekerjaan berat yang tidak perlu.
+
+Laporkan:
+- proses Next.js aktif
+- port yang digunakan
+- hasil localhost /
+- hasil localhost /api/products
+- apakah production runtime sehat.
 
 ```
 # Prompt: Verifikasi Payment Webhook
