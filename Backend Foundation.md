@@ -188,6 +188,125 @@
 # 
 ```
 
+Lanjutkan project toko-online dari hasil konfigurasi systemd terakhir.
+
+Fokus tahap ini hanya pada MENYIAPKAN PRODUCTION ENVIRONMENT UNTUK SYSTEMD PAYMENT EXPIRY WORKER.
+
+Kondisi saat ini:
+
+* Deployment path: `/root/toko-online/app`
+* systemd service payment expiry sudah dibuat.
+* systemd timer sudah dibuat.
+* Service dan timer BELUM enable/start.
+* File `/etc/toko-online/toko-online.env` belum dibuat.
+* Environment production belum dipisahkan secara eksplisit dari `.env.local`.
+* Jangan mengubah logic payment, webhook idempotency, atau expiry worker.
+
+Tugas:
+
+1. Audit environment existing secara read-only.
+
+   * Periksa `.env`, `.env.local`, `.env.production`, dan environment lain yang relevan.
+   * Identifikasi variable yang benar-benar diperlukan oleh payment expiry worker.
+   * Minimal pastikan kebutuhan `DATABASE_URL`.
+   * Jangan pernah menampilkan nilai secret/API key/password ke output.
+
+2. Tentukan sumber environment production yang benar.
+
+   * Jangan menggunakan `.env.local` sebagai production environment secara otomatis.
+   * Jangan menyalin seluruh `.env.local` jika berisi secret yang tidak diperlukan worker.
+   * Gunakan hanya variable yang memang diperlukan oleh worker.
+   * Jangan hardcode secret ke source code.
+
+3. Buat directory environment systemd jika belum ada:
+   `/etc/toko-online/`
+
+4. Buat environment file:
+   `/etc/toko-online/toko-online.env`
+
+   Ketentuan:
+
+   * permission ketat;
+   * owner sesuai user service;
+   * tidak masuk Git;
+   * tidak berisi credential yang tidak diperlukan worker;
+   * `DATABASE_URL` harus berasal dari environment production yang benar.
+   * Jika DATABASE_URL production belum dapat diidentifikasi dengan aman, JANGAN menebak dan jangan membuat nilai palsu.
+
+5. Audit user service.
+
+   * Tentukan user yang seharusnya menjalankan worker berdasarkan permission `/root/toko-online/app`, Node.js, Prisma, dan deployment existing.
+   * Jangan membuat user baru tanpa alasan.
+   * Jika project memang hanya dapat dijalankan sebagai root karena struktur deployment saat ini, laporkan sebagai technical debt dan jangan mengubah ownership project secara massal.
+
+6. Update systemd unit agar:
+
+   * menggunakan `EnvironmentFile=/etc/toko-online/toko-online.env`;
+   * tidak menyimpan secret langsung di unit file;
+   * WorkingDirectory tetap `/root/toko-online/app`;
+   * command worker tetap menggunakan script production yang sudah diverifikasi;
+   * logging tetap melalui journalctl.
+
+7. Jangan enable/start service atau timer pada tahap ini.
+
+8. Validasi:
+
+   * `systemd-analyze verify`;
+   * validasi environment tanpa mencetak secret;
+   * jalankan worker manual menggunakan environment production jika aman;
+   * pastikan database connection berhasil;
+   * pastikan worker exit normal;
+   * jangan membuat perubahan payment nyata hanya untuk testing.
+
+9. Jalankan:
+
+   * payment expiry tests;
+   * webhook regression tests;
+   * typecheck;
+   * lint;
+   * build;
+   * git diff --check.
+
+10. Pastikan `/etc/toko-online/toko-online.env` tidak berada di repository dan tidak akan ikut commit.
+
+JANGAN:
+
+* enable systemd;
+* start systemd service;
+* enable timer;
+* start timer;
+* kill/restart process web existing;
+* mengubah port;
+* reset database;
+* migration;
+* mengubah frontend;
+* mengubah webhook idempotency;
+* mengubah expiry logic;
+* commit;
+* push GitHub;
+* menampilkan secret di output;
+* membuat README baru.
+
+Jika `DATABASE_URL` production belum dapat ditentukan:
+
+* berhenti sebelum membuat environment palsu;
+* tampilkan variable apa yang dibutuhkan;
+* tampilkan dari mana environment tersebut seharusnya berasal;
+* jangan mengaktifkan scheduler.
+
+Setelah selesai tampilkan:
+
+1. Environment source yang ditemukan tanpa nilai rahasia.
+2. File environment yang dibuat.
+3. User service yang dipilih.
+4. Permission file environment.
+5. Perubahan systemd unit.
+6. Hasil `systemd-analyze verify`.
+7. Hasil manual worker smoke test.
+8. Hasil test/typecheck/lint/build.
+9. Pastikan service dan timer tetap DISABLED/NOT STARTED.
+
+Berhenti setelah environment production siap dan tervalidasi.
 
 
 ```
