@@ -59,7 +59,30 @@
 # 
 ```
 
+Prompt: Perbaiki Payment Webhook
 
+Fokus hanya pada payment webhook.
+
+Temuan:
+GET /api/payments/webhook -> HTTP 401
+Pesan: ditangani auth guard catch-all; webhook belum memiliki implementation.
+
+Tugas:
+1. Audit route /api/payments/webhook dan auth guard/middleware yang memblokirnya.
+2. Tentukan method webhook yang benar (POST jika sesuai arsitektur).
+3. Webhook harus dapat menerima callback payment tanpa login user biasa.
+4. Jangan mematikan authentication global.
+5. Buat pengecualian hanya untuk route webhook yang diperlukan.
+6. Tambahkan validasi signature/secret webhook jika provider payment mendukungnya.
+7. Jangan memproses transaksi nyata atau mengirim pembayaran sungguhan.
+8. Jangan membuat mock payment.
+9. Simpan/update status order menggunakan Prisma sesuai schema yang sudah ada.
+10. Jangan mengubah UI atau database schema jika tidak benar-benar diperlukan.
+11. Jalankan typecheck dan build.
+12. Verifikasi endpoint webhook dengan request aman tanpa transaksi nyata.
+13. Jangan commit/push GitHub.
+
+Laporkan file yang diubah dan hasil verifikasi.
 
 ```
 # 
