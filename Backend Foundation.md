@@ -39,7 +39,28 @@
 ```
 
 
+Prompt: Verifikasi Database Prisma
 
+Jangan mengubah UI, Cloudflare, port, atau konfigurasi server yang tidak diperlukan.
+
+Fokus hanya pada database Prisma.
+
+1. Audit schema Prisma dan migration yang sudah ada.
+2. Periksa apakah DATABASE_URL tersedia pada environment aplikasi yang sedang berjalan.
+3. Jangan membuat atau menggunakan database dummy.
+4. Jangan menjalankan prisma migrate terhadap database production tanpa memastikan DATABASE_URL benar.
+5. Jika DATABASE_URL belum tersedia, jangan memaksa migration. Laporkan dengan jelas file/environment mana yang membutuhkan DATABASE_URL.
+6. Jika DATABASE_URL tersedia, lakukan verifikasi koneksi Prisma secara aman dan read-only terlebih dahulu.
+7. Verifikasi apakah /api/products benar-benar mengambil data dari database atau masih menggunakan mock/static data.
+8. Jangan commit atau push.
+9. Setelah selesai, laporkan:
+   - status DATABASE_URL
+   - status koneksi Prisma
+   - sumber data /api/products
+   - migration yang sudah ada
+   - apakah database siap digunakan.
+
+Jangan memperbaiki hal lain di luar scope ini.
 ```
 # 
 ```
