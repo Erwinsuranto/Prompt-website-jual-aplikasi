@@ -31,10 +31,620 @@
 
 
 ```
-# 
+# Prompt: Implementasi Admin Catalog & Manajemen Produk
 ```
 
+PROMPT — ADMIN CATALOG & PRODUCT MANAGEMENT
 
+Project: Digital Cell / toko-online
+
+KONDISI TERKINI
+
+Core integration sudah selesai dan diverifikasi.
+
+Status:
+- Next.js runtime berjalan.
+- Prisma/PostgreSQL menjadi sumber data utama.
+- /api/products menggunakan database.
+- Catalog tidak menggunakan mock data.
+- Product detail menggunakan data server.
+- Checkout melakukan validasi harga, stock, active status, dan quantity di server.
+- Order menggunakan database transaction dan ownership protection.
+- Payment webhook tetap exact-path dan signature-aware.
+- Authentication tetap aktif.
+- Prisma schema tidak diubah pada tahap sebelumnya.
+- Migration existing tidak dihapus/reset.
+- npm run typecheck PASS.
+- npm run build PASS.
+- Development runtime sehat.
+- Database development boleh tetap kosong.
+- VPS ini hanya untuk DEVELOPMENT dan nantinya project dipindahkan ke VPS production.
+
+TUJUAN
+
+Tahap berikutnya adalah membangun dan menghubungkan ADMIN CATALOG MANAGEMENT dengan backend database yang sudah ada.
+
+Fokus utama:
+
+1. Categories
+2. Products
+3. Product stock
+4. Product status
+5. Product pricing
+6. Product images
+7. Basic product management
+8. Admin authorization
+
+Jangan mengubah UI storefront yang sudah ada kecuali memang diperlukan agar data admin yang baru dibuat dapat tampil dengan benar.
+
+==================================================
+1. AUDIT ADMIN EXISTING
+==================================================
+
+Sebelum coding:
+
+Audit seluruh folder/file yang berhubungan dengan:
+
+- /admin
+- admin dashboard
+- category management
+- product management
+- product forms
+- stock management
+- settings terkait catalog
+- authentication admin
+- API admin
+- server actions admin
+
+Cari:
+
+- mock data
+- hardcoded products
+- hardcoded categories
+- local JSON
+- localStorage yang digunakan sebagai database
+- placeholder CRUD
+- fake success response
+- endpoint yang belum terhubung database.
+
+Jangan langsung membuat file baru sebelum memahami struktur existing.
+
+==================================================
+2. ADMIN AUTHORIZATION
+==================================================
+
+Pastikan halaman dan endpoint admin benar-benar protected.
+
+Rules:
+
+- User biasa tidak boleh mengakses admin management.
+- Authentication harus diverifikasi di server.
+- Authorization harus dilakukan server-side.
+- Jangan hanya menyembunyikan tombol admin di frontend.
+- Jangan percaya role yang dikirim dari browser.
+- Jangan membuat bypass authentication.
+
+Jika sistem role/admin existing sudah tersedia:
+
+- gunakan sistem tersebut.
+- jangan membuat sistem role baru.
+
+Jika admin authorization belum lengkap tetapi schema existing mendukungnya:
+
+- integrasikan menggunakan schema existing.
+
+Jika membutuhkan perubahan Prisma schema:
+
+STOP sebelum membuat migration.
+
+Laporkan:
+- model yang kurang
+- field yang diperlukan
+- alasan
+- perubahan yang direncanakan
+
+Jangan membuat migration otomatis tanpa approval.
+
+==================================================
+3. CATEGORY MANAGEMENT
+==================================================
+
+Implementasikan CRUD category jika schema Prisma sudah mendukung.
+
+Admin harus dapat:
+
+- melihat kategori
+- membuat kategori
+- mengubah kategori
+- mengaktifkan/nonaktifkan kategori
+- menghapus kategori jika aman
+
+Validasi:
+
+- nama wajib
+- slug harus valid
+- slug harus unik jika schema mensyaratkannya
+- jangan membuat duplicate category
+- jangan menghapus kategori yang masih digunakan produk tanpa handling yang benar.
+
+Jika delete tidak aman karena foreign key:
+
+gunakan pendekatan yang sesuai schema existing.
+
+Jangan menghapus data secara paksa.
+
+==================================================
+4. PRODUCT MANAGEMENT
+==================================================
+
+Admin harus dapat mengelola produk menggunakan database.
+
+Field yang tersedia di schema dapat mencakup:
+
+- name
+- slug
+- description
+- category
+- price
+- discount
+- stock
+- image
+- status
+- active
+- sold count
+- metadata
+
+Gunakan HANYA field yang benar-benar tersedia pada Prisma schema.
+
+Jangan menambahkan field hanya karena frontend menginginkannya.
+
+Admin harus dapat:
+
+- melihat daftar produk
+- search produk
+- filter kategori
+- filter status
+- membuat produk
+- mengubah produk
+- mengaktifkan/nonaktifkan produk
+- mengubah harga
+- mengubah stock
+- melihat detail produk.
+
+==================================================
+5. PRODUCT PRICE
+==================================================
+
+Harga adalah data sensitif terhadap checkout.
+
+Rules:
+
+- harga disimpan di database.
+- frontend admin hanya mengirim input.
+- server melakukan validasi.
+- checkout tetap mengambil harga dari database.
+- jangan percaya total dari browser.
+
+Jika ada discount:
+
+- validasi discount di server.
+- jangan sampai discount menghasilkan nilai negatif.
+- jangan sampai total checkout dapat dimanipulasi client.
+
+Jangan mengubah aturan checkout yang sudah berhasil.
+
+==================================================
+6. STOCK MANAGEMENT
+==================================================
+
+Stock harus berasal dari database.
+
+Admin dapat:
+
+- melihat stock
+- mengubah stock
+- mengaktifkan/nonaktifkan produk berdasarkan status existing
+- melihat produk habis stock.
+
+Rules:
+
+- stock tidak boleh negatif.
+- quantity harus integer valid.
+- checkout tetap melakukan validasi ulang.
+- jangan mengandalkan stock dari frontend.
+
+Jangan membuat sistem inventory kompleks jika schema existing belum mendukungnya.
+
+Implementasikan hanya kebutuhan dasar yang aman.
+
+==================================================
+7. PRODUCT IMAGE
+==================================================
+
+Audit cara frontend saat ini menyimpan product image.
+
+Jika sistem existing sudah memiliki:
+
+- URL image
+- path image
+- storage provider
+
+gunakan mekanisme existing.
+
+Jangan menambahkan image hosting baru.
+
+Jika image upload belum tersedia:
+
+jangan membuat sistem storage baru hanya untuk prompt ini.
+
+Untuk sementara gunakan mekanisme image yang sudah didukung schema/application.
+
+==================================================
+8. ADMIN API / SERVER ACTION
+==================================================
+
+Gunakan pola arsitektur existing.
+
+Jangan membuat API route hanya untuk formalitas.
+
+Untuk setiap operasi:
+
+CREATE:
+- validate input
+- authorize admin
+- write database
+- return result
+
+UPDATE:
+- authorize admin
+- validate ID
+- validate input
+- update database
+
+DELETE:
+- authorize admin
+- cek dependency
+- lakukan operasi aman
+
+READ:
+- authorize admin jika data memang private
+- gunakan pagination jika daftar besar.
+
+Jangan expose secret/database information.
+
+==================================================
+9. VALIDATION
+==================================================
+
+Semua input admin harus divalidasi server-side.
+
+Validasi:
+
+- string kosong
+- panjang string
+- number
+- integer
+- price
+- stock
+- category ID
+- product ID
+- slug
+- status.
+
+Jika project sudah menggunakan validation library:
+
+gunakan library existing.
+
+Jangan menambahkan dependency baru jika tidak diperlukan.
+
+==================================================
+10. ERROR HANDLING
+==================================================
+
+Gunakan HTTP status yang benar.
+
+400:
+invalid input
+
+401:
+belum login
+
+403:
+bukan admin
+
+404:
+resource tidak ditemukan
+
+409:
+duplicate/conflict
+
+500:
+unexpected server error
+
+Jangan mengembalikan stack trace ke frontend.
+
+Error message harus aman dan mudah dipahami.
+
+==================================================
+11. FRONTEND ADMIN
+==================================================
+
+Hubungkan UI admin existing dengan backend.
+
+Jangan redesign.
+
+Pertahankan:
+
+- layout
+- warna
+- typography
+- sidebar
+- navigation
+- component style.
+
+Perbaiki hanya bagian yang diperlukan agar CRUD bekerja.
+
+Pastikan loading state tersedia.
+
+Pastikan error state tersedia.
+
+Pastikan empty state tersedia.
+
+Pastikan setelah:
+
+CREATE
+UPDATE
+DELETE
+
+data UI diperbarui dengan benar.
+
+==================================================
+12. STORE FRONTEND
+==================================================
+
+Setelah admin catalog selesai:
+
+verifikasi storefront.
+
+Flow:
+
+Admin membuat product
+        ↓
+PostgreSQL
+        ↓
+Product API
+        ↓
+Storefront
+        ↓
+Product detail
+        ↓
+Cart
+        ↓
+Checkout
+
+Tidak boleh ada mock data yang mengambil alih data database.
+
+Jika database kosong:
+
+storefront harus tetap menampilkan empty state dengan benar.
+
+==================================================
+13. SECURITY AUDIT
+==================================================
+
+Periksa:
+
+- IDOR
+- admin authorization
+- product update authorization
+- category update authorization
+- price manipulation
+- stock manipulation
+- mass assignment
+- hidden admin endpoints
+- secret leakage.
+
+Jangan mempercayai:
+
+- role dari request body
+- userId dari request body
+- admin=true dari browser.
+
+Gunakan session/authentication server-side.
+
+==================================================
+14. DATABASE SAFETY
+==================================================
+
+PENTING:
+
+Jangan:
+
+- prisma migrate reset
+- DROP DATABASE
+- delete migration
+- recreate database
+- mengganti DATABASE_URL
+- mengganti PostgreSQL
+- menghapus data existing.
+
+Database development saat ini boleh kosong.
+
+Jangan membuat seed data otomatis.
+
+Jangan membuat dummy product hanya agar UI terlihat berisi.
+
+==================================================
+15. TESTING
+==================================================
+
+Setelah implementasi:
+
+1. npm run typecheck
+
+2. npm run build
+
+3. Pastikan runtime tetap berjalan.
+
+4. Test read endpoint product.
+
+5. Test category read.
+
+6. Test admin authorization tanpa login.
+
+7. Test admin authorization dengan user non-admin jika memungkinkan.
+
+8. Test validation invalid product.
+
+9. Test validation invalid stock.
+
+10. Test validation invalid price.
+
+11. Test duplicate category/product slug jika applicable.
+
+12. Test create/update/delete menggunakan database development hanya jika aman.
+
+Jangan melakukan transaksi payment nyata.
+
+Jangan menjalankan load test.
+
+Jangan menjalankan stress test.
+
+==================================================
+16. JANGAN UBAH SCOPE
+==================================================
+
+Jangan mengerjakan:
+
+- email delivery
+- notification system
+- reviews
+- favorites
+- coupon engine kompleks
+- payment provider integration baru
+- analytics kompleks
+- production deployment
+- Cloudflare production migration.
+
+Fokus hanya:
+
+ADMIN
+→ CATEGORY
+→ PRODUCT
+→ STOCK
+→ PRICE
+→ STATUS
+→ DATABASE
+→ STOREFRONT INTEGRATION
+
+==================================================
+17. PRISMA SCHEMA
+==================================================
+
+Gunakan schema Prisma yang sudah ada.
+
+Jika schema sudah mencukupi:
+
+JANGAN ubah schema.
+
+Jika schema ternyata tidak mencukupi:
+
+BERHENTI sebelum migration.
+
+Tampilkan:
+
+- model yang kurang
+- field yang kurang
+- alasan
+- dampak ke frontend/backend
+- migration yang diperlukan.
+
+Jangan membuat migration tanpa approval.
+
+==================================================
+18. FINAL REPORT
+==================================================
+
+Setelah selesai tampilkan:
+
+A. ADMIN
+
+Category:
+- READ
+- CREATE
+- UPDATE
+- DELETE
+
+Product:
+- READ
+- CREATE
+- UPDATE
+- DELETE
+
+Stock:
+- READ
+- UPDATE
+
+Price:
+- READ
+- UPDATE
+
+Status:
+- READ
+- UPDATE
+
+B. STOREFRONT
+
+- Product listing
+- Search
+- Category filter
+- Product detail
+- Stock
+- Price
+
+C. SECURITY
+
+- Authentication
+- Admin authorization
+- Input validation
+- IDOR protection
+- Price protection
+- Stock protection
+
+D. DATABASE
+
+- Prisma connection
+- Models used
+- Migration status
+- Schema changed atau tidak
+
+E. TEST
+
+- typecheck
+- build
+- runtime
+- endpoint tests
+- authorization tests
+
+F. FILES CHANGED
+
+Tampilkan setiap file yang diubah dan alasan perubahan.
+
+G. REMAINING
+
+Tampilkan fitur yang belum dikerjakan.
+
+PENTING:
+
+Jangan commit.
+Jangan push GitHub.
+Jangan reset database.
+Jangan membuat migration tanpa approval.
+Jangan mengubah UI tanpa alasan teknis.
+Jangan membuat mock data.
+Jangan membuat dummy transaction.
+
+Setelah semua selesai, BERHENTI dan berikan laporan.
 
 ```
 # Prompt: Integrasi Core Backend & Frontend Digital Cell
