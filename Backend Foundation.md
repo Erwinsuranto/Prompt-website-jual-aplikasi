@@ -169,6 +169,158 @@
 ```
 # 
 ```
+Lanjutkan project toko-online dari kondisi terakhir.
+
+Payment expiry production scheduler SUDAH AKTIF dan jangan diubah lagi.
+
+Fokus tahap berikutnya hanya pada AUDIT PAYMENT FLOW END-TO-END. Jangan menambahkan fitur baru sebelum audit selesai.
+
+Kondisi yang sudah selesai:
+
+* Webhook idempotency sudah diimplementasikan.
+* Payment expiry worker sudah diimplementasikan.
+* Legacy expiresAt sudah ditangani.
+* Production systemd timer sudah aktif.
+* Payment expiry tests 10/10 PASS.
+* Worker tests 3/3 PASS.
+* Webhook regression tests 3/3 PASS.
+* Typecheck PASS.
+* Build PASS.
+* git diff --check PASS.
+
+Tujuan:
+Pastikan seluruh lifecycle payment konsisten dari pembuatan payment sampai terminal state.
+
+Audit flow berikut:
+
+1. CREATE PAYMENT
+
+   * Periksa endpoint create payment.
+   * Pastikan order/payment dibuat dengan status awal yang benar.
+   * Pastikan nominal, product/order reference, user ownership, provider metadata, dan expiresAt konsisten.
+   * Pastikan payment baru tidak dapat dibuat dengan data invalid.
+   * Pastikan tidak terjadi duplicate order/payment akibat retry request create.
+
+2. GET PAYMENT
+
+   * Periksa endpoint get payment/session.
+   * Pastikan user hanya dapat melihat payment miliknya.
+   * Pastikan response tidak membocorkan credential/provider secret.
+   * Pastikan status yang dikembalikan berasal dari database source of truth.
+   * Pastikan expired payment tidak tetap terlihat sebagai pending apabila worker atau state transition sudah menandainya EXPIRED.
+
+3. WEBHOOK
+
+   * Audit webhook signature/authentication.
+   * Audit provider/external transaction ID.
+   * Audit idempotency key.
+   * Pastikan duplicate webhook tidak mengulangi business effect.
+   * Pastikan event berbeda untuk transaction berbeda tetap diproses.
+   * Pastikan webhook tidak dapat mengubah payment secara ilegal dari terminal state.
+
+4. PAYMENT SUCCESS
+
+   * Audit transition:
+     PENDING → PAID/COMPLETED.
+   * Pastikan order hanya diselesaikan satu kali.
+   * Pastikan stock/balance/business effect tidak dilakukan dua kali.
+   * Pastikan webhook retry aman.
+   * Pastikan payment yang sudah EXPIRED tidak dapat sembarangan menjadi PAID tanpa aturan bisnis yang valid.
+
+5. PAYMENT EXPIRY
+
+   * Audit transition:
+     PENDING → EXPIRED.
+   * Pastikan scheduler production yang sudah aktif tidak perlu diubah.
+   * Pastikan worker tidak mengubah PAID/COMPLETED menjadi EXPIRED.
+   * Pastikan concurrent webhook success dan expiry worker aman.
+
+6. CANCEL / REFUND
+
+   * Cari semua status CANCELLED, REFUNDED, FAILED, atau equivalent.
+   * Audit semua state transition.
+   * Pastikan refund tidak dapat dilakukan dua kali.
+   * Pastikan payment terminal state tidak dapat dipindahkan secara ilegal.
+   * Jika refund belum benar-benar diimplementasikan, JANGAN mengimplementasikan provider refund pada tahap ini. Hanya laporkan gap.
+
+7. OWNERSHIP / AUTHORIZATION
+
+   * Audit bahwa user A tidak dapat membaca atau mengubah payment/order user B.
+   * Audit admin-only operation.
+   * Pastikan webhook provider tidak menggunakan user authorization biasa.
+   * Pastikan payment ID/order ID tidak menjadi satu-satunya security boundary.
+
+8. DATABASE CONSISTENCY
+
+   * Audit transaction boundary.
+   * Cari operasi yang mengubah payment + order + stock secara bersamaan.
+   * Pastikan partial update tidak menyebabkan state bisnis tidak konsisten.
+   * Jangan melakukan migration baru kecuali benar-benar diperlukan untuk memperbaiki bug yang ditemukan.
+
+9. RETRY / IDEMPOTENCY
+   Buat test untuk:
+
+   * duplicate create request;
+   * duplicate webhook;
+   * webhook retry setelah processing failure;
+   * expiry worker dijalankan berulang;
+   * concurrent success vs expiry;
+   * refund retry jika refund flow sudah tersedia.
+
+10. TESTING
+    Jalankan seluruh test payment yang relevan.
+    Tambahkan test hanya untuk bug/gap yang benar-benar ditemukan.
+    Jangan membuat integration test PostgreSQL besar jika infrastructure test database belum tersedia.
+    Jangan menyentuh database production.
+
+11. Jalankan:
+
+* payment tests;
+* webhook tests;
+* expiry tests;
+* authorization tests jika tersedia;
+* typecheck;
+* lint;
+* build;
+* git diff --check.
+
+12. Warning UI berikut jangan disentuh:
+    `src/components/ui/select.tsx`
+
+PENTING:
+
+* Jangan mengubah systemd timer production.
+* Jangan mematikan scheduler.
+* Jangan restart/kill web process.
+* Jangan mengubah frontend.
+* Jangan mengintegrasikan provider payment nyata.
+* Jangan membuat refund provider nyata.
+* Jangan reset database.
+* Jangan migration destructive.
+* Jangan commit.
+* Jangan push GitHub.
+* Jangan membuat README baru.
+* Pertahankan arsitektur modular.
+
+Jika menemukan bug kritis:
+
+* perbaiki hanya jika perubahan aman dan berada dalam scope payment lifecycle;
+* tambahkan regression test;
+* jangan melakukan perubahan besar tanpa alasan.
+
+Setelah selesai tampilkan:
+
+1. Flow payment saat ini dari CREATE sampai terminal state.
+2. State transition yang valid.
+3. State transition yang berisiko/bug.
+4. Bug yang ditemukan dan diperbaiki.
+5. File yang berubah.
+6. Test yang ditambahkan.
+7. Hasil semua test/typecheck/lint/build.
+8. Gap yang masih tersisa.
+9. Konfirmasi bahwa systemd payment expiry timer tetap aktif dan tidak diubah.
+
+Jangan commit atau push.
 
 
 
