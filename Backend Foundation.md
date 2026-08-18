@@ -143,10 +143,246 @@
 
 
 ```
-# 
+# Prompt: Payment Cancel Flow
 ```
 
+Lanjutkan project toko-online dari kondisi terakhir.
 
+Fokus tahap ini HANYA pada PAYMENT CANCEL FLOW dan STATE TRANSITION.
+
+Kondisi saat ini:
+- Payment expiry scheduler production SUDAH AKTIF dan berjalan normal.
+- Jangan mengubah, mematikan, restart, atau mengonfigurasi ulang scheduler tersebut.
+- Payment expiry worker sudah selesai.
+- Webhook idempotency sudah selesai.
+- Create payment idempotency sudah dikerjakan.
+- Payment expiry tests sebelumnya PASS.
+- Worker tests sebelumnya PASS.
+- Webhook regression tests sebelumnya PASS.
+- Typecheck dan build sebelumnya PASS.
+- Jangan mengerjakan refund provider nyata pada tahap ini.
+- Jangan mengerjakan authorization integration test PostgreSQL pada tahap ini.
+
+Tujuan:
+Pastikan payment dapat dibatalkan secara aman tanpa merusak lifecycle payment dan tanpa race condition dengan webhook atau expiry worker.
+
+TUGAS:
+
+1. AUDIT PAYMENT STATE
+
+Cari seluruh model, enum, service, repository, endpoint, dan helper yang berkaitan dengan payment/order status.
+
+Identifikasi state yang benar-benar digunakan project, misalnya:
+- PENDING
+- PAID
+- COMPLETED
+- EXPIRED
+- CANCELLED
+- FAILED
+- REFUNDED
+
+Jangan mengarang state baru jika tidak diperlukan.
+
+Buat mapping state transition yang benar-benar digunakan source code saat ini.
+
+2. AUDIT CANCEL ENDPOINT/FLOW
+
+Cari apakah sudah terdapat:
+- cancel payment endpoint;
+- cancel order endpoint;
+- cancel service;
+- repository method;
+- admin cancel operation;
+- user cancel operation.
+
+Jika cancel flow sudah ada:
+- audit implementasinya;
+- jangan membuat endpoint duplicate.
+
+Jika belum ada:
+- implementasikan cancel flow minimal sesuai architecture existing.
+
+3. ATURAN CANCEL
+
+Payment yang masih PENDING dapat berubah menjadi:
+
+PENDING → CANCELLED
+
+Payment yang sudah:
+- PAID
+- COMPLETED
+- EXPIRED
+- REFUNDED
+
+tidak boleh dibatalkan secara sembarangan.
+
+Jika FAILED memang merupakan terminal state di project, jangan mengubahnya menjadi CANCELLED tanpa alasan bisnis yang jelas.
+
+Gunakan state transition yang atomic dan berdasarkan database source of truth.
+
+4. OWNERSHIP
+
+Pastikan user hanya dapat membatalkan payment/order miliknya sendiri.
+
+Jangan menggunakan payment ID/order ID sebagai satu-satunya security boundary.
+
+Jika endpoint membutuhkan authentication:
+- gunakan mekanisme authorization existing;
+- jangan membuat sistem authentication baru.
+
+Admin operation tetap mengikuti authorization admin existing.
+
+5. RACE CONDITION
+
+Pastikan cancel aman jika terjadi bersamaan dengan:
+
+- webhook payment success;
+- payment expiry worker;
+- retry request cancel;
+- duplicate cancel request.
+
+Contoh kondisi:
+
+Request A:
+PENDING → CANCELLED
+
+Request B:
+PENDING → PAID
+
+Tidak boleh menghasilkan state yang tidak konsisten.
+
+Gunakan conditional database update atau transaction sesuai architecture Prisma/PostgreSQL existing.
+
+Jangan menggunakan in-memory lock sebagai sumber kebenaran.
+
+6. IDEMPOTENT CANCEL
+
+Jika cancel request dikirim dua kali:
+
+- request pertama berhasil CANCELLED;
+- request kedua tidak boleh menghasilkan efek samping tambahan;
+- jangan membuat error internal;
+- response harus mengikuti behavior API existing yang paling konsisten.
+
+Tidak boleh:
+- membuat record baru;
+- mengurangi stock dua kali;
+- mengubah order dua kali;
+- memicu efek provider dua kali.
+
+7. ORDER CONSISTENCY
+
+Jika cancel payment juga mengubah order:
+
+- audit hubungan payment ↔ order;
+- pastikan perubahan status order dan payment tidak meninggalkan partial state;
+- gunakan transaction jika memang keduanya harus berubah atomically.
+
+Jangan mengubah stock/balance kecuali memang sudah menjadi behavior existing yang diperlukan.
+
+Jangan menambahkan business logic baru yang tidak diperlukan.
+
+8. REFUND
+
+Jangan mengimplementasikan provider refund nyata.
+
+Jika payment sudah PAID/COMPLETED dan bisnis membutuhkan refund:
+- jangan mengubahnya langsung menjadi CANCELLED;
+- tampilkan bahwa refund masih merupakan gap jika memang belum tersedia.
+
+Jangan menggunakan fake refund sebagai pengganti provider nyata.
+
+9. TESTING
+
+Tambahkan regression tests minimal untuk:
+
+- PENDING → CANCELLED berhasil;
+- CANCELLED → CANCELLED/retry aman;
+- PAID tidak dapat dibatalkan;
+- COMPLETED tidak dapat dibatalkan;
+- EXPIRED tidak dapat dibatalkan;
+- REFUNDED tidak dapat dibatalkan;
+- FAILED mengikuti aturan state existing;
+- user A tidak dapat membatalkan payment user B;
+- duplicate cancel request aman;
+- cancel concurrent dengan payment success aman;
+- cancel concurrent dengan expiry worker aman;
+- order/payment tidak mengalami partial update.
+
+Jika PostgreSQL integration test infrastructure belum tersedia:
+- jangan membuat infrastructure besar;
+- gunakan test layer existing;
+- verifikasi conditional update/transaction secara static;
+- laporkan bahwa HTTP concurrency PostgreSQL belum dapat diverifikasi langsung.
+
+10. TEST YANG HARUS DIJALANKAN
+
+Jalankan:
+
+- payment/cancel tests;
+- payment expiry tests;
+- webhook regression tests;
+- create payment idempotency tests jika tersedia;
+- typecheck;
+- lint;
+- build;
+- git diff --check.
+
+Jangan memperbaiki warning UI existing:
+
+src/components/ui/select.tsx
+
+kecuali warning tersebut menyebabkan test/build gagal.
+
+11. BATASAN KERAS
+
+JANGAN:
+- mengubah systemd payment expiry scheduler;
+- mematikan scheduler;
+- restart/kill process web;
+- mengubah port;
+- mengubah frontend/UI;
+- mengubah webhook idempotency kecuali benar-benar diperlukan untuk kompatibilitas cancel;
+- mengubah expiry worker;
+- mengintegrasikan payment provider nyata;
+- mengintegrasikan refund provider;
+- membuat authorization integration PostgreSQL besar;
+- reset database;
+- migration destructive;
+- menghapus data production;
+- commit;
+- push GitHub;
+- membuat README baru.
+
+Pertahankan arsitektur modular project existing.
+
+12. PERBAIKI HANYA JIKA DIPERLUKAN
+
+Jika ditemukan bug pada cancel/state transition:
+- perbaiki hanya bagian yang diperlukan;
+- tambahkan regression test;
+- jangan melakukan refactor besar;
+- jangan mengubah behavior payment lain yang sudah PASS.
+
+SETELAH SELESAI, TAMPILKAN:
+
+1. State payment yang ditemukan.
+2. State transition yang valid.
+3. State transition yang ditolak.
+4. Endpoint/service cancel yang digunakan.
+5. Authorization/ownership yang diterapkan.
+6. Cara race condition dicegah.
+7. File yang berubah.
+8. Test yang ditambahkan.
+9. Hasil seluruh test.
+10. Hasil typecheck.
+11. Hasil lint.
+12. Hasil build.
+13. Hasil git diff --check.
+14. Gap payment lifecycle yang masih tersisa.
+15. Konfirmasi bahwa systemd payment expiry scheduler tetap aktif dan TIDAK DIUBAH.
+
+Jangan commit atau push GitHub.
 
 ```
 # Authorization Payment
