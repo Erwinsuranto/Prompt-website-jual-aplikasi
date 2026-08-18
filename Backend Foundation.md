@@ -25,9 +25,828 @@
 
 ```
 
-# 
+# Prompt: Order & Checkout Management — Database Backend
 ```
+PROMPT — ORDER & CHECKOUT BACKEND INTEGRATION
 
+Project: Digital Cell / toko-online
+
+KONDISI TERKINI
+
+Tahap sebelumnya sudah selesai:
+
+- Prisma/PostgreSQL menjadi sumber data utama.
+- Catalog tidak lagi menggunakan mock sebagai sumber data.
+- Product listing menggunakan database.
+- Product detail menggunakan data server.
+- Admin catalog/product management sudah terhubung ke database.
+- Category/product/stock/price/status menggunakan backend.
+- Authentication dan authorization server-side tetap digunakan.
+- Checkout sudah memiliki validasi server-side untuk:
+  - product
+  - price
+  - stock
+  - active status
+  - quantity
+- Order menggunakan database transaction dan ownership protection.
+- Payment webhook sudah exact-path dan signature-aware.
+- npm run typecheck PASS.
+- npm run build PASS.
+- Runtime development sehat.
+- Database development boleh kosong.
+- VPS ini HANYA DEVELOPMENT.
+- Nantinya project akan dipindahkan ke VPS production.
+
+Jangan mengubah Cloudflare, DNS, port runtime, atau deployment.
+
+==================================================
+TUJUAN TAHAP INI
+==================================================
+
+Fokus tahap ini adalah memastikan CORE ORDER dan CHECKOUT benar-benar menggunakan Prisma/PostgreSQL secara konsisten.
+
+Flow yang harus menjadi sumber kebenaran:
+
+PRODUCT DATABASE
+      ↓
+PRODUCT DETAIL
+      ↓
+CART
+      ↓
+CHECKOUT
+      ↓
+SERVER VALIDATION
+      ↓
+CREATE ORDER
+      ↓
+ORDER ITEMS
+      ↓
+ORDER STATUS
+      ↓
+PAYMENT STATUS
+      ↓
+ORDER DETAIL
+
+Jangan mengerjakan payment provider nyata pada tahap ini.
+
+==================================================
+1. AUDIT ORDER SYSTEM
+==================================================
+
+Audit terlebih dahulu seluruh kode yang berhubungan dengan:
+
+- order-service
+- checkout-service
+- cart
+- order API
+- order detail
+- order history
+- order status
+- payment status
+- order item
+- customer/buyer data
+- admin order management.
+
+Cari:
+
+- mock order
+- fake order
+- localStorage sebagai sumber order
+- hardcoded order
+- dummy payment
+- fake success response
+- client-side order creation
+- total harga yang dipercaya dari browser.
+
+Jangan langsung mengubah kode sebelum memahami arsitektur existing.
+
+==================================================
+2. PRISMA SCHEMA
+==================================================
+
+Gunakan Prisma schema existing.
+
+Audit model:
+
+- Order
+- OrderItem
+- Product
+- Category
+- User/customer
+- Payment jika tersedia
+- model lain yang berhubungan dengan checkout.
+
+Pastikan hubungan antar-model dipahami.
+
+JANGAN mengubah Prisma schema jika tidak diperlukan.
+
+Jika schema existing sudah cukup:
+
+- gunakan schema tersebut.
+
+Jika schema tidak cukup:
+
+STOP sebelum migration.
+
+Laporkan:
+
+- model yang kurang
+- field yang kurang
+- relation yang kurang
+- alasan kebutuhan perubahan.
+
+Jangan membuat migration tanpa approval.
+
+==================================================
+3. CART
+==================================================
+
+Audit cart existing.
+
+Cart boleh berada di client sebagai state sementara.
+
+Tetapi:
+
+CART CLIENT BUKAN SUMBER KEBENARAN TRANSAKSI.
+
+Saat checkout:
+
+Server HARUS mengambil ulang:
+
+- product
+- price
+- stock
+- active status
+- quantity limit
+- product availability
+
+dari database.
+
+Jangan mempercayai:
+
+- price dari client
+- subtotal dari client
+- total dari client
+- product name dari client
+- stock dari client.
+
+Client hanya boleh mengirim identifier dan quantity yang diperlukan.
+
+==================================================
+4. CHECKOUT VALIDATION
+==================================================
+
+Implementasikan/rapikan validasi checkout server-side.
+
+Untuk setiap item:
+
+1. Cari product dari database.
+2. Pastikan product tersedia.
+3. Pastikan product active.
+4. Pastikan quantity valid.
+5. Pastikan stock mencukupi.
+6. Ambil harga terbaru dari database.
+7. Hitung subtotal di server.
+
+Kemudian:
+
+server menghitung total order sendiri.
+
+Jangan menerima:
+
+subtotal
+total
+discount
+final price
+
+sebagai nilai terpercaya dari browser.
+
+==================================================
+5. CREATE ORDER
+==================================================
+
+Create order harus dilakukan di server.
+
+Gunakan Prisma transaction jika schema existing mendukung.
+
+Minimal flow:
+
+BEGIN TRANSACTION
+
+- validasi semua product
+- validasi stock
+- ambil harga database
+- hitung subtotal
+- hitung total
+- create Order
+- create OrderItem
+- update stock jika desain inventory existing memang menggunakan pengurangan stock saat order
+- commit
+
+Jika terjadi error:
+
+ROLLBACK.
+
+Jangan menghasilkan order setengah jadi.
+
+==================================================
+6. STOCK CONCURRENCY
+==================================================
+
+Periksa race condition.
+
+Contoh:
+
+User A membeli stock terakhir.
+User B membeli product yang sama hampir bersamaan.
+
+Jangan hanya:
+
+READ STOCK
+↓
+CHECK
+↓
+UPDATE
+
+tanpa mempertimbangkan concurrent checkout.
+
+Gunakan transaction/atomic operation sesuai kemampuan schema dan database existing.
+
+Jangan membuat inventory engine baru.
+
+Gunakan mekanisme sederhana yang aman.
+
+Jika implementasi existing belum memungkinkan atomic stock update:
+
+laporkan keterbatasannya.
+
+==================================================
+7. ORDER NUMBER / IDENTIFIER
+==================================================
+
+Audit identifier order existing.
+
+Jika sudah tersedia:
+
+gunakan sistem existing.
+
+Jika belum ada tetapi schema sudah memiliki identifier yang sesuai:
+
+gunakan field tersebut.
+
+Jangan membuat sistem nomor order baru jika tidak diperlukan.
+
+Pastikan identifier tidak mudah menyebabkan collision.
+
+Jangan expose database internal ID secara tidak perlu.
+
+==================================================
+8. ORDER STATUS
+==================================================
+
+Audit status order existing.
+
+Jangan membuat status baru jika enum/status existing sudah cukup.
+
+Pastikan lifecycle order konsisten.
+
+Contoh konsep:
+
+PENDING
+→ PAID
+→ PROCESSING
+→ COMPLETED
+
+atau status yang memang sudah digunakan project.
+
+Jangan memaksakan status di atas jika schema existing memiliki sistem berbeda.
+
+Yang penting:
+
+- status valid
+- transition aman
+- tidak bisa dimanipulasi customer melalui request.
+
+Customer tidak boleh bebas mengubah:
+
+- paid
+- completed
+- processing
+- cancelled
+
+melalui endpoint client.
+
+==================================================
+9. PAYMENT STATUS
+==================================================
+
+Payment belum menjadi fokus integrasi provider nyata.
+
+Tetapi order harus memiliki pemisahan yang jelas antara:
+
+ORDER STATUS
+
+dan
+
+PAYMENT STATUS
+
+jika schema existing mendukungnya.
+
+Jangan menganggap:
+
+"checkout berhasil"
+
+berarti:
+
+"payment berhasil".
+
+Checkout hanya membuat order.
+
+Payment confirmation dilakukan oleh payment system/webhook pada tahap berikutnya.
+
+==================================================
+10. ORDER OWNERSHIP
+==================================================
+
+Pastikan user hanya dapat melihat order miliknya sendiri.
+
+Contoh:
+
+GET /api/orders/:id
+
+Server harus:
+
+1. membaca session user
+2. mengambil order
+3. memastikan ownership
+4. baru mengembalikan data.
+
+Jangan percaya:
+
+userId dari URL
+userId dari body
+userId dari query
+customerId dari browser.
+
+Jika admin memiliki akses:
+
+gunakan authorization admin server-side.
+
+==================================================
+11. ORDER DETAIL
+==================================================
+
+Order detail harus berasal dari database.
+
+Tampilkan data yang memang tersedia:
+
+- order identifier
+- status
+- payment status jika ada
+- products
+- quantity
+- price
+- subtotal
+- total
+- buyer information jika sesuai ownership
+- createdAt
+- updatedAt
+
+Jangan membuat data dummy.
+
+Jika order belum ada:
+
+return empty/not-found state yang benar.
+
+==================================================
+12. ORDER HISTORY
+==================================================
+
+Jika UI sudah memiliki halaman riwayat order:
+
+hubungkan dengan database.
+
+User harus melihat:
+
+HANYA order miliknya.
+
+Gunakan pagination jika arsitektur existing sudah mendukungnya.
+
+Jangan mengambil semua order lalu melakukan filtering hanya di browser.
+
+Filtering ownership harus terjadi server-side.
+
+==================================================
+13. ADMIN ORDER VIEW
+==================================================
+
+Jika admin UI existing memiliki order management:
+
+hubungkan ke database.
+
+Admin dapat melihat order sesuai authorization.
+
+Admin dapat melihat:
+
+- order
+- customer
+- items
+- total
+- payment status
+- order status.
+
+Jangan menambahkan fitur payment provider.
+
+Jangan membuat refund system.
+
+Jangan membuat settlement system.
+
+==================================================
+14. API SECURITY
+==================================================
+
+Audit endpoint order.
+
+Pastikan:
+
+GET private order
+→ authentication required
+
+CREATE order
+→ authentication sesuai arsitektur existing
+
+UPDATE order
+→ authorization required
+
+DELETE order
+→ jangan diizinkan sembarangan.
+
+Jangan membuat:
+
+?admin=true
+
+atau:
+
+{ "role": "admin" }
+
+sebagai authorization.
+
+Jangan percaya data privilege dari client.
+
+==================================================
+15. INPUT VALIDATION
+==================================================
+
+Validasi semua input:
+
+- product ID
+- quantity
+- order ID
+- customer data
+- notes jika tersedia.
+
+Rules:
+
+quantity:
+- integer
+- > 0
+- batas maksimum sesuai kebutuhan existing.
+
+String:
+- trim
+- panjang maksimum
+- tidak menerima input berlebihan.
+
+ID:
+- format valid
+- resource harus benar-benar ada.
+
+Jika project sudah menggunakan validation library:
+
+gunakan yang existing.
+
+Jangan menambahkan dependency baru tanpa kebutuhan.
+
+==================================================
+16. PRICE INTEGRITY
+==================================================
+
+Ini WAJIB.
+
+Pastikan user tidak dapat:
+
+- mengubah harga menjadi 0
+- mengubah harga menjadi negatif
+- mengirim harga lama
+- mengirim total palsu
+- memanipulasi discount
+- memanipulasi subtotal.
+
+Server harus selalu:
+
+DATABASE PRICE
+↓
+SERVER CALCULATION
+↓
+ORDER SNAPSHOT/TOTAL
+
+Jika schema existing memiliki snapshot harga pada OrderItem:
+
+gunakan mekanisme tersebut.
+
+Jangan mengubah schema tanpa approval.
+
+==================================================
+17. TRANSACTION SAFETY
+==================================================
+
+Jika create order membutuhkan beberapa operasi database:
+
+gunakan transaction.
+
+Contoh:
+
+create Order
++
+create OrderItems
++
+stock update
+
+harus konsisten.
+
+Jika salah satu gagal:
+
+rollback.
+
+Jangan meninggalkan:
+
+Order ada tetapi OrderItem tidak ada.
+
+atau:
+
+Stock berkurang tetapi Order gagal dibuat.
+
+==================================================
+18. ERROR HANDLING
+==================================================
+
+Gunakan status HTTP yang tepat.
+
+400:
+invalid checkout
+
+401:
+unauthenticated
+
+403:
+unauthorized
+
+404:
+product/order tidak ditemukan
+
+409:
+stock conflict / duplicate / state conflict
+
+422:
+validation failure jika pola project menggunakan 422
+
+500:
+unexpected error.
+
+Jangan mengembalikan:
+
+- DATABASE_URL
+- Prisma stack trace
+- internal server path
+- secret
+- credentials.
+
+==================================================
+19. FRONTEND CHECKOUT
+==================================================
+
+Audit checkout UI existing.
+
+Jangan redesign.
+
+Pertahankan:
+
+- layout
+- warna
+- typography
+- component structure.
+
+Perbaiki hanya integrasi data.
+
+Pastikan:
+
+Loading
+Error
+Success
+Empty cart
+Out of stock
+Product unavailable
+
+memiliki state yang benar.
+
+Setelah order berhasil:
+
+UI harus menggunakan order ID/identifier yang diberikan server.
+
+Jangan membuat order ID palsu di frontend.
+
+==================================================
+20. DUPLICATE SUBMISSION
+==================================================
+
+Audit kemungkinan user menekan tombol checkout berkali-kali.
+
+Contoh:
+
+User klik:
+
+"Bayar / Buat Pesanan"
+
+beberapa kali dengan cepat.
+
+Pastikan tidak mudah membuat duplicate order.
+
+Gunakan mekanisme existing jika sudah tersedia.
+
+Jika idempotency belum ada dan schema/API belum mendukung:
+
+jangan membuat sistem kompleks tanpa kebutuhan.
+
+Laporkan risiko dan solusi yang diperlukan.
+
+==================================================
+21. NO REAL PAYMENT
+==================================================
+
+PENTING:
+
+Jangan:
+
+- menghubungkan payment provider baru
+- mengirim payment nyata
+- mengirim webhook provider nyata
+- membuat transaksi finansial nyata
+- menggunakan API key payment production.
+
+Tahap ini hanya:
+
+ORDER
++
+CHECKOUT
++
+DATABASE
++
+VALIDATION
+
+==================================================
+22. TESTING
+==================================================
+
+Setelah implementasi jalankan:
+
+1. npm run typecheck
+
+2. npm run build
+
+3. Pastikan runtime development sehat.
+
+Kemudian test read-only terlebih dahulu.
+
+Test:
+
+- GET products
+- GET product detail
+- GET orders
+- GET order detail
+- unauthorized access
+- ownership protection
+- invalid product
+- invalid quantity
+- unavailable product
+- insufficient stock
+- manipulated price
+- manipulated total.
+
+Jika database development kosong:
+
+JANGAN membuat dummy transaction hanya untuk testing.
+
+Gunakan test yang aman sesuai data existing.
+
+==================================================
+23. DATABASE SAFETY
+==================================================
+
+PENTING:
+
+Jangan:
+
+- prisma migrate reset
+- DROP DATABASE
+- delete migration
+- recreate database
+- seed dummy transaction
+- menghapus data existing
+- mengganti DATABASE_URL.
+
+Database development saat ini boleh kosong.
+
+==================================================
+24. FILE MODULARITY
+==================================================
+
+Jangan membuat satu file besar.
+
+Pisahkan logic sesuai struktur existing:
+
+- service
+- validation
+- API/server action
+- database
+- UI.
+
+Gunakan module existing jika sudah tersedia.
+
+Jangan menduplikasi:
+
+- Prisma client
+- auth logic
+- validation logic
+- order calculation.
+
+==================================================
+25. FINAL VERIFICATION
+==================================================
+
+Setelah selesai, berikan laporan:
+
+A. CHECKOUT
+
+- Client cart
+- Server validation
+- Price validation
+- Stock validation
+- Product status validation
+
+B. ORDER
+
+- Order creation
+- Order items
+- Transaction
+- Ownership
+- Status
+
+C. SECURITY
+
+- Authentication
+- Authorization
+- IDOR protection
+- Price manipulation protection
+- Stock manipulation protection
+- Duplicate submission handling
+
+D. DATABASE
+
+- Prisma models digunakan
+- Transaction digunakan atau tidak
+- Migration berubah atau tidak
+- Schema berubah atau tidak
+
+E. TEST
+
+- npm run typecheck
+- npm run build
+- runtime
+- API tests
+- security tests
+
+F. FILES CHANGED
+
+Tampilkan setiap file yang diubah beserta alasannya.
+
+G. REMAINING
+
+Tampilkan fitur yang belum dikerjakan.
+
+PENTING:
+
+- Jangan commit.
+- Jangan push GitHub.
+- Jangan reset database.
+- Jangan membuat migration tanpa approval.
+- Jangan mengubah Cloudflare.
+- Jangan mengubah port.
+- Jangan mengubah UI yang tidak diperlukan.
+- Jangan membuat mock data.
+- Jangan membuat transaksi payment nyata.
+- Jangan mengerjakan payment provider production.
+
+Setelah selesai, BERHENTI dan berikan laporan lengkap.
 
 
 ```
