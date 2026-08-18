@@ -163,6 +163,162 @@
 ```
 # 
 ```
+Lanjutkan project toko-online dari hasil audit Payment Flow End-to-End terakhir.
+
+Fokus tahap ini HANYA pada DUPLICATE CREATE PAYMENT/ORDER IDEMPOTENCY.
+
+Jangan mengubah systemd payment expiry scheduler yang saat ini sudah aktif.
+
+Kondisi:
+
+* Payment expiry scheduler production aktif dan berjalan normal.
+* Webhook idempotency sudah selesai.
+* Payment expiry worker sudah selesai.
+* Payment expiry tests 10/10 PASS.
+* Worker tests 3/3 PASS.
+* Webhook regression 3/3 PASS.
+* Typecheck/build sebelumnya PASS.
+* Audit menemukan duplicate create request BELUM memiliki idempotency key yang persisted.
+* Jangan mengerjakan authorization integration test, refund provider, atau PostgreSQL HTTP concurrency integration pada tahap ini.
+
+Tujuan:
+Jika client mengirim request CREATE PAYMENT yang sama lebih dari sekali karena retry/network timeout/double-click, sistem tidak boleh membuat order/payment baru secara tidak sengaja.
+
+Tugas:
+
+1. Audit endpoint create payment/order yang sekarang.
+
+   * Temukan controller/route.
+   * Temukan service/repository.
+   * Temukan model Order dan Payment.
+   * Tentukan identifier request idempotency yang paling tepat.
+   * Jangan membuat identifier berdasarkan timestamp saja.
+
+2. Implementasikan persisted idempotency key untuk create request.
+
+   * Client harus dapat mengirim idempotency key.
+   * Key harus disimpan di database.
+   * Buat unique constraint/index pada scope yang tepat.
+   * Pertimbangkan ownership/user agar user berbeda tidak saling collision.
+   * Jangan menggunakan in-memory Map/cache sebagai source of truth.
+
+3. Tentukan behavior ketika key yang sama dikirim ulang:
+
+   * Jika request pertama sudah berhasil membuat payment/order, request berikutnya harus mengembalikan hasil yang sama atau reference yang sama.
+   * Jangan membuat payment/order kedua.
+   * Jangan membuat payment session kedua.
+   * Jangan mengurangi stock/balance dua kali.
+   * Jangan mengirim efek samping provider dua kali.
+
+4. Tangani concurrent duplicate request.
+
+   * Dua request dengan idempotency key sama yang masuk hampir bersamaan hanya boleh menghasilkan satu business operation.
+   * Jangan hanya melakukan:
+     find → jika tidak ada → create.
+   * Gunakan unique constraint + transaction/atomic operation sesuai Prisma/PostgreSQL architecture existing.
+
+5. Pastikan request dengan key berbeda:
+
+   * tetap dapat membuat payment/order berbeda apabila memang request bisnisnya berbeda;
+   * tidak dianggap duplicate.
+
+6. Validasi request idempotency key.
+
+   * Tentukan format dan panjang yang aman.
+   * Tolak key kosong/invalid sesuai pola validation existing.
+   * Jangan menyimpan data sensitif sebagai idempotency key.
+   * Jangan log key jika dapat dikaitkan dengan data sensitif.
+
+7. Pastikan replay behavior aman.
+
+   * Jika request pertama SUCCESS lalu client retry, kembalikan result yang konsisten.
+   * Jika request pertama gagal sebelum operation selesai, retry harus dapat diproses sesuai desain.
+   * Jangan membuat record idempotency yang permanen sebagai SUCCESS jika business transaction sebenarnya gagal.
+
+8. Database:
+
+   * Tambahkan migration hanya jika diperlukan.
+   * Jangan reset database.
+   * Jangan menghapus data existing.
+   * Unique constraint harus benar-benar berada di PostgreSQL.
+   * Jangan membuat migration destructive.
+
+9. Testing minimal:
+
+   * create payment dengan idempotency key baru → berhasil;
+   * request identik dengan key sama → tidak membuat duplicate;
+   * request key sama setelah request pertama sukses → result/reference konsisten;
+   * key berbeda → dapat membuat operation berbeda;
+   * invalid/empty key → ditolak sesuai validation;
+   * duplicate concurrent request → hanya satu business operation;
+   * retry setelah failure → dapat diproses kembali sesuai desain;
+   * tidak ada double stock/order/payment effect.
+
+10. Jangan membutuhkan payment provider nyata.
+
+    * Gunakan mock/helper/test fixture existing.
+    * Jangan menggunakan credential production.
+
+11. Jika integration PostgreSQL test infrastructure belum tersedia:
+
+    * gunakan test layer yang aman dan helper/transaction behavior yang tersedia;
+    * jangan mereset database development;
+    * jangan membuat setup PostgreSQL besar hanya untuk tahap ini;
+    * tetap pastikan unique constraint/migration diverifikasi secara static.
+
+12. Jalankan:
+
+    * seluruh test payment yang relevan;
+    * create payment idempotency tests;
+    * webhook regression tests;
+    * expiry tests;
+    * typecheck;
+    * lint;
+    * build;
+    * git diff --check.
+
+13. Warning UI ini jangan disentuh:
+    `src/components/ui/select.tsx`
+
+PENTING:
+
+* Jangan mengubah systemd timer/service production.
+* Jangan mematikan atau restart scheduler.
+* Jangan restart/kill web process.
+* Jangan mengubah frontend.
+* Jangan mengubah webhook idempotency kecuali benar-benar diperlukan untuk kompatibilitas.
+* Jangan mengubah expiry worker.
+* Jangan mengintegrasikan provider payment nyata.
+* Jangan mengimplementasikan refund provider.
+* Jangan membuat authorization integration test pada tahap ini.
+* Jangan reset database.
+* Jangan migration destructive.
+* Jangan commit.
+* Jangan push GitHub.
+* Jangan membuat README baru.
+* Pertahankan arsitektur modular existing.
+
+Jika menemukan bug kritis pada create payment:
+
+* perbaiki hanya yang diperlukan untuk idempotency;
+* tambahkan regression test;
+* jangan melakukan refactor besar yang tidak diperlukan.
+
+Setelah selesai tampilkan:
+
+1. Endpoint create yang diperbaiki.
+2. Idempotency key disimpan di model/table apa.
+3. Unique constraint yang digunakan.
+4. Behavior replay request.
+5. Cara race condition dicegah.
+6. File yang berubah.
+7. Migration yang dibuat jika ada.
+8. Test yang ditambahkan dan hasilnya.
+9. Typecheck/lint/build.
+10. Konfirmasi systemd payment expiry timer tetap aktif dan tidak diubah.
+11. Gap payment lifecycle yang masih tersisa.
+
+Jangan commit atau push.
 
 
 
