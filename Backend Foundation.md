@@ -137,11 +137,192 @@
 
 
 ```
-# 
+# Prompt: Payment Provider Cancellation & Refund Abstraction
 ```
 
 
+Lanjutkan project toko-online dari hasil audit Payment Flow terakhir.
 
+Fokus tahap ini HANYA pada PAYMENT PROVIDER CANCELLATION/REFUND ABSTRACTION.
+
+Jangan mengintegrasikan provider pembayaran nyata pada tahap ini.
+
+Kondisi saat ini:
+- Payment create idempotency sudah selesai.
+- Webhook idempotency sudah selesai.
+- Payment expiry worker sudah selesai.
+- Payment expiry scheduler production aktif dan berjalan normal.
+- Payment cancel flow lokal sudah tersedia.
+- PENDING dapat dibatalkan secara aman.
+- Payment yang sudah PAID/COMPLETED tidak boleh langsung menjadi CANCELLED.
+- Refund provider nyata belum tersedia.
+- Provider cancellation nyata belum tersedia.
+- Jangan mengubah systemd payment expiry scheduler.
+
+Tujuan:
+Membuat abstraction/interface provider yang jelas untuk cancellation dan refund agar provider nyata dapat ditambahkan kemudian tanpa mengubah core payment lifecycle.
+
+Tugas:
+
+1. Audit architecture provider payment yang sekarang.
+   - Cari type/interface provider.
+   - Cari repository/service payment.
+   - Cari create payment/session.
+   - Cari webhook processing.
+   - Cari cancel flow.
+   - Cari status transition.
+   - Jangan mengubah provider nyata karena belum tersedia.
+
+2. Buat abstraction provider jika memang belum ada.
+
+Minimal dukung konsep:
+- create payment/session;
+- cancel payment jika provider mendukung;
+- refund payment jika payment sudah sukses dan provider mendukung.
+
+Gunakan interface/type yang modular.
+
+Jangan membuat implementasi provider palsu yang seolah-olah benar-benar melakukan refund.
+
+3. Cancellation capability:
+
+Provider harus dapat menyatakan apakah cancellation didukung.
+
+Contoh konsep:
+- supportsCancellation
+- supportsRefund
+
+Jangan hardcode behavior provider di core payment service.
+
+Jika provider tidak mendukung cancellation:
+- core payment tetap dapat melakukan local cancellation hanya jika business state memang masih PENDING;
+- jangan mengklaim provider transaction sudah dibatalkan.
+
+4. Refund capability:
+
+Untuk payment PAID/COMPLETED:
+- jangan mengubah payment menjadi REFUNDED hanya karena endpoint refund dipanggil;
+- REFUNDED hanya boleh terjadi setelah provider refund berhasil, ketika provider nyata sudah tersedia.
+
+Untuk sekarang:
+- buat interface/service boundary;
+- jangan melakukan network request;
+- jangan menggunakan credential provider;
+- jangan membuat fake SUCCESS refund.
+
+5. State transition:
+
+Pertahankan aturan existing:
+
+PENDING → CANCELLED
+
+PAID/COMPLETED → REFUNDED hanya setelah refund provider berhasil.
+
+Jangan izinkan:
+
+PAID → CANCELLED
+
+COMPLETED → CANCELLED
+
+REFUNDED → CANCELLED
+
+CANCELLED → PAID
+
+kecuali architecture existing memang memiliki aturan khusus yang sudah terbukti valid.
+
+6. Webhook compatibility:
+
+Pastikan abstraction tidak merusak webhook.
+
+Jika webhook success datang setelah local cancellation:
+- conditional lifecycle tetap berlaku;
+- jangan mengubah payment secara ilegal;
+- jangan menghapus idempotency protection.
+
+Jika provider refund nantinya menghasilkan webhook:
+- architecture harus dapat menerima event tersebut;
+- tetapi jangan implementasikan provider nyata sekarang.
+
+7. Testing:
+
+Tambahkan test untuk:
+
+- provider mendukung cancellation;
+- provider tidak mendukung cancellation;
+- provider mendukung refund;
+- provider tidak mendukung refund;
+- PENDING local cancellation tetap aman;
+- PAID tidak berubah menjadi CANCELLED;
+- COMPLETED tidak berubah menjadi CANCELLED;
+- refund belum tersedia tidak menghasilkan REFUNDED;
+- provider error tidak menghasilkan REFUNDED;
+- provider success nantinya dapat menghasilkan REFUNDED melalui abstraction;
+- duplicate refund request tidak boleh menghasilkan duplicate business effect jika idempotency layer existing dapat digunakan;
+- webhook lifecycle tetap aman.
+
+Gunakan mock provider/interface saja.
+
+8. Jangan membuat:
+- payment provider nyata;
+- credential provider;
+- HTTP call ke provider;
+- refund uang nyata;
+- cancellation transaksi nyata.
+
+9. Jangan mengubah:
+- frontend;
+- payment expiry worker;
+- systemd timer;
+- webhook idempotency;
+- create payment idempotency;
+- database production;
+- port;
+- deployment process.
+
+10. Migration:
+- Jangan membuat migration jika abstraction dapat dibuat tanpa perubahan database.
+- Jika perubahan database benar-benar diperlukan, jelaskan dahulu alasannya dan gunakan migration non-destructive.
+- Jangan reset database.
+
+11. Verification:
+
+Jalankan:
+- payment tests;
+- cancel tests;
+- refund abstraction tests;
+- webhook regression tests;
+- expiry tests;
+- typecheck;
+- lint;
+- build;
+- git diff --check.
+
+Warning existing berikut jangan disentuh:
+
+src/components/ui/select.tsx
+
+12. Jangan commit atau push GitHub.
+
+Setelah selesai tampilkan:
+
+1. Provider interface/type yang dibuat.
+2. Cancellation capability.
+3. Refund capability.
+4. Service yang menggunakan abstraction.
+5. State transition yang didukung.
+6. State transition yang ditolak.
+7. Test yang ditambahkan dan hasilnya.
+8. File yang berubah.
+9. Hasil typecheck/lint/build.
+10. Konfirmasi systemd payment expiry scheduler tetap aktif dan tidak diubah.
+11. Gap yang masih tersisa untuk provider nyata.
+
+PENTING:
+Jangan membuat provider palsu.
+Jangan mengklaim refund berhasil tanpa provider nyata.
+Jangan mengubah payment menjadi REFUNDED hanya untuk membuat test PASS.
+Jangan commit.
+Jangan push GitHub.
 ```
 # Prompt: Payment Cancel Flow
 ```
