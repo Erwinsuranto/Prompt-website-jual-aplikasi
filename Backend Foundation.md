@@ -101,11 +101,506 @@
 
 
 ```
-# 
+# Prompt: Payment Idempotency & State Consistency
 ```
 
 
+PROMPT — PAYMENT IDEMPOTENCY & ORDER/PAYMENT STATE CONSISTENCY
 
+Project: Digital Cell / toko-online
+
+Lanjutkan dari hasil audit payment adapter terakhir.
+
+STATUS SAAT INI
+
+- Payment provider adapter sudah terintegrasi.
+- Midtrans adapter sudah diverifikasi.
+- createPayment sudah terhubung ke core.
+- Server-side status polling/reconciliation sudah tersedia.
+- Payment webhook sudah exact-path dan signature-aware.
+- Payment amount berasal dari server/database.
+- Ownership protection sudah diterapkan.
+- Tidak ada transaksi Midtrans production.
+- Tidak ada production credential.
+- Test menggunakan mock/stub.
+- Prisma/PostgreSQL tetap menjadi sumber data utama.
+- Prisma schema TIDAK boleh diubah pada tahap ini.
+- Migration TIDAK boleh dibuat.
+- Cancel/refund nyata belum menjadi scope.
+- Full provider-event idempotency belum selesai karena dedicated provider event ID belum tersedia di schema.
+
+TUJUAN TAHAP INI
+
+Perkuat consistency antara:
+
+Order
+↓
+Payment
+↓
+Provider callback/status
+↓
+Order status transition
+
+tanpa mengubah Prisma schema.
+
+==================================================
+1. AUDIT STATE MACHINE EXISTING
+==================================================
+
+Audit enum/status yang sudah ada untuk:
+
+- Order
+- Payment
+- Payment provider status
+
+Jangan membuat enum baru jika existing enum masih dapat digunakan.
+
+Petakan status provider ke status internal secara terpusat.
+
+Pastikan tidak ada status transition yang dilakukan langsung dari route tanpa melalui service/domain logic.
+
+==================================================
+2. PAYMENT STATE TRANSITION
+==================================================
+
+Buat atau rapikan centralized payment transition logic.
+
+Rules:
+
+PENDING → PAID
+PENDING → FAILED
+PENDING → EXPIRED
+
+sesuai status yang memang tersedia di schema.
+
+Jangan mengizinkan:
+
+PAID → PENDING
+PAID → FAILED
+
+atau regression status lain yang tidak valid.
+
+Jika status existing berbeda, gunakan status existing dan dokumentasikan mapping-nya.
+
+==================================================
+3. ORDER STATE TRANSITION
+==================================================
+
+Audit hubungan payment status dengan order status.
+
+Jika payment berhasil:
+
+Payment
+→ PAID
+
+Order
+→ status sukses/paid yang sesuai existing architecture.
+
+Jika payment gagal/expired:
+
+Order hanya boleh berubah jika transition tersebut memang valid menurut order-service.
+
+Jangan bypass centralized order transition logic.
+
+==================================================
+4. ATOMIC UPDATE
+==================================================
+
+Jika webhook/status reconciliation mengubah:
+
+- payment
+- order
+
+pastikan perubahan dilakukan secara atomic menggunakan Prisma transaction jika diperlukan.
+
+Jangan membuat:
+
+payment berhasil
+tetapi order gagal diperbarui.
+
+Jika transaction gagal:
+
+jangan mengembalikan success palsu.
+
+==================================================
+5. IDEMPOTENCY TANPA MIGRATION
+==================================================
+
+Karena schema tidak boleh berubah:
+
+gunakan field existing yang memang tersedia untuk membantu mencegah duplicate processing.
+
+Prioritaskan:
+
+- payment ID
+- order ID
+- provider reference
+- PaymentWebhookEvent unique key jika memang sudah ada.
+
+Jangan membuat migration baru.
+
+Jangan menambah kolom hanya untuk idempotency.
+
+Jika full provider-event idempotency benar-benar membutuhkan:
+
+providerEventId
+
+atau dedicated event table:
+
+JANGAN IMPLEMENT MIGRATION.
+
+Cukup:
+
+1. dokumentasikan kebutuhan tersebut;
+2. gunakan protection yang bisa dilakukan dengan schema existing;
+3. lanjutkan bagian lain yang tidak membutuhkan schema change.
+
+==================================================
+6. DUPLICATE WEBHOOK
+==================================================
+
+Buat test:
+
+Webhook A
+→ payment PENDING → PAID
+
+Webhook A dikirim lagi.
+
+Expected:
+
+- tidak membuat payment baru;
+- tidak membuat order baru;
+- tidak menurunkan status;
+- tidak menggandakan side effect;
+- response tetap aman.
+
+Gunakan data mock.
+
+Jangan kirim webhook ke provider nyata.
+
+==================================================
+7. OUT-OF-ORDER WEBHOOK
+==================================================
+
+Test sequence:
+
+PAID
+↓
+PENDING
+
+Expected:
+
+PENDING tidak boleh menurunkan PAID.
+
+Test:
+
+FAILED
+↓
+PAID
+
+Tentukan apakah transition tersebut valid berdasarkan existing order/payment architecture.
+
+Jangan mengarang business rule baru.
+
+Jika ambiguous:
+
+ikuti state transition logic existing dan laporkan.
+
+==================================================
+8. STATUS RECONCILIATION
+==================================================
+
+Audit status polling yang sudah tersedia.
+
+Pastikan reconciliation juga menggunakan centralized transition logic.
+
+Jangan membuat polling mempunyai aturan status sendiri.
+
+Flow harus:
+
+provider status
+→ provider mapper
+→ internal payment status
+→ payment transition
+→ order transition
+
+bukan:
+
+provider status
+→ langsung update database.
+
+==================================================
+9. CONCURRENT REQUEST
+==================================================
+
+Audit kemungkinan dua proses berjalan bersamaan:
+
+Webhook
++
+Status polling
+
+keduanya mencoba mengubah payment yang sama.
+
+Pastikan hasil akhir konsisten.
+
+Jangan menggunakan global lock yang dapat menghambat seluruh payment system.
+
+Gunakan transaction/database-safe logic yang sesuai dengan schema existing.
+
+Jika race condition tidak dapat sepenuhnya diselesaikan tanpa migration:
+
+jangan mengubah schema.
+
+Dokumentasikan limitation.
+
+==================================================
+10. CREATE PAYMENT DUPLICATION
+==================================================
+
+Audit kemungkinan user menekan:
+
+"Bayar"
+
+dua kali.
+
+Jangan otomatis membuat dua payment provider session jika order masih memiliki payment yang valid.
+
+Gunakan payment/order record existing untuk menentukan apakah payment existing masih dapat digunakan.
+
+Jika existing architecture memang membuat payment baru untuk retry:
+
+pastikan retry tersebut tidak membuat order baru.
+
+Jangan mengubah business rule tanpa alasan.
+
+==================================================
+11. OWNERSHIP
+==================================================
+
+Pastikan semua payment operation customer memvalidasi:
+
+- authenticated user
+- order ownership
+- payment ownership/order relation.
+
+User A tidak boleh:
+
+- melihat payment User B;
+- polling payment User B;
+- memicu payment User B;
+- memanipulasi status User B.
+
+Admin flow tetap mengikuti authorization existing.
+
+==================================================
+12. AMOUNT INTEGRITY
+==================================================
+
+Pastikan idempotency tidak membuka celah amount manipulation.
+
+Amount harus tetap berasal dari:
+
+Order database
+
+bukan:
+
+request body.
+
+Test:
+
+client amount = 1000
+database amount = 50000
+
+Expected:
+
+server menggunakan 50000.
+
+Jangan percaya:
+
+amount
+price
+total
+currency
+
+dari client jika database sudah memiliki authoritative value.
+
+==================================================
+13. WEBHOOK SECURITY
+==================================================
+
+Pertahankan:
+
+- exact path;
+- POST only;
+- signature validation;
+- payload validation;
+- provider validation.
+
+Pastikan duplicate/idempotency handling dilakukan SETELAH request lolos validation/security yang diperlukan.
+
+Jangan menjadikan idempotency sebagai bypass authentication/signature validation.
+
+==================================================
+14. SIDE EFFECT SAFETY
+==================================================
+
+Audit apakah payment success memicu:
+
+- order update;
+- stock reduction;
+- notification;
+- invoice;
+- callback lain.
+
+Jangan menjalankan side effect dua kali akibat duplicate webhook.
+
+Jika side effect belum diimplementasikan:
+
+JANGAN membuatnya sekarang.
+
+Cukup pastikan payment/order state layer siap.
+
+==================================================
+15. TEST MATRIX
+==================================================
+
+Buat test menggunakan mock/stub.
+
+Minimal:
+
+A. PENDING → PAID
+B. PENDING → FAILED
+C. PENDING → EXPIRED jika tersedia
+D. PAID → PENDING harus ditolak
+E. Duplicate PAID callback
+F. Duplicate FAILED callback
+G. Out-of-order callback
+H. Webhook + polling race simulation
+I. Double create-payment request
+J. Unauthorized payment access
+K. Cross-user payment access
+L. Amount manipulation
+M. Invalid provider status
+N. Invalid webhook signature
+O. Invalid payload
+P. Provider configuration missing
+
+Tidak boleh menggunakan credential production.
+
+Tidak boleh membuat transaksi nyata.
+
+==================================================
+16. NO SCHEMA CHANGE
+==================================================
+
+WAJIB:
+
+Jangan menjalankan:
+
+- prisma migrate dev
+- prisma migrate deploy
+- prisma migrate reset
+- prisma db push
+- DROP DATABASE
+- migration baru.
+
+Jangan mengubah:
+
+app/prisma/schema.prisma
+
+Jika ditemukan kebutuhan schema untuk idempotency penuh:
+
+STOP pada bagian tersebut dan dokumentasikan:
+
+- field yang dibutuhkan;
+- alasan;
+- lokasi penggunaan;
+- risiko jika belum ada.
+
+Tetapi lanjutkan test dan hardening yang bisa dilakukan tanpa schema change.
+
+==================================================
+17. BUILD & VERIFICATION
+==================================================
+
+Jalankan:
+
+npm run typecheck
+npm run build
+
+Kemudian jalankan test payment yang relevan.
+
+Jika server development sedang aktif:
+
+jangan menghentikan process yang bukan bagian task.
+
+Jangan mengubah:
+
+- Cloudflare
+- DNS
+- tunnel
+- port
+- deployment configuration.
+
+==================================================
+18. GIT
+==================================================
+
+JANGAN:
+
+git commit
+git push
+
+Jangan reset worktree.
+
+Jangan menghapus perubahan existing.
+
+Di akhir tampilkan:
+
+git status --short
+
+==================================================
+19. FINAL REPORT
+==================================================
+
+Laporkan:
+
+A. Existing payment states
+B. Existing order states
+C. State transition rules
+D. Idempotency mechanism yang berhasil diterapkan
+E. Duplicate webhook handling
+F. Concurrent webhook/polling handling
+G. Double create-payment handling
+H. Ownership protection
+I. Amount integrity
+J. Test results
+K. Files changed
+L. Schema status
+M. Remaining limitations
+
+Khusus Remaining Limitations:
+
+Jika full provider-event idempotency masih membutuhkan schema field/event table, jelaskan secara eksplisit.
+
+Jangan mengklaim idempotency FULL jika sebenarnya hanya menggunakan existing payment/order/reference protection.
+
+==================================================
+STOP CONDITION
+==================================================
+
+Setelah selesai:
+
+- jangan commit;
+- jangan push;
+- jangan migration;
+- jangan transaksi nyata;
+- jangan production credential;
+- jangan ubah Cloudflare;
+- jangan ubah DNS;
+- jangan ubah port.
+
+Berhenti dan tampilkan laporan hasil verifikasi lengkap.
 ```
 # Prompt: Integrasi Payment Adapter ke Core
 ```
