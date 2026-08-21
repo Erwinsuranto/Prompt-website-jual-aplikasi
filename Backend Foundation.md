@@ -95,10 +95,579 @@
 
 
 ```
-# 
+# Prompt: Payment Session & Checkout Completion
 ```
 
+PROMPT — COMPLETE PAYMENT SESSION AND CHECKOUT FLOW
 
+Project: Digital Cell / toko-online
+
+Lanjutkan dari seluruh pekerjaan payment integration sebelumnya.
+
+STATUS YANG SUDAH SELESAI
+
+- Prisma/PostgreSQL menjadi sumber data utama.
+- Catalog/product/order sudah terhubung ke backend database.
+- Payment service sudah menggunakan database.
+- Payment provider abstraction sudah tersedia.
+- Midtrans adapter sudah tersedia.
+- createPayment sudah terhubung ke core payment flow.
+- Server-side status polling/reconciliation sudah terhubung.
+- Payment webhook sudah exact-path dan signature-aware.
+- Payment amount berasal dari server/database.
+- Ownership protection sudah diterapkan.
+- Payment state transition sudah diperketat.
+- Order/payment consistency sudah diperiksa.
+- Idempotency protection sudah diterapkan menggunakan mekanisme/schema existing.
+- Duplicate callback protection sudah diuji.
+- Race condition webhook/polling sudah diperiksa.
+- Tidak ada migration baru.
+- Tidak ada transaksi Midtrans production.
+- Tidak ada production credential.
+- Tidak ada perubahan Cloudflare/DNS/port.
+- Tidak ada commit/push.
+
+REMAINING WORK UTAMA
+
+Create-session/payment session sudah tersedia di adapter/core, tetapi frontend masih belum sepenuhnya menggunakan hasil payment gateway seperti:
+
+- redirectUrl
+- Snap token
+- payment reference
+- atau response provider lain
+
+sesuai implementasi existing.
+
+TUJUAN TAHAP INI
+
+Selesaikan alur checkout dari order sampai customer mendapatkan payment session yang benar.
+
+TARGET:
+
+Customer checkout
+↓
+Order valid
+↓
+Payment dibuat
+↓
+Payment provider dipilih
+↓
+Payment session dibuat
+↓
+Normalized payment response
+↓
+Frontend menerima response
+↓
+Customer dapat melanjutkan pembayaran
+↓
+Backend tetap menjadi sumber status payment
+
+Jangan mengaktifkan transaksi production.
+
+==================================================
+1. AUDIT CHECKOUT EXISTING
+==================================================
+
+Audit terlebih dahulu:
+
+- checkout page
+- checkout component
+- order creation
+- payment creation
+- payment service
+- payment provider interface
+- Midtrans adapter
+- payment API
+- order API
+- existing payment UI.
+
+Cari flow existing secara menyeluruh.
+
+Jangan membuat duplicate checkout flow jika sudah ada.
+
+Jangan membuat endpoint baru jika endpoint existing dapat digunakan dengan benar.
+
+==================================================
+2. TRACE FULL FLOW
+==================================================
+
+Trace flow aktual:
+
+Frontend checkout
+→ API
+→ authentication
+→ order
+→ payment
+→ provider
+→ response
+→ frontend.
+
+Temukan titik dimana flow sekarang berhenti.
+
+Secara khusus periksa apakah:
+
+createPayment()
+
+sudah benar-benar menghasilkan payment session provider.
+
+Periksa apakah hasil adapter seperti:
+
+- token
+- redirect URL
+- reference
+- transaction ID
+
+sudah diteruskan sampai frontend.
+
+==================================================
+3. NORMALIZED PAYMENT RESPONSE
+==================================================
+
+Pastikan backend tidak mengirim raw Midtrans response langsung ke frontend.
+
+Gunakan normalized response sesuai abstraction existing.
+
+Contoh konsep:
+
+{
+  paymentId,
+  orderId,
+  provider,
+  status,
+  redirectUrl,
+  snapToken,
+  reference
+}
+
+Gunakan hanya field yang benar-benar tersedia.
+
+Jangan menambahkan field hanya untuk mengikuti contoh.
+
+Jika project menggunakan nama field berbeda, pertahankan nama existing.
+
+Jangan expose:
+
+- server key
+- secret
+- signature secret
+- authorization header
+- internal adapter configuration.
+
+==================================================
+4. CREATE SESSION
+==================================================
+
+Pastikan create-session benar-benar dipanggil pada titik yang tepat.
+
+Flow:
+
+1. User checkout.
+2. Backend validasi session/user.
+3. Backend mengambil order dari database.
+4. Backend validasi ownership.
+5. Backend memastikan order masih payable.
+6. Backend mengambil total dari database.
+7. Backend memastikan payment existing tidak menyebabkan duplicate charge/session.
+8. Payment service resolve provider.
+9. Adapter membuat payment session.
+10. Local payment record disimpan/update sesuai architecture existing.
+11. Backend mengembalikan normalized response.
+
+Jangan membuat payment berdasarkan amount yang dikirim frontend.
+
+==================================================
+5. PAYMENT SESSION RETRY
+==================================================
+
+Audit apa yang terjadi jika user:
+
+- menekan tombol bayar dua kali;
+- refresh halaman;
+- kembali dari payment gateway;
+- membuka checkout di tab lain;
+- gagal menyelesaikan payment lalu mencoba lagi.
+
+Gunakan payment/order state existing.
+
+Jangan membuat order baru hanya karena customer melakukan retry.
+
+Jangan membuat duplicate payment session jika existing payment/session masih valid menurut architecture.
+
+Jika provider memang memerlukan session baru setelah expiry:
+
+ikuti rule provider adapter yang sudah ada.
+
+==================================================
+6. FRONTEND PAYMENT HANDLING
+==================================================
+
+Hubungkan frontend ke normalized response.
+
+Jika response memiliki:
+
+snapToken
+
+gunakan integration Snap yang memang sudah tersedia di project.
+
+Jika response memiliki:
+
+redirectUrl
+
+gunakan redirect URL tersebut.
+
+Jika keduanya tersedia:
+
+ikuti architecture existing dan gunakan flow yang paling tepat.
+
+Jangan hardcode:
+
+- payment URL
+- Snap token
+- transaction ID
+- provider endpoint.
+
+Jangan menaruh credential provider di frontend.
+
+==================================================
+7. CLIENT STATE
+==================================================
+
+Frontend harus memiliki state yang jelas:
+
+- idle
+- creating payment
+- payment ready
+- payment failed
+- payment completed/pending sesuai kebutuhan.
+
+Saat tombol Bayar ditekan:
+
+- disable duplicate submit;
+- tampilkan loading;
+- panggil backend;
+- tangani error;
+- restore button jika gagal.
+
+Jangan menganggap HTTP 200 berarti payment sudah PAID.
+
+==================================================
+8. PAYMENT STATUS
+==================================================
+
+Setelah payment session dibuat:
+
+frontend tidak boleh menentukan status pembayaran sendiri.
+
+Status authoritative tetap dari backend.
+
+Gunakan:
+
+payment status endpoint
+atau
+existing reconciliation mechanism
+
+yang sudah tersedia.
+
+Jangan membuat frontend mengubah status order.
+
+Jangan membuat:
+
+POST status = PAID
+
+dari browser.
+
+==================================================
+9. RETURN / CALLBACK FLOW
+==================================================
+
+Audit apakah provider mengembalikan customer ke:
+
+- success URL
+- pending URL
+- error URL
+
+Jika infrastructure existing sudah memilikinya:
+
+gunakan existing implementation.
+
+Jika belum:
+
+buat minimal integration yang sesuai architecture existing.
+
+Tetapi status final tetap diverifikasi ke backend.
+
+Customer kembali ke halaman:
+
+bukan berarti payment otomatis dianggap berhasil.
+
+Frontend harus melakukan server-side verification.
+
+==================================================
+10. PAYMENT DETAIL PAGE
+==================================================
+
+Audit halaman order/payment detail existing.
+
+Pastikan setelah checkout customer dapat melihat:
+
+- order ID
+- product/order information
+- total
+- payment status
+- provider
+- payment action jika masih payable.
+
+Jangan redesign UI.
+
+Hanya hubungkan data backend jika memang diperlukan.
+
+==================================================
+11. ERROR HANDLING
+==================================================
+
+Handle minimal:
+
+A. Order tidak ditemukan
+B. Order bukan milik user
+C. Order sudah dibayar
+D. Order expired
+E. Payment configuration belum tersedia
+F. Provider tidak tersedia
+G. Provider adapter error
+H. Session creation error
+I. Invalid payment state
+J. Network/provider timeout
+K. Duplicate payment attempt
+
+Gunakan HTTP status dan error structure existing.
+
+Jangan expose raw provider error kepada customer jika mengandung internal details.
+
+==================================================
+12. SECURITY
+==================================================
+
+Pastikan:
+
+- authentication tetap aktif;
+- ownership tetap diverifikasi;
+- amount tidak dipercaya dari client;
+- provider tidak bisa dipilih secara bebas jika tidak diizinkan server;
+- credential tetap server-side;
+- raw provider response tidak bocor;
+- internal error tidak bocor ke frontend.
+
+Jangan melemahkan auth guard existing.
+
+==================================================
+13. DATABASE
+==================================================
+
+JANGAN mengubah schema Prisma.
+
+JANGAN:
+
+- membuat migration;
+- prisma db push;
+- prisma migrate reset;
+- menghapus migration;
+- membuat kolom baru.
+
+Gunakan model existing.
+
+Jika create-session membutuhkan field database yang belum tersedia:
+
+STOP dan laporkan kebutuhan schema.
+
+Jangan workaround dengan mengubah schema diam-diam.
+
+==================================================
+14. MOCK PAYMENT TEST
+==================================================
+
+Semua test payment session harus menggunakan mock/stub.
+
+Jangan:
+
+- menggunakan Midtrans production;
+- menggunakan production server key;
+- melakukan charge nyata;
+- membuat transaksi customer nyata.
+
+Test minimal:
+
+1. Successful create session.
+2. Missing provider configuration.
+3. Invalid order.
+4. Unauthorized order.
+5. Already paid order.
+6. Duplicate request.
+7. Provider adapter failure.
+8. Invalid provider response.
+9. Normalized response.
+10. No secret leakage.
+
+==================================================
+15. FRONTEND TEST
+==================================================
+
+Test bahwa frontend:
+
+- memanggil endpoint yang benar;
+- menampilkan loading;
+- tidak double-submit;
+- menangani payment session;
+- membuka Snap/redirect jika response valid;
+- menangani error;
+- tidak menganggap HTTP 200 sebagai PAID.
+
+Jika automated browser test infrastructure sudah ada:
+
+gunakan yang existing.
+
+Jangan menambahkan framework testing besar hanya untuk task ini.
+
+==================================================
+16. API TEST
+==================================================
+
+Verifikasi endpoint checkout/payment menggunakan test-safe environment.
+
+Pastikan:
+
+POST payment
+
+menghasilkan response yang sesuai.
+
+Jika provider belum dikonfigurasi:
+
+harus menghasilkan configuration error yang aman.
+
+Jangan mengaktifkan real provider hanya agar test PASS.
+
+==================================================
+17. BUILD
+==================================================
+
+Jalankan:
+
+npm run typecheck
+npm run build
+
+Jika ada test script payment yang relevan:
+
+jalankan juga.
+
+Perbaiki error yang disebabkan oleh perubahan task ini.
+
+Jangan memperbaiki unrelated issue dengan scope besar.
+
+==================================================
+18. RUNTIME
+==================================================
+
+Jika server sedang berjalan:
+
+jangan mematikan process yang bukan milik task.
+
+Jangan mengubah:
+
+- port
+- Cloudflare
+- DNS
+- tunnel
+- production configuration.
+
+Development VPS ini hanya digunakan untuk coding dan verification.
+
+Production deployment akan dilakukan di VPS lain setelah project selesai.
+
+==================================================
+19. NO REAL PAYMENT
+==================================================
+
+WAJIB.
+
+Jangan:
+
+- menggunakan production credential;
+- membuat transaksi Midtrans nyata;
+- charge customer;
+- melakukan settlement;
+- refund nyata;
+- mengaktifkan production provider.
+
+Sandbox/mock boleh digunakan jika architecture existing memang mendukungnya, tetapi jangan mengubah environment production.
+
+==================================================
+20. GIT
+==================================================
+
+Jangan:
+
+git commit
+git push
+
+Jangan reset worktree.
+
+Jangan menghapus perubahan existing.
+
+Di akhir jalankan:
+
+git status --short
+
+dan laporkan perubahan tracked/untracked.
+
+==================================================
+21. FINAL REPORT
+==================================================
+
+Setelah selesai tampilkan:
+
+A. Checkout flow sebelum perubahan
+B. Checkout flow setelah perubahan
+C. Payment session integration
+D. Backend API
+E. Frontend integration
+F. Payment status verification
+G. Retry/double-submit handling
+H. Security
+I. Test results
+J. Build/typecheck results
+K. Files changed
+L. Database/schema status
+M. Remaining work
+
+Khusus Remaining Work:
+
+Pisahkan dengan jelas:
+
+DONE
+PARTIALLY DONE
+NOT IMPLEMENTED
+
+Jangan mengklaim real payment sudah selesai.
+
+Jika Snap token/redirect URL masih membutuhkan production configuration:
+
+jelaskan bahwa code integration selesai tetapi activation production belum dilakukan.
+
+==================================================
+STOP CONDITION
+==================================================
+
+Setelah selesai:
+
+- jangan commit;
+- jangan push;
+- jangan migration;
+- jangan transaksi nyata;
+- jangan production credential;
+- jangan ubah Cloudflare;
+- jangan ubah DNS;
+- jangan ubah port.
+
+Berhenti setelah laporan verifikasi lengkap.
 
 ```
 # Prompt: Payment Idempotency & State Consistency
