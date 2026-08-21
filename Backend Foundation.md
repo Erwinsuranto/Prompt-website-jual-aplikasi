@@ -107,9 +107,623 @@
 
 
 ```
-# 
+# Prompt: Integrasi Payment Adapter ke Core
 ```
+PROMPT — INTEGRATE PAYMENT ADAPTER INTO CORE PAYMENT FLOW
 
+Project: Digital Cell / toko-online
+
+STATUS SAAT INI
+
+Payment foundation dan adapter Midtrans sudah diaudit.
+
+Hasil tahap sebelumnya:
+
+- Adapter Midtrans sudah tersedia.
+- Test adapter sudah ditambahkan.
+- Verifikasi adapter berhasil.
+- Tidak ada API key Midtrans production.
+- Tidak ada transaksi payment nyata.
+- Tidak ada perubahan database/migration.
+- Cancel/refund nyata belum diimplementasikan.
+- Create-session dan status-polling adapter belum dipanggil dari core.
+- Legacy webhook repository masih memiliki implementation tertentu dan harus tetap diaudit sebelum digunakan.
+- Project masih development-only.
+- Database Prisma/PostgreSQL tetap menjadi sumber data utama.
+- npm run typecheck/build sebelumnya berhasil.
+
+TUJUAN TAHAP INI
+
+Hubungkan payment adapter dengan core payment service secara modular TANPA melakukan transaksi payment nyata.
+
+Arsitektur target:
+
+Frontend
+  ↓
+Payment API
+  ↓
+Payment Service
+  ↓
+Payment Provider Adapter
+  ↓
+Midtrans Adapter
+  ↓
+[DEVELOPMENT / NO REAL API CALL]
+
+Jangan langsung mengaktifkan payment production.
+
+==================================================
+1. AUDIT SEBELUM CODING
+==================================================
+
+Audit terlebih dahulu:
+
+- payment-service
+- payment-provider interface
+- Midtrans adapter
+- payment API
+- order-service
+- payment model Prisma
+- AppSettings
+- existing webhook
+- existing payment UI.
+
+Cari apakah sudah ada:
+
+- create payment
+- payment session
+- status polling
+- provider selection
+- provider configuration
+- webhook processing.
+
+Jangan membuat duplicate abstraction jika interface sudah tersedia.
+
+==================================================
+2. PROVIDER INTERFACE
+==================================================
+
+Jika belum ada abstraction yang tepat, buat interface modular.
+
+Konsep:
+
+PaymentProviderAdapter
+
+dengan operasi yang memang dibutuhkan core.
+
+Contoh konsep:
+
+- createPayment
+- getPaymentStatus
+- handleWebhook
+
+Tetapi gunakan nama/type sesuai arsitektur existing.
+
+Jangan membuat interface terlalu besar.
+
+Jangan menambahkan:
+
+refund
+cancel
+settlement
+dispute
+
+jika belum dibutuhkan core.
+
+==================================================
+3. MIDTRANS ADAPTER
+==================================================
+
+Hubungkan Midtrans adapter ke interface existing.
+
+Adapter bertanggung jawab atas:
+
+- request formatting
+- response mapping
+- provider-specific status mapping
+- signature validation
+- provider error normalization.
+
+Core payment service TIDAK boleh mengetahui detail API Midtrans.
+
+Jangan menaruh kode Midtrans langsung di:
+
+- order-service
+- checkout route
+- frontend
+- generic payment service.
+
+==================================================
+4. PROVIDER SELECTION
+==================================================
+
+Payment service harus dapat menentukan provider secara terkontrol.
+
+Jangan percaya provider dari client tanpa validasi.
+
+Jika provider berasal dari database/settings:
+
+ambil dari server.
+
+Jika provider belum dikonfigurasi:
+
+payment harus tetap aman dan tidak melakukan API call nyata.
+
+Jangan fallback diam-diam ke provider lain.
+
+==================================================
+5. DEVELOPMENT SAFETY
+==================================================
+
+WAJIB.
+
+Karena environment sekarang DEVELOPMENT:
+
+Jangan melakukan HTTP request ke Midtrans production.
+
+Jangan menggunakan:
+
+- MIDTRANS_SERVER_KEY nyata
+- MIDTRANS_CLIENT_KEY nyata
+- production merchant credential
+- production payment session.
+
+Jika adapter membutuhkan credential:
+
+gunakan configuration validation dan fail-safe.
+
+Jika credential tidak tersedia:
+
+return error/configuration state yang jelas.
+
+Jangan membuat fake "PAID".
+
+==================================================
+6. CREATE PAYMENT FLOW
+==================================================
+
+Integrasikan flow:
+
+POST payment
+ ↓
+authenticate
+ ↓
+load order
+ ↓
+verify ownership
+ ↓
+verify order payable
+ ↓
+calculate amount from DB
+ ↓
+create local payment record
+ ↓
+resolve provider
+ ↓
+provider adapter
+ ↓
+return safe payment response.
+
+Payment amount HARUS berasal dari database order.
+
+Jangan menerima amount dari frontend sebagai sumber kebenaran.
+
+==================================================
+7. PAYMENT RECORD
+==================================================
+
+Pastikan local payment dibuat/di-update secara aman.
+
+Gunakan Prisma transaction jika diperlukan.
+
+Payment record harus tetap konsisten dengan:
+
+- order
+- amount
+- currency jika schema memilikinya
+- provider
+- status
+- external reference jika tersedia.
+
+Jangan mengubah Prisma schema tanpa approval.
+
+Jika ada kebutuhan field baru:
+
+STOP dan laporkan.
+
+==================================================
+8. PROVIDER RESPONSE MAPPING
+==================================================
+
+Jangan expose raw Midtrans response langsung ke frontend.
+
+Buat normalized internal response.
+
+Contoh konsep:
+
+{
+  provider,
+  paymentId,
+  status,
+  redirectUrl,
+  reference
+}
+
+Gunakan field yang benar-benar tersedia di project.
+
+Jangan expose:
+
+- server key
+- secret
+- internal signature
+- raw authorization header.
+
+==================================================
+9. PAYMENT STATUS
+==================================================
+
+Integrasikan status provider ke internal payment status.
+
+Contoh:
+
+provider pending
+→ local PENDING
+
+provider success
+→ local PAID
+
+provider failed
+→ local FAILED
+
+Tetapi gunakan enum/status yang memang sudah tersedia.
+
+Jangan membuat status baru hanya karena nama status Midtrans berbeda.
+
+Buat mapper khusus provider.
+
+==================================================
+10. STATUS POLLING
+==================================================
+
+Adapter memiliki status-polling capability.
+
+Tetapi core hanya boleh memanggilnya jika:
+
+- payment valid
+- ownership valid
+- provider valid
+- payment masih berada pada state yang dapat diperiksa.
+
+Jika polling membutuhkan credential dan credential tidak tersedia:
+
+jangan melakukan request.
+
+Return configuration error yang aman.
+
+Jangan membuat infinite polling.
+
+==================================================
+11. WEBHOOK
+==================================================
+
+Audit webhook existing sebelum menghubungkannya ke adapter.
+
+Pastikan webhook:
+
+- exact path
+- POST only
+- payload validation
+- provider validation
+- signature validation
+- payment lookup
+- amount/reference validation jika tersedia
+- transaction saat update payment + order.
+
+Jangan membuat catch-all webhook.
+
+Jangan menghapus implementation legacy sebelum memahami dependencynya.
+
+Jika legacy webhook masih digunakan:
+
+integrasikan secara bertahap.
+
+==================================================
+12. WEBHOOK IDEMPOTENCY
+==================================================
+
+Jika schema existing memiliki external transaction ID/event ID:
+
+gunakan untuk mencegah duplicate callback.
+
+Jika tidak ada field tersebut:
+
+jangan membuat migration.
+
+Gunakan state transition protection yang sudah tersedia.
+
+Jika idempotency penuh membutuhkan schema change:
+
+STOP dan laporkan kebutuhan migration.
+
+==================================================
+13. ORDER UPDATE
+==================================================
+
+Jika payment provider mengkonfirmasi sukses:
+
+update payment dan order dalam transaction.
+
+Jangan:
+
+payment = PAID
+tetapi order tetap state yang tidak konsisten.
+
+Gunakan order transition validator existing.
+
+Jangan bypass order-service jika project memang sudah memiliki centralized order transition logic.
+
+==================================================
+14. CUSTOMER PAYMENT API
+==================================================
+
+Audit endpoint payment customer.
+
+Pastikan:
+
+- authentication
+- ownership
+- validation
+- no client-side amount trust
+- no arbitrary status update
+- no arbitrary provider selection.
+
+Request seperti:
+
+{
+  "status": "PAID"
+}
+
+harus ditolak jika berasal dari customer.
+
+Customer tidak boleh mengonfirmasi pembayaran sendiri.
+
+==================================================
+15. ADMIN
+==================================================
+
+Jika admin membutuhkan payment information:
+
+gunakan service existing.
+
+Admin dapat melihat:
+
+- order
+- payment
+- amount
+- provider
+- status
+- reference
+- timestamps.
+
+Jangan expose secret provider.
+
+Jangan menambahkan refund system.
+
+==================================================
+16. FRONTEND
+==================================================
+
+Jangan redesign UI.
+
+Jika payment page sudah ada:
+
+hubungkan ke normalized payment response.
+
+Pastikan frontend tidak menganggap:
+
+HTTP 200 create payment = payment sukses.
+
+HTTP 200 hanya berarti request berhasil diproses.
+
+Status payment harus berasal dari backend.
+
+==================================================
+17. TEST MODE
+==================================================
+
+Buat test untuk:
+
+A. Provider interface
+B. Midtrans adapter
+C. Provider status mapping
+D. Invalid configuration
+E. Invalid credential state
+F. Payment amount integrity
+G. Ownership protection
+H. Invalid status transition
+I. Webhook validation
+J. Duplicate webhook handling jika dapat dilakukan tanpa schema change
+K. No-secret-leak verification.
+
+Semua test harus menggunakan:
+
+mock HTTP/client
+atau
+credential stub.
+
+Jangan menggunakan credential Midtrans nyata.
+
+Jangan melakukan HTTP request ke Midtrans production.
+
+==================================================
+18. NEGATIVE TEST
+==================================================
+
+Wajib test:
+
+1. User tidak login.
+2. User mencoba payment order milik user lain.
+3. Amount dimanipulasi.
+4. Provider tidak tersedia.
+5. Provider configuration kosong.
+6. Invalid payment state.
+7. Invalid webhook signature.
+8. Invalid webhook payload.
+9. Webhook endpoint dengan method GET.
+10. Webhook extra path.
+11. Duplicate callback.
+12. Provider mengembalikan unknown status.
+13. Payment sudah PAID tetapi callback pending datang lagi.
+
+Pastikan tidak ada state regression.
+
+==================================================
+19. NO DATABASE MIGRATION
+==================================================
+
+JANGAN:
+
+- prisma migrate reset
+- DROP DATABASE
+- delete migration
+- membuat migration baru
+- seed payment dummy
+- mengubah schema Prisma.
+
+Jika integrasi membutuhkan perubahan schema:
+
+STOP.
+
+Laporkan field yang diperlukan dan alasan.
+
+==================================================
+20. NO PRODUCTION PAYMENT
+==================================================
+
+PENTING:
+
+Tahap ini hanya integrasi kode.
+
+DILARANG:
+
+- transaksi Midtrans nyata
+- API production nyata
+- credential production
+- charge customer
+- settlement nyata
+- refund nyata.
+
+Midtrans hanya boleh diuji menggunakan mock/stub.
+
+==================================================
+21. CODE QUALITY
+==================================================
+
+Pastikan:
+
+- modular
+- provider-agnostic core
+- no duplicated payment logic
+- no PrismaClient per request
+- no secret logging
+- no raw provider response leakage
+- no hardcoded credentials
+- no hardcoded production URL
+- no client-side authorization.
+
+Jangan membuat satu file payment raksasa.
+
+==================================================
+22. VERIFICATION
+==================================================
+
+Jalankan:
+
+npm run typecheck
+
+npm run build
+
+Kemudian test endpoint yang aman tanpa transaksi nyata.
+
+Verifikasi:
+
+- payment creation logic
+- ownership
+- amount integrity
+- provider adapter
+- status mapping
+- webhook validation.
+
+Jika runtime sedang aktif:
+
+jangan mematikan process yang bukan milik task ini.
+
+Jangan mengubah:
+
+- Cloudflare
+- DNS
+- tunnel
+- port
+- production configuration.
+
+==================================================
+23. GIT
+==================================================
+
+Jangan:
+
+git commit
+
+git push
+
+Jangan menghapus perubahan worktree yang sudah ada.
+
+Setelah selesai tampilkan:
+
+git status --short
+
+Tetapi jangan commit.
+
+==================================================
+24. FINAL REPORT
+==================================================
+
+Berikan laporan:
+
+A. Provider architecture
+B. Payment core integration
+C. Midtrans adapter integration
+D. Payment lifecycle
+E. Webhook integration
+F. Security
+G. Test results
+H. Database/schema status
+I. Files changed
+J. Remaining work.
+
+Khusus Remaining Work jelaskan:
+
+- production credentials
+- real Midtrans API activation
+- real payment testing
+- cancel/refund
+- create-session jika belum terhubung
+- status polling jika belum terhubung
+- idempotency migration jika memang dibutuhkan.
+
+Jangan mengklaim fitur sebagai selesai jika sebenarnya belum di-wire ke core.
+
+SETELAH SELESAI:
+
+Berhenti.
+
+Jangan commit.
+Jangan push.
+Jangan melakukan transaksi nyata.
+Jangan membuat migration.
+Jangan mengubah Cloudflare/DNS/port.
+
+Laporkan hasil lengkap untuk diverifikasi sebelum tahap berikutnya.
 
 
 ```
