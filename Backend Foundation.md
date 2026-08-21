@@ -89,10 +89,583 @@
 
 
 ```
-# 
+# Prompt: Final Payment Integration Audit + Commit & Push
 ```
 
+PROMPT — FINAL PAYMENT INTEGRATION AUDIT, CLEANUP, TEST, COMMIT & PUSH
 
+Project: Digital Cell / toko-online
+
+Lanjutkan dari seluruh pekerjaan payment integration yang sudah dikerjakan sebelumnya.
+
+JANGAN mengulang implementasi yang sudah selesai. Audit kondisi repository saat ini terlebih dahulu dan lanjutkan hanya bagian yang memang masih diperlukan.
+
+==================================================
+CURRENT STATUS
+==================================================
+
+Payment integration saat ini sudah memiliki:
+
+- Prisma/PostgreSQL sebagai sumber data utama.
+- Catalog/product/order menggunakan data server/database.
+- Checkout melakukan validasi server-side.
+- Harga, stock, active status, quantity divalidasi di server.
+- Order ownership protection sudah tersedia.
+- Payment service sudah menggunakan database.
+- Payment provider abstraction sudah tersedia.
+- Midtrans adapter sudah tersedia.
+- Create-payment/session flow sudah terhubung.
+- Normalized payment response sudah tersedia.
+- Redirect-based payment flow sudah terhubung.
+- Payment status polling/reconciliation sudah tersedia.
+- Payment webhook exact-path sudah tersedia.
+- Webhook signature-aware.
+- Payment callback tidak mempercayai client sebagai sumber status final.
+- Duplicate payment/callback protection sudah diperiksa.
+- Idempotency sudah diperiksa menggunakan mekanisme/schema existing.
+- Transactional order/payment handling sudah menggunakan Prisma transaction sesuai architecture existing.
+- Race condition antara webhook dan polling sudah diperiksa.
+- Test payment menggunakan mock/stub, bukan transaksi nyata.
+- TypeScript check berhasil.
+- Production build berhasil.
+- Cloudflare/DNS/port tidak diubah.
+- Prisma schema tidak diubah pada tahap sebelumnya.
+- Tidak ada production payment credential yang digunakan.
+- Tidak ada transaksi Midtrans nyata.
+
+HASIL TERAKHIR YANG SUDAH DIVERIFIKASI:
+
+- Snap token flow tidak digunakan karena normalized response menggunakan redirectUrl.
+- Redirect-based Snap/payment flow sudah diimplementasikan.
+- Return/checkout status diverifikasi kembali melalui server-side status.
+- Production Midtrans belum diaktifkan.
+- Cancel/refund real flow belum diimplementasikan.
+- Provider externalId/providerEventId dedicated belum dibuat karena membutuhkan schema migration.
+- Payment provider real belum dipanggil.
+- Test menggunakan mock/stub.
+- Tidak ada migration baru.
+- Tidak ada commit/push pada tahap sebelumnya.
+
+==================================================
+TUJUAN TAHAP INI
+==================================================
+
+Lakukan FINAL AUDIT terhadap seluruh perubahan payment integration.
+
+Tujuan utama:
+
+1. Pastikan implementasi yang sudah dibuat benar.
+2. Pastikan tidak ada regression.
+3. Pastikan checkout/payment flow konsisten.
+4. Pastikan test dan build lulus.
+5. Bersihkan perubahan yang tidak diperlukan jika ditemukan.
+6. Jangan membuat migration baru.
+7. Jangan melakukan transaksi payment nyata.
+8. Setelah semua valid, LANGSUNG commit dan push perubahan ke GitHub.
+
+==================================================
+1. AUDIT WORKTREE
+==================================================
+
+Mulai dengan:
+
+git status --short
+git diff --stat
+git diff
+
+Audit perubahan yang belum di-commit.
+
+Jangan menghapus perubahan existing yang memang bagian dari project.
+
+Pisahkan perubahan menjadi:
+
+- payment integration;
+- checkout;
+- backend;
+- frontend;
+- tests;
+- konfigurasi;
+- perubahan unrelated.
+
+Jika ada perubahan unrelated yang memang berasal dari pekerjaan sebelumnya dan dibutuhkan project, jangan hapus.
+
+Jika ada perubahan sementara/debug yang jelas tidak diperlukan, bersihkan.
+
+==================================================
+2. AUDIT PAYMENT FLOW
+==================================================
+
+Trace flow lengkap:
+
+Customer
+→ Checkout
+→ Create Order
+→ Create Payment
+→ Provider Adapter
+→ Payment Session
+→ Redirect
+→ Provider
+→ Return
+→ Backend Verification
+→ Payment Status
+→ Order Status
+
+Pastikan tidak ada bagian yang:
+
+- menggunakan mock sebagai production source;
+- mengambil harga dari frontend;
+- mengambil ownership dari frontend;
+- mengubah payment status langsung dari browser;
+- menganggap HTTP 200 sebagai PAID;
+- membuat duplicate order saat retry;
+- membuat duplicate payment tanpa alasan;
+- membocorkan credential provider.
+
+Jika menemukan bug nyata, perbaiki.
+
+Jangan melakukan refactor besar yang tidak diperlukan.
+
+==================================================
+3. CHECKOUT
+==================================================
+
+Pastikan checkout:
+
+- menggunakan product dari database;
+- mengambil harga dari database;
+- memvalidasi stock;
+- memvalidasi active status;
+- memvalidasi quantity;
+- menjaga ownership;
+- membuat order secara transactional;
+- tidak percaya total dari client;
+- tidak membuat order duplicate karena double click;
+- tidak merusak cart existing.
+
+Pastikan frontend tidak dapat memanipulasi:
+
+- price;
+- total;
+- payment amount;
+- order ownership;
+- payment status.
+
+==================================================
+4. PAYMENT SESSION
+==================================================
+
+Pastikan create payment/session:
+
+- menerima order yang valid;
+- mengambil total dari server;
+- memastikan order masih payable;
+- menggunakan provider abstraction existing;
+- menggunakan Midtrans adapter existing;
+- menghasilkan normalized response;
+- tidak mengirim secret/provider credential ke client.
+
+Jika response menggunakan:
+
+redirectUrl
+
+pastikan frontend menggunakannya dengan benar.
+
+Jangan mengganti flow menjadi Snap token jika architecture existing sudah menggunakan redirect.
+
+Jangan membuat dua metode payment flow sekaligus hanya untuk memperbanyak kode.
+
+==================================================
+5. FRONTEND
+==================================================
+
+Audit checkout/payment UI.
+
+Pastikan:
+
+- tombol Bayar memiliki loading state;
+- double click dicegah;
+- error ditampilkan secara aman;
+- redirectUrl digunakan dengan benar;
+- customer tidak melihat internal error;
+- payment status diambil dari backend;
+- customer dapat kembali ke order detail;
+- UI tidak menganggap payment sukses hanya karena redirect berhasil.
+
+Jangan redesign UI.
+
+Jangan mengubah styling yang tidak berhubungan dengan task.
+
+==================================================
+6. RETURN / STATUS
+==================================================
+
+Pastikan ketika customer kembali dari provider:
+
+frontend melakukan server-side status verification.
+
+Jangan melakukan:
+
+setPaymentStatus("PAID")
+
+berdasarkan query parameter atau return URL saja.
+
+Status authoritative harus tetap berasal dari backend/database/provider reconciliation.
+
+Pastikan status:
+
+- PENDING
+- PAID
+- FAILED
+- EXPIRED
+- CANCELLED
+
+atau enum existing project ditangani sesuai schema yang sudah ada.
+
+Jangan mengubah enum Prisma.
+
+==================================================
+7. WEBHOOK
+==================================================
+
+Audit webhook existing.
+
+Pastikan:
+
+- exact path tetap;
+- method POST;
+- signature verification tetap;
+- invalid payload ditolak;
+- provider yang tidak dikonfigurasi ditangani aman;
+- duplicate callback tidak membuat duplicate update;
+- webhook tidak membuat duplicate order;
+- webhook tidak mempercayai amount dari client;
+- webhook tetap transactional;
+- concurrent webhook/polling aman.
+
+Jangan mengubah webhook menjadi endpoint public tanpa verification.
+
+==================================================
+8. IDEMPOTENCY
+==================================================
+
+Audit idempotency yang sudah ada.
+
+Pastikan retry request tidak menghasilkan duplicate payment/order secara tidak sengaja.
+
+Gunakan mekanisme existing.
+
+JANGAN membuat migration hanya untuk idempotency.
+
+JANGAN menambahkan providerEventId/externalId column pada tahap ini.
+
+Jika provider event ID masih membutuhkan schema migration:
+
+biarkan sebagai remaining work dan jangan implementasikan migration.
+
+==================================================
+9. TEST
+==================================================
+
+Jalankan test yang relevan dengan payment integration.
+
+WAJIB menggunakan mock/stub.
+
+JANGAN melakukan:
+
+- real Midtrans transaction;
+- real charge;
+- real settlement;
+- real refund;
+- real cancel;
+- production webhook.
+
+Minimal verifikasi:
+
+1. create payment success;
+2. create payment failure;
+3. invalid order;
+4. unauthorized order;
+5. already paid order;
+6. duplicate request;
+7. invalid provider response;
+8. provider unavailable;
+9. normalized response;
+10. redirectUrl;
+11. payment status polling;
+12. webhook signature validation;
+13. duplicate webhook;
+14. concurrent payment state update;
+15. secret leakage prevention.
+
+Jika test existing sudah mencakup sebagian besar kasus tersebut, jangan membuat duplicate test.
+
+==================================================
+10. TYPECHECK & BUILD
+==================================================
+
+Jalankan:
+
+npm run typecheck
+
+kemudian:
+
+npm run build
+
+Jika project memiliki test command resmi yang relevan:
+
+jalankan.
+
+Perbaiki error yang disebabkan oleh perubahan payment integration.
+
+Jangan mengejar warning yang tidak berhubungan dengan task jika build tetap valid.
+
+Jika build gagal karena unrelated pre-existing issue:
+
+verifikasi penyebabnya sebelum melakukan perubahan besar.
+
+==================================================
+11. DATABASE
+==================================================
+
+Database development ini hanya digunakan untuk coding/testing.
+
+JANGAN:
+
+- prisma migrate reset;
+- prisma db push;
+- membuat migration baru;
+- menghapus migration;
+- mengubah Prisma schema;
+- menghapus data existing;
+- memasukkan production data.
+
+Jika migration status hanya menunjukkan migration yang memang belum diterapkan pada database development:
+
+jangan membuat migration baru hanya untuk membuat status terlihat bersih.
+
+==================================================
+12. PRODUCTION PAYMENT
+==================================================
+
+WAJIB TETAP DISABLED.
+
+Jangan memasukkan:
+
+- Midtrans production server key;
+- Midtrans client key production;
+- production webhook secret;
+- credential provider asli.
+
+Jangan melakukan transaksi nyata.
+
+Production activation akan dilakukan setelah project dipindahkan ke VPS production.
+
+==================================================
+13. CLOUDFLARE / DNS / PORT
+==================================================
+
+JANGAN mengubah:
+
+- Cloudflare Tunnel;
+- DNS;
+- domain;
+- port;
+- firewall;
+- VPS networking;
+- systemd service;
+- production deployment.
+
+VPS saat ini hanya untuk coding dan verification.
+
+Project akan dipindahkan ke VPS lain setelah development selesai.
+
+==================================================
+14. UNRELATED FEATURES
+==================================================
+
+Jangan mengimplementasikan fitur di luar scope seperti:
+
+- real refund;
+- real cancel provider;
+- email delivery;
+- reviews;
+- ratings;
+- coupon engine;
+- analytics;
+- address management;
+- favorites;
+- inventory reservation system;
+- production deployment;
+- Cloudflare migration;
+- admin system baru.
+
+Jika fitur tersebut masih tercatat sebagai remaining work:
+
+biarkan.
+
+==================================================
+15. FINAL CLEANUP
+==================================================
+
+Setelah test dan build selesai:
+
+- hapus debug console/log sementara jika memang tidak diperlukan;
+- jangan menghapus logging production yang memang dibutuhkan;
+- jangan menghapus test yang valid;
+- jangan mengubah architecture hanya untuk memperpendek kode;
+- pastikan TypeScript tetap bersih;
+- pastikan tidak ada secret di tracked files.
+
+Periksa:
+
+git diff --check
+
+==================================================
+16. FINAL VERIFICATION
+==================================================
+
+Jalankan:
+
+git status --short
+git diff --stat
+git diff --check
+
+Pastikan hanya perubahan yang memang ingin disimpan.
+
+Tampilkan daftar file yang akan di-commit.
+
+==================================================
+17. COMMIT
+==================================================
+
+SETELAH seluruh verifikasi berhasil, langsung commit.
+
+Gunakan commit message yang jelas, misalnya:
+
+feat(payment): complete payment session integration
+
+Jika perubahan final ternyata lebih cocok menggunakan message lain, pilih Conventional Commit yang sesuai.
+
+Jangan membuat commit kosong.
+
+==================================================
+18. PUSH
+==================================================
+
+Setelah commit berhasil:
+
+push branch aktif ke remote origin.
+
+Gunakan branch yang sedang aktif.
+
+Jangan membuat branch baru kecuali branch existing memang tidak dapat dipush.
+
+Sebelum push pastikan:
+
+git branch --show-current
+git remote -v
+
+Kemudian push branch aktif.
+
+Jika push ditolak karena remote memiliki commit baru:
+
+JANGAN force push.
+
+Lakukan fetch dan evaluasi kondisi repository terlebih dahulu.
+
+Jangan menghapus history Git.
+
+==================================================
+19. SETELAH PUSH
+==================================================
+
+Verifikasi:
+
+git status --short
+git log -1 --oneline
+
+Pastikan working tree bersih atau hanya berisi perubahan yang memang tidak terkait.
+
+Pastikan commit berhasil berada di branch yang dipush.
+
+==================================================
+20. FINAL REPORT
+==================================================
+
+Setelah commit dan push berhasil, tampilkan laporan:
+
+1. Payment integration status
+2. Checkout status
+3. Webhook status
+4. Idempotency status
+5. Frontend payment status
+6. Test result
+7. Typecheck result
+8. Build result
+9. Files changed
+10. Commit hash
+11. Commit message
+12. Branch
+13. Push result
+14. Remaining work
+
+Remaining work wajib dipisahkan:
+
+DONE
+- Payment session integration
+- Redirect payment flow
+- Server-side status verification
+- Existing webhook verification
+- Idempotency verification
+- Mock payment testing
+- Build/typecheck
+
+NOT IMPLEMENTED / FUTURE
+- Real Midtrans production activation
+- Production credentials
+- Real cancel/refund
+- Dedicated providerEventId/externalId migration jika memang masih dibutuhkan
+- Production VPS deployment
+
+Jangan menyatakan production payment sudah aktif.
+
+==================================================
+FINAL RULES
+==================================================
+
+WAJIB:
+
+- audit dulu;
+- perbaiki hanya jika diperlukan;
+- test;
+- typecheck;
+- build;
+- git diff --check;
+- commit;
+- push;
+- verifikasi push.
+
+DILARANG:
+
+- real payment;
+- production credential;
+- migration baru;
+- Prisma schema change;
+- migrate reset;
+- db push;
+- force push;
+- mengubah Cloudflare;
+- mengubah DNS;
+- mengubah port;
+- menghapus fitur existing;
+- menghapus migration;
+- membuat mock sebagai pengganti database production.
+
+Jika semua valid, JANGAN berhenti hanya setelah build.
+
+LANJUTKAN sampai COMMIT dan PUSH berhasil.
+
+Berikan commit hash dan hasil push sebagai laporan akhir.
 
 ```
 # Prompt: Payment Session & Checkout Completion
