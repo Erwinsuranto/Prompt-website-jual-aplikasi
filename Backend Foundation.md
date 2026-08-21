@@ -83,10 +83,216 @@
 
 
 ```
-# 
+# Prompt berikutnya — Payment Idempotency & Webhook Hardening
 ```
 
+Prompt: Payment Idempotency & Webhook Hardening
 
+Project: /root/toko-online
+Branch: main
+
+Konteks:
+Payment session, checkout integration, redirect payment flow, server-side status handling, existing webhook verification, dan payment testing sudah selesai dan sudah di-commit/push.
+
+Commit terakhir:
+feat(payment): complete payment session and checkout integration
+
+Sekarang lanjutkan tahap berikutnya dengan fokus HANYA pada reliability dan idempotency payment/webhook.
+
+PENTING:
+Project ini masih lingkungan coding/testing. Jangan mengaktifkan payment production, jangan memasukkan credential Midtrans production, jangan melakukan transaksi nyata, dan jangan mengubah Cloudflare/DNS/port/VPS deployment.
+
+TUJUAN:
+Pastikan webhook/payment callback yang sama dapat diterima berkali-kali tanpa menyebabkan order/payment berubah secara tidak aman atau diproses dua kali.
+
+TUGAS:
+
+1. AUDIT IMPLEMENTASI SAAT INI
+- Baca seluruh payment flow yang sudah ada.
+- Identifikasi:
+  - payment creation
+  - payment session
+  - checkout
+  - redirect
+  - webhook
+  - status update
+  - retry handling
+  - notification/event handling
+- Jangan membuat ulang payment system.
+- Gunakan arsitektur yang sudah ada.
+
+2. IDEMPOTENCY WEBHOOK
+- Audit mekanisme idempotency webhook yang sekarang.
+- Tentukan identifier paling aman yang tersedia dari provider callback saat ini.
+- Pastikan callback yang sama tidak menyebabkan:
+  - order dibuat ulang
+  - payment dibuat ulang
+  - status berubah berkali-kali secara tidak valid
+  - stock dikurangi dua kali
+  - notification dikirim berkali-kali
+  - side effect checkout dijalankan dua kali.
+
+3. PROVIDER EVENT ID
+Saat ini dedicated providerEventId/externalId masih ditunda karena membutuhkan perubahan schema.
+
+Implementasikan hanya jika memang dapat dilakukan dengan aman menggunakan Prisma schema yang sudah ada.
+
+Jika membutuhkan migration/schema change:
+- Jangan membuat migration secara otomatis tanpa verifikasi.
+- Jangan menghapus migration existing.
+- Jangan reset database.
+- Jangan menggunakan `prisma migrate reset`.
+- Dokumentasikan dengan jelas bahwa migration diperlukan.
+- Jika arsitektur saat ini sudah memiliki identifier unik yang cukup untuk idempotency, jangan memaksakan field baru.
+
+4. TRANSACTION SAFETY
+Pastikan proses webhook menggunakan Prisma transaction jika beberapa perubahan database harus terjadi sebagai satu unit.
+
+Perhatikan khusus:
+- payment status
+- order status
+- stock/inventory
+- payment event
+- notification
+
+Jangan membuat partial update yang dapat meninggalkan database dalam keadaan tidak konsisten.
+
+5. STATUS TRANSITION
+Audit status transition.
+
+Pastikan webhook tidak dapat melakukan transition mundur secara sembarangan.
+
+Contoh:
+- PAID tidak boleh kembali menjadi PENDING karena callback lama.
+- CANCELLED/FAILED tidak boleh menghapus status PAID yang sudah final.
+- Callback duplicate untuk status yang sama harus menjadi no-op.
+- Callback out-of-order harus ditangani dengan aman.
+
+Gunakan status enum/schema yang benar-benar ada di project.
+Jangan mengarang status baru jika tidak diperlukan.
+
+6. CONCURRENCY
+Audit kemungkinan dua webhook datang hampir bersamaan.
+
+Contoh:
+- webhook A dan webhook B datang pada waktu hampir sama.
+- keduanya membaca payment sebagai PENDING.
+- keduanya mencoba mengubah payment/order.
+
+Pastikan implementasi tidak menyebabkan:
+- double stock deduction
+- double order completion
+- duplicate payment processing.
+
+Gunakan mekanisme Prisma/PostgreSQL yang sesuai dengan schema dan pola transaction yang sudah ada.
+
+7. RETRY TEST
+Buat test untuk skenario:
+
+A. webhook valid pertama
+B. webhook valid yang sama dikirim kedua kali
+C. webhook valid yang sama dikirim berkali-kali
+D. webhook dengan status berbeda datang setelah status final
+E. webhook datang out-of-order
+F. dua callback diproses secara concurrent jika test environment memungkinkan
+G. malformed payload
+H. invalid signature
+I. webhook provider belum dikonfigurasi
+
+Expected:
+- tidak ada duplicate transaction
+- tidak ada duplicate stock deduction
+- tidak ada invalid status regression
+- tidak ada uncaught exception
+- response HTTP tetap sesuai contract endpoint yang sudah ada.
+
+8. JANGAN MENGUBAH UI
+Tidak perlu mengubah:
+- halaman catalog
+- product detail
+- cart
+- checkout UI
+- styling
+- layout
+- komponen frontend
+
+Kecuali benar-benar diperlukan untuk memperbaiki bug akibat integrasi backend.
+
+9. JANGAN MENGGANTI DATABASE
+Tetap gunakan PostgreSQL + Prisma.
+
+Jangan:
+- membuat mock database baru
+- mengganti SQLite
+- membuat JSON database
+- membuat static payment store
+- membuat database kedua.
+
+10. JANGAN MENGAKTIFKAN PRODUCTION PAYMENT
+Tetap sandbox/mock.
+
+Jangan:
+- memasukkan PAYMENT_PROVIDER_MIDTRANS_SERVER_KEY production
+- menggunakan client key production
+- menjalankan transaksi nyata
+- mengaktifkan production adapter
+- mengubah sandbox menjadi production.
+
+11. VALIDASI
+
+Setelah implementasi jalankan:
+
+npm run typecheck
+npm run build
+
+Kemudian jalankan test payment yang relevan.
+
+Jika ada test khusus payment/webhook, jalankan semuanya.
+
+Jika server dapat dijalankan tanpa mengganggu process existing, lakukan smoke test endpoint yang relevan.
+
+Minimal verifikasi:
+- valid webhook
+- duplicate webhook
+- invalid signature
+- malformed payload
+- status transition
+- idempotency.
+
+12. JAGA PERUBAHAN TETAP TERBATAS
+
+Jangan melakukan pekerjaan di luar scope seperti:
+- production deployment
+- Cloudflare
+- DNS
+- VPS configuration
+- email
+- coupon
+- reviews
+- analytics
+- address management
+- refund production
+- payment provider activation.
+
+Jangan menghapus fitur existing.
+
+Jangan melakukan refactor besar yang tidak diperlukan.
+
+13. GIT
+
+JANGAN commit.
+JANGAN push GitHub.
+
+Setelah semua selesai tampilkan:
+
+A. File yang diubah
+B. Apa yang diperbaiki
+C. Mekanisme idempotency yang digunakan
+D. Apakah membutuhkan perubahan Prisma schema/migration
+E. Hasil semua test
+F. Risiko atau pekerjaan yang masih tersisa
+
+Berhenti setelah laporan selesai.
 
 ```
 # Prompt: Final Payment Integration Audit + Commit & Push
