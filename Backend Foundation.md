@@ -17,10 +17,305 @@
 
 
 ```
-# 
+# Prompt: Siapkan Database Testing & Online UI
 ```
 
+Prompt: Setup PostgreSQL Testing & Online UI Verification — toko-online
 
+Project:
+  /root/toko-online
+
+KONDISI:
+- Build PASS.
+- Typecheck PASS.
+- Next.js production server sudah bisa berjalan di port 3000.
+- Saat dibuka melalui HTTP, homepage mengalami server-side exception.
+- Root cause sudah dikonfirmasi: DATABASE_URL belum menunjuk ke PostgreSQL yang reachable dan memiliki schema aplikasi.
+- Source code tidak perlu diperbaiki untuk masalah ini.
+
+TUJUAN:
+Siapkan PostgreSQL khusus TESTING di VPS ini, deploy migration Prisma yang SUDAH ADA, lalu jalankan aplikasi sampai homepage bisa dibuka normal melalui:
+
+http://104.207.89.204:3000
+
+==================================================
+ATURAN KEAMANAN
+==================================================
+
+VPS ini adalah VPS coding/testing.
+
+BOLEH:
+- menggunakan PostgreSQL lokal VPS jika tersedia
+- membuat database testing
+- membuat user database testing
+- mengisi DATABASE_URL untuk environment runtime testing
+- menjalankan `npx prisma migrate deploy`
+- menjalankan seed hanya jika project memang sudah memiliki seed resmi dan aman
+
+DILARANG:
+- `prisma migrate reset`
+- `prisma db push`
+- menghapus database
+- menghapus migration
+- membuat migration baru
+- menggunakan database production
+- menggunakan production payment credential
+- transaksi pembayaran nyata
+- mengubah Cloudflare/DNS
+- mengubah port permanen
+- commit
+- push
+
+Jangan menampilkan password/database credential dalam output.
+
+==================================================
+1. AUDIT POSTGRESQL
+==================================================
+
+Masuk:
+
+cd /root/toko-online
+
+Periksa apakah PostgreSQL tersedia:
+
+systemctl status postgresql --no-pager
+
+atau metode yang sesuai jika PostgreSQL menggunakan container/service lain.
+
+Periksa database/user yang tersedia TANPA menampilkan password.
+
+Jika PostgreSQL lokal tersedia dan aman digunakan untuk testing, gunakan PostgreSQL lokal.
+
+Jika PostgreSQL tidak tersedia, jangan install secara agresif tanpa terlebih dahulu melaporkan kondisi tersebut.
+
+==================================================
+2. DATABASE TESTING
+==================================================
+
+Jika PostgreSQL lokal tersedia:
+
+- buat database khusus testing untuk toko-online jika belum ada
+- buat user khusus testing jika diperlukan
+- jangan gunakan database production
+- jangan menghapus database existing.
+
+Nama database boleh menggunakan nama yang jelas seperti:
+
+toko_online_test
+
+Gunakan credential testing yang aman.
+
+Jangan tampilkan password di final report.
+
+==================================================
+3. DATABASE_URL
+==================================================
+
+Konfigurasikan DATABASE_URL hanya untuk environment testing/runtime VPS.
+
+Jangan commit `.env`, `.env.local`, atau credential apa pun.
+
+Validasi hanya dengan status:
+
+DATABASE_URL: PRESENT
+DATABASE_URL: REACHABLE
+
+Jangan print nilai DATABASE_URL.
+
+Pastikan konfigurasi yang dipakai oleh Next.js production server sama dengan environment testing yang sedang digunakan.
+
+==================================================
+4. PRISMA MIGRATION
+==================================================
+
+Periksa:
+
+ls app/prisma/migrations
+
+dan schema Prisma.
+
+Jalankan:
+
+npx prisma migrate deploy
+
+PENTING:
+
+- gunakan migration yang SUDAH ADA
+- jangan membuat migration baru
+- jangan reset database
+- jangan db push.
+
+Jika migration gagal, STOP dan tampilkan error sebenarnya.
+
+==================================================
+5. SEED DATA
+==================================================
+
+Periksa apakah project memang memiliki seed resmi.
+
+Jika ada seed yang memang menjadi bagian dari project:
+
+- jalankan seed sesuai script resmi
+- gunakan hanya data testing
+- jangan memasukkan credential/payment production.
+
+Jika tidak ada seed:
+
+jangan membuat seed baru hanya untuk memalsukan hasil.
+
+Homepage harus tetap diuji sesuai arsitektur existing.
+
+==================================================
+6. START PRODUCTION SERVER
+==================================================
+
+Pastikan build masih valid:
+
+npm run typecheck
+npm run build
+
+Kemudian jalankan production server menggunakan environment testing.
+
+Gunakan port 3000.
+
+Pastikan hanya satu server testing yang aktif agar tidak terjadi port conflict.
+
+==================================================
+7. HTTP VERIFICATION
+==================================================
+
+Tes:
+
+curl -i http://127.0.0.1:3000/
+
+Target:
+HTTP 200.
+
+Kemudian:
+
+curl -i http://104.207.89.204:3000/
+
+Target:
+HTTP 200.
+
+Jika masih 500:
+
+- ambil server log
+- cari stack trace asli
+- jangan menebak
+- jangan mengubah source code sebelum root cause diketahui.
+
+==================================================
+8. BROWSER / UI VERIFICATION
+==================================================
+
+Setelah HTTP 200, buka:
+
+http://104.207.89.204:3000
+
+Verifikasi secara manual:
+
+1. Homepage
+2. Header/navigation
+3. Catalog/product listing
+4. Product card
+5. Product detail
+6. Responsive mobile layout
+7. Desktop layout
+8. Console/server error
+9. Broken image/resource
+10. Loading state
+11. Empty state jika catalog memang kosong.
+
+JANGAN melakukan transaksi/payment nyata.
+
+Untuk checkout, cukup pastikan halaman dan flow UI dapat dirender sampai batas yang aman tanpa melakukan pembayaran nyata.
+
+==================================================
+9. JIKA DATA CATALOG KOSONG
+==================================================
+
+Jangan langsung menganggap UI rusak.
+
+Bedakan:
+
+- database kosong
+- query error
+- schema error
+- UI rendering error.
+
+Jika database berhasil tetapi catalog kosong karena belum ada seed/data:
+
+laporkan:
+
+"UI berhasil render, tetapi catalog kosong karena database testing belum memiliki data produk."
+
+Jangan membuat data produk palsu kecuali project sudah memiliki mekanisme seed resmi.
+
+==================================================
+10. FINAL CHECK
+==================================================
+
+Jalankan:
+
+git status --short
+git diff --check
+
+Pastikan tidak ada:
+
+- `.env`
+- `.env.local`
+- secret
+- password
+- build artifact baru yang ter-track
+- migration baru.
+
+JANGAN commit/push.
+
+==================================================
+FINAL REPORT
+==================================================
+
+Tampilkan:
+
+DATABASE
+- PostgreSQL: PASS/FAIL
+- Database testing: PASS/FAIL
+- DATABASE_URL: PRESENT/MISSING
+- Database reachable: PASS/FAIL
+- Prisma migrate deploy: PASS/FAIL
+- Migration baru dibuat: NO
+
+APPLICATION
+- typecheck: PASS/FAIL
+- build: PASS/FAIL
+- server port 3000: PASS/FAIL
+- localhost HTTP: PASS/FAIL
+- public HTTP: PASS/FAIL
+
+UI
+- homepage: PASS/FAIL
+- catalog: PASS/FAIL
+- product listing: PASS/FAIL
+- product detail: PASS/FAIL
+- mobile layout: PASS/FAIL
+- desktop layout: PASS/FAIL
+- server/browser error: ada/tidak
+
+GIT
+- working tree:
+- diff check:
+- commit: NO
+- push: NO
+
+STATUS:
+Pilih salah satu:
+
+1. ONLINE — homepage dan UI dapat dibuka normal
+2. BLOCKED — database/environment belum siap
+3. FAILED — masih ada error aplikasi
+
+Jika ONLINE, berhenti dan tunggu instruksi berikutnya.
 
 ```
 # Prompt: Fix Server-Side Exception Sebelum UI Test
