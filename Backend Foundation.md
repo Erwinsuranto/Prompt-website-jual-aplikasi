@@ -13,7 +13,286 @@
 ```
 # 
 ```
+Prompt: Full UI Menu & User Flow Audit — toko-online
 
+Project: /root/toko-online
+
+KONDISI:
+- Aplikasi sudah berhasil berjalan di VPS pada port 3000.
+- Homepage/category page sudah bisa dirender melalui browser.
+- Halaman Kategori menampilkan empty state "Belum Ada Kategori".
+- Jangan menganggap empty state sebagai error.
+- Sekarang fokus audit seluruh UI dan navigasi yang sudah ada.
+
+TUJUAN:
+Audit semua menu, tombol, navigasi, search, filter, dan user flow dari UI yang sudah ada.
+
+JANGAN:
+- membuat fitur baru
+- mengubah desain besar-besaran
+- membuat database dummy hanya untuk menghilangkan empty state
+- mengubah schema/migration
+- mengubah Cloudflare/DNS/port
+- mengaktifkan payment production
+- melakukan transaksi nyata
+- commit
+- push
+
+1. AUDIT BOTTOM NAV
+
+Verifikasi satu per satu:
+
+- Beranda
+- Kategori
+- Pesanan
+- Favorit
+- Akun
+
+Untuk setiap menu:
+- klik/buka
+- pastikan route benar
+- pastikan tidak 404
+- pastikan tidak server error
+- pastikan loading/error/empty state benar
+- pastikan active navigation state benar
+- pastikan tombol back/navigation tidak rusak
+
+2. HEADER
+
+Verifikasi:
+
+- Logo/brand
+- tombol dark mode
+- tombol hamburger/menu
+- search
+- filter
+
+Pastikan setiap tombol benar-benar memiliki action.
+
+Jika tombol hanya UI placeholder, laporkan.
+
+3. SEARCH
+
+Uji:
+
+- buka search
+- masukkan keyword
+- submit
+- hasil pencarian
+- empty result
+- clear search
+- kembali ke catalog
+
+Jika backend belum memiliki data, jangan membuat data palsu.
+
+4. FILTER
+
+Audit tombol filter.
+
+Periksa:
+- filter kategori
+- provider
+- harga atau filter lain yang memang sudah tersedia
+- apply
+- reset
+- close
+
+Pastikan tidak ada tombol mati.
+
+5. BERANDA
+
+Audit seluruh homepage:
+
+- banner/promo
+- kategori
+- produk
+- produk promo
+- product card
+- tombol lihat semua
+- tombol beli
+- search
+- navigasi
+
+Setiap link harus menuju halaman/flow yang benar.
+
+6. KATEGORI
+
+Audit:
+- daftar kategori
+- empty state
+- klik kategori
+- halaman produk berdasarkan kategori
+
+Jika database testing memang belum memiliki kategori:
+- jangan membuat data palsu
+- cukup pastikan empty state memang benar
+- laporkan bahwa data belum tersedia.
+
+7. PRODUCT FLOW
+
+Jika ada produk:
+
+product list
+→ product card
+→ product detail
+→ pilih/beli
+→ checkout
+
+Pastikan tidak ada broken route.
+
+Jika tidak ada produk karena database kosong:
+laporkan dan jangan memalsukan data.
+
+8. FAVORIT
+
+Audit:
+- buka Favorit
+- empty state
+- tombol favorite pada product
+- add/remove favorite jika fitur memang sudah tersedia
+- persistence jika backend sudah mendukung
+
+Jangan membuat fitur baru.
+
+9. PESANAN
+
+Audit:
+- halaman Pesanan
+- empty state
+- detail order jika tersedia
+- status order
+- tombol/detail yang tersedia
+
+Jangan membuat transaksi nyata.
+
+10. AKUN
+
+Audit:
+- halaman akun
+- login/register jika tersedia
+- profile
+- logout
+- menu akun yang tersedia
+
+Jangan menggunakan credential production.
+
+11. CHECKOUT
+
+Audit hanya sampai batas aman:
+
+- buka checkout
+- product/order summary
+- quantity
+- harga
+- payment method UI
+- submit/order flow
+
+JANGAN melakukan pembayaran nyata.
+
+Pastikan payment production tetap OFF.
+
+12. RESPONSIVE
+
+Verifikasi minimal:
+
+mobile sekitar 390x844
+desktop sekitar 1366x768
+
+Periksa:
+- tidak overflow
+- bottom navigation
+- header
+- card
+- text
+- button
+- modal/drawer
+- search
+- checkout
+
+13. ERROR AUDIT
+
+Untuk setiap masalah:
+- route
+- tombol
+- error message
+- server log
+- root cause
+- apakah source code atau database/environment
+
+Jangan menebak.
+
+14. FIX
+
+Jika menemukan BUG nyata pada source code:
+- perbaiki bug tersebut
+- jangan redesign
+- jangan mengubah database schema
+- jangan membuat migration
+- jangan mengubah fitur yang tidak terkait.
+
+Setelah fix jalankan:
+
+npm run typecheck
+npm run build
+
+Jika server perlu restart, restart server testing di port 3000.
+
+15. FINAL VERIFICATION
+
+Jalankan:
+
+git status --short
+git diff --check
+
+Jangan commit/push.
+
+FINAL REPORT:
+
+A. NAVIGATION
+- Beranda:
+- Kategori:
+- Pesanan:
+- Favorit:
+- Akun:
+
+B. HEADER
+- Search:
+- Filter:
+- Dark mode:
+- Hamburger:
+
+C. FLOW
+- Product:
+- Product detail:
+- Checkout:
+- Login:
+- Account:
+
+D. RESPONSIVE
+- Mobile:
+- Desktop:
+
+E. DATA
+- Category data:
+- Product data:
+
+F. BUG
+- ditemukan:
+- diperbaiki:
+
+G. VERIFICATION
+- typecheck:
+- build:
+- HTTP:
+- working tree:
+
+Bedakan dengan jelas:
+PASS = berfungsi
+EMPTY = UI benar tetapi data belum tersedia
+BLOCKED = membutuhkan database/auth/environment
+FAIL = ada bug yang harus diperbaiki
+
+Jangan commit atau push. Berhenti setelah laporan.
 
 
 ```
