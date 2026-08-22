@@ -29,10 +29,449 @@
 
 
 ```
-# 
+# Prompt: Full Online + UI Test Toko-Online
 ```
 
+Prompt: Full Online Runtime & UI Verification — toko-online
 
+Project:
+  /root/toko-online
+
+TUJUAN:
+Lakukan pengujian aplikasi secara nyata sampai aplikasi berjalan online melalui konfigurasi VPS yang SUDAH ADA, kemudian lakukan pemeriksaan UI/frontend secara menyeluruh.
+
+VPS ini adalah VPS CODING/TESTING.
+Jangan dianggap sebagai production.
+
+==================================================
+ATURAN MUTLAK
+==================================================
+
+JANGAN:
+- commit
+- push GitHub
+- migration baru
+- prisma migrate reset
+- database reset/drop
+- mengubah schema Prisma
+- mengubah Cloudflare/DNS
+- mengubah konfigurasi tunnel yang sudah ada
+- mengubah port permanen
+- memasukkan production credential
+- melakukan transaksi nyata
+- charge nyata
+- refund nyata
+- mengaktifkan production payment
+- menghapus fitur existing
+- mengubah desain UI hanya demi test.
+
+Jika menemukan masalah, perbaiki hanya jika memang diperlukan agar aplikasi dapat berjalan/test.
+Jangan melakukan perubahan arsitektur besar.
+
+==================================================
+1. AUDIT KONDISI AWAL
+==================================================
+
+Masuk:
+
+cd /root/toko-online
+
+Periksa:
+
+git status --short
+git branch -vv
+git log -3 --oneline
+
+Pastikan working tree awal bersih.
+
+Periksa package.json dan konfigurasi Next.js untuk mengetahui:
+- command development
+- command production
+- port
+- konfigurasi output
+- konfigurasi environment.
+
+Jangan mengubah konfigurasi sebelum memahami kondisi existing.
+
+==================================================
+2. VALIDASI ENVIRONMENT
+==================================================
+
+Pastikan environment yang diperlukan tersedia.
+
+Jangan tampilkan nilai secret.
+
+Validasi keberadaan:
+- DATABASE_URL
+- SESSION_SECRET
+- konfigurasi aplikasi
+- konfigurasi payment sandbox/mock jika diperlukan.
+
+Jika DATABASE_URL belum tersedia:
+- jangan membuat database baru secara otomatis
+- jangan migration
+- catat sebagai limitation.
+
+==================================================
+3. DATABASE / PRISMA
+==================================================
+
+Lakukan hanya pemeriksaan aman:
+
+- prisma validate
+- prisma generate jika diperlukan
+- koneksi/read-only database check jika database tersedia.
+
+Jangan:
+- migrate reset
+- db push
+- membuat migration
+- mengubah schema.
+
+Pastikan aplikasi tidak diam-diam menggunakan mock catalog jika database service memang sudah diintegrasikan.
+
+==================================================
+4. TYPECHECK DAN BUILD
+==================================================
+
+Jalankan:
+
+npm run typecheck
+npm run build
+
+Jika gagal:
+- identifikasi error sebenarnya
+- perbaiki minimal
+- ulangi test.
+
+Jangan mengubah UI hanya untuk menghilangkan error.
+
+==================================================
+5. START APLIKASI SEBENARNYA
+==================================================
+
+Jalankan production runtime menggunakan command project yang benar.
+
+Contoh jika sesuai package.json:
+
+npm run start
+
+Gunakan port existing project, misalnya 3000.
+
+Jangan mengganti port permanen.
+
+Pastikan:
+- server berhasil boot
+- tidak crash
+- tidak ada fatal runtime error
+- tidak ada Prisma fatal error
+- tidak ada error environment fatal.
+
+==================================================
+6. LOCAL HTTP TEST
+==================================================
+
+Setelah server hidup, test dari VPS:
+
+curl -I http://127.0.0.1:3000/
+curl -I http://127.0.0.1:3000/api/products
+
+Jika endpoint tersedia, test juga:
+- catalog
+- product detail
+- cart/checkout endpoint yang relevan
+- invoice/order endpoint yang relevan.
+
+Catat HTTP status.
+
+Target:
+- halaman utama: 200
+- endpoint valid: 200/expected status
+- tidak ada 500.
+
+==================================================
+7. ONLINE ACCESS
+==================================================
+
+Gunakan konfigurasi online/tunnel yang SUDAH ADA.
+
+Pertama identifikasi:
+- apakah Cloudflare Tunnel sudah aktif
+- hostname/domain yang sudah dikonfigurasi
+- service/port yang sedang diarahkan.
+
+JANGAN membuat tunnel baru.
+JANGAN mengubah DNS.
+JANGAN mengganti hostname.
+JANGAN mengubah konfigurasi Cloudflare jika tidak diperlukan.
+
+Pastikan tunnel mengarah ke aplikasi yang sedang berjalan.
+
+Setelah itu lakukan HTTP test melalui URL online yang memang sudah tersedia.
+
+Contoh:
+
+curl -I https://DOMAIN-YANG-SUDAH-ADA/
+
+Jika URL tidak dapat diketahui dari konfigurasi existing, tampilkan URL/hostname yang ditemukan dan berhenti sebelum mengubah konfigurasi.
+
+==================================================
+8. UI / FRONTEND TEST
+==================================================
+
+Ini bagian WAJIB.
+
+Jangan hanya menggunakan curl.
+
+Gunakan browser automation yang tersedia di environment, misalnya Playwright jika sudah tersedia.
+
+Jangan install dependency besar hanya untuk test kecuali memang sudah ada di project.
+
+Buka URL online aplikasi.
+
+Periksa minimal halaman:
+
+1. Homepage
+2. Catalog/product listing
+3. Category/filter jika tersedia
+4. Product detail
+5. Cart
+6. Checkout
+7. Invoice/order detail jika dapat diakses tanpa transaksi nyata.
+
+==================================================
+9. PEMERIKSAAN VISUAL UI
+==================================================
+
+Periksa secara nyata:
+
+- halaman dapat dirender
+- tidak blank screen
+- tidak hydration error
+- tidak React error
+- tidak Next.js error page
+- navbar/header
+- logo/branding
+- product card
+- gambar produk
+- harga
+- stock
+- kategori
+- tombol beli
+- cart
+- checkout
+- form input
+- responsive mobile
+- responsive desktop.
+
+Karena aplikasi akan digunakan dari HP, WAJIB test viewport mobile sekitar:
+
+390 x 844
+
+Kemudian test desktop sekitar:
+
+1366 x 768
+
+Pastikan:
+- tidak horizontal overflow yang tidak semestinya
+- tombol tidak keluar layar
+- teks tidak bertabrakan
+- product card tidak rusak
+- checkout masih usable
+- navbar tidak rusak.
+
+==================================================
+10. BROWSER CONSOLE
+==================================================
+
+Saat melakukan UI test, periksa:
+
+- browser console error
+- failed network request
+- HTTP 404
+- HTTP 500
+- hydration error
+- JavaScript runtime error
+- image loading failure
+- API request failure.
+
+Bedakan warning biasa dengan error yang benar-benar merusak aplikasi.
+
+==================================================
+11. USER FLOW TANPA TRANSAKSI NYATA
+==================================================
+
+Simulasikan user flow:
+
+Homepage
+→ Catalog
+→ pilih produk
+→ Product Detail
+→ Add to Cart
+→ Cart
+→ Checkout
+
+Isi hanya data dummy/testing jika form membutuhkan input.
+
+JANGAN:
+- submit payment nyata
+- membuat transaksi provider nyata
+- mengirim webhook provider nyata
+- melakukan charge.
+
+Jika checkout membutuhkan payment submission, berhenti tepat sebelum tindakan yang membuat transaksi nyata.
+
+==================================================
+12. DATA BACKEND
+==================================================
+
+Pastikan UI benar-benar mengambil data dari backend/database jika memang sudah diintegrasikan.
+
+Verifikasi:
+- product list
+- product detail
+- stock
+- price
+- category.
+
+Jangan mengganti data server dengan mock hanya untuk membuat UI terlihat bagus.
+
+Jika database kosong, catat:
+"UI berhasil dirender tetapi data database kosong."
+
+Jangan membuat data production palsu.
+
+==================================================
+13. PERFORMANCE DASAR
+==================================================
+
+Periksa apakah:
+- halaman utama cepat merespons
+- API tidak 500
+- tidak ada request yang looping
+- tidak ada server crash
+- tidak ada memory/error fatal.
+
+Tidak perlu melakukan benchmark berat.
+
+==================================================
+14. SETELAH TEST
+==================================================
+
+Pastikan aplikasi tetap berjalan jika memang runtime test membutuhkan akses online.
+
+Jangan mematikan server/tunnel jika itu diperlukan agar saya dapat membuka URL online untuk pemeriksaan manual.
+
+Jika server harus dijalankan sebagai background process untuk mempertahankan akses online, gunakan metode yang SUDAH digunakan project/VPS.
+
+Jangan mengubah deployment architecture.
+
+==================================================
+15. FINAL GIT CHECK
+==================================================
+
+Setelah semua test:
+
+git status --short
+git diff --check
+
+Jika ada perubahan file akibat test/build:
+- identifikasi
+- jangan commit
+- jangan push.
+
+Working tree sebaiknya tetap bersih.
+
+==================================================
+FINAL REPORT
+==================================================
+
+Tampilkan laporan:
+
+A. SERVER
+- Node:
+- npm:
+- Next.js:
+- Production server:
+- Port:
+- Status:
+
+B. DATABASE
+- Prisma:
+- PostgreSQL:
+- Connection:
+- Schema unchanged:
+
+C. ONLINE
+- Existing domain/tunnel:
+- Online HTTP status:
+- URL yang dapat dibuka:
+
+D. API
+- GET /
+- GET /api/products
+- endpoint lain:
+- status/error:
+
+E. UI
+- Homepage:
+- Catalog:
+- Category:
+- Product detail:
+- Cart:
+- Checkout:
+- Invoice:
+- Mobile 390x844:
+- Desktop 1366x768:
+
+F. BROWSER
+- Console errors:
+- Failed requests:
+- Hydration errors:
+- Runtime errors:
+
+G. USER FLOW
+- Homepage → Catalog: PASS/FAIL
+- Catalog → Product: PASS/FAIL
+- Product → Cart: PASS/FAIL
+- Cart → Checkout: PASS/FAIL
+- Payment: SKIPPED (no real transaction)
+
+H. SECURITY
+- Production payment: OFF
+- Production credential: NOT USED
+- Real transaction: NONE
+- Webhook production: NONE
+
+I. GIT
+- Working tree:
+- git diff --check:
+- Commit:
+- Push:
+
+J. KESIMPULAN
+
+Pilih:
+
+PASS
+= online dan UI dapat digunakan, tidak ada blocker.
+
+PASS WITH WARNINGS
+= online/UI berjalan tetapi ada limitation yang tidak menghalangi testing.
+
+FAIL
+= ada masalah yang membuat aplikasi belum layak dipindahkan.
+
+PENTING:
+Jangan commit/push.
+Jangan migration.
+Jangan reset database.
+Jangan transaksi nyata.
+Jangan ubah Cloudflare/DNS/port.
+Jangan berhenti hanya setelah build PASS.
+
+Test harus benar-benar sampai:
+SERVER → ONLINE → BROWSER → UI → USER FLOW.
 
 ```
 # Prompt: Test Final Toko-Online di VPS Coding
