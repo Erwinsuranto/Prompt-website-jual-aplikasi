@@ -77,9 +77,73 @@
 
 
 ```
-# 
+# Prompt — Commit & Push
 ```
+Prompt: Commit and Push Payment Idempotency Hardening
 
+Project: /root/toko-online
+
+Hasil tahap sebelumnya sudah selesai dan seluruh verifikasi lulus.
+
+Lakukan hanya proses finalisasi Git:
+
+1. Jalankan:
+   git status --short
+   git diff --check
+
+2. Pastikan tidak ada:
+   - secret
+   - API key
+   - credential production
+   - .env
+   - file sementara
+   - hasil build yang tidak seharusnya di-track.
+
+3. Review perubahan yang memang berasal dari tahap:
+   Payment Idempotency & Webhook Hardening.
+
+4. Jangan mengubah kode lagi kecuali diperlukan untuk menghapus file sementara/secrets yang tidak sengaja masuk.
+
+5. Jika working tree berisi perubahan yang benar, lakukan:
+
+git add .
+git commit -m "fix(payment): harden webhook idempotency"
+
+6. Push:
+
+git push origin main
+
+7. Setelah push selesai, verifikasi:
+
+git status --short
+git log -1 --oneline
+git branch -vv
+
+8. Pastikan:
+- commit berhasil
+- origin/main sudah menunjuk ke commit terbaru
+- working tree bersih
+- push berhasil
+
+JANGAN:
+- membuat migration
+- menjalankan prisma migrate reset
+- mengubah database
+- menjalankan transaksi payment nyata
+- memasukkan credential production
+- mengubah Cloudflare/DNS/port
+- mengubah UI
+- melakukan pekerjaan fitur baru.
+
+Jika tidak ada perubahan untuk di-commit, jangan membuat empty commit. Laporkan bahwa working tree sudah clean.
+
+Setelah selesai tampilkan:
+- commit hash
+- commit message
+- hasil push
+- status working tree.
+
+Berhenti setelah itu.
 
 
 ```
