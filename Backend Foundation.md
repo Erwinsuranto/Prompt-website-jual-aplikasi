@@ -59,10 +59,113 @@
 
 
 ```
-# 
+# Prompt: Commit & Push Final Checkout Hardening
 ```
 
+Prompt: Commit & Push Final Checkout Hardening
 
+Project: /root/toko-online
+Branch: main
+
+Pekerjaan hardening checkout/order sudah selesai dan sudah diverifikasi.
+
+Sekarang lakukan FINAL GIT COMMIT & PUSH.
+
+WAJIB:
+
+1. Periksa:
+   git status --short
+
+2. Periksa:
+   git diff --check
+
+3. Periksa:
+   git diff --stat
+
+4. Pastikan tidak ada:
+   - .env
+   - .env.*
+   - API key
+   - secret
+   - credential production
+   - node_modules
+   - build artifact
+   - temporary file
+   - conflict marker
+
+5. Pastikan perubahan yang akan di-commit hanya perubahan project yang memang berasal dari tahap checkout/order hardening.
+
+6. Jangan melakukan:
+   - prisma migrate reset
+   - database reset
+   - database drop
+   - migration baru
+   - perubahan schema
+   - perubahan Cloudflare
+   - perubahan DNS
+   - perubahan port
+   - production payment activation
+   - transaksi payment nyata.
+
+7. Jalankan verification terakhir yang ringan:
+   - git diff --check
+   - jika typecheck/build sudah PASS pada tahap sebelumnya, jangan mengulang build yang mahal kecuali ada perubahan setelah verification.
+
+8. Stage perubahan:
+
+git add .
+
+9. Tampilkan staged summary:
+
+git diff --cached --stat
+
+10. Commit dengan message:
+
+fix(payment): harden checkout order lifecycle
+
+11. Setelah commit berhasil, periksa:
+
+git status --short
+git log -1 --oneline
+
+12. Push ke remote branch main:
+
+git push origin main
+
+13. Setelah push, verifikasi:
+
+git status --short
+git log -1 --oneline
+git branch -vv
+
+14. Pastikan:
+   - push berhasil
+   - working tree bersih
+   - branch main sinkron dengan origin/main
+   - tidak ada force push
+   - tidak ada migration
+   - tidak ada production credential
+   - tidak ada perubahan Cloudflare/DNS/port.
+
+Jika git push gagal karena masalah authentication/network, JANGAN memaksa dan JANGAN force push. Laporkan error sebenarnya.
+
+Jika ada file mencurigakan/secret sebelum commit, BERHENTI dan jangan commit.
+
+FINAL REPORT:
+
+- Commit hash
+- Commit message
+- Push status
+- Branch status
+- Working tree status
+- Jumlah file yang di-commit
+- Ringkasan perubahan
+- Konfirmasi tidak ada migration
+- Konfirmasi production payment tetap OFF
+- Konfirmasi tidak ada secret/API key yang ikut ter-commit
+
+Jangan membuat perubahan fitur tambahan.
+Selesai setelah push berhasil.
 
 ```
 # Prompt berikutnya — Final Hardening Checkout & Order
