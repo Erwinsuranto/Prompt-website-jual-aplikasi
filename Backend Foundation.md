@@ -65,10 +65,480 @@
 
 
 ```
-# 
+# Prompt berikutnya — Final Hardening Checkout & Order
 ```
 
+Prompt: Final Checkout & Order Hardening
 
+Project: /root/toko-online
+Branch: main
+
+KONDISI TERAKHIR:
+
+Audit checkout end-to-end sebelumnya sudah selesai.
+
+File yang saat ini berubah antara lain:
+- app/src/components/checkout/CheckoutContent.tsx
+- app/src/components/invoice/InvoiceContent.tsx
+- app/src/components/invoice/InvoiceStatusBadge.tsx
+
+git diff --check bersih.
+Tidak ada secret/API key/credential production.
+Tidak ada migration database.
+Tidak ada perubahan Cloudflare/DNS/port.
+Belum ada commit/push.
+
+Dari audit terakhir ditemukan beberapa remaining item:
+
+1. Restock pada order EXPIRED/FAILED/CANCELLED belum dikembalikan.
+2. Ownership/order access sudah ada di server-side, tetapi frontend order list/detail masih bergantung pada session cookie/middleware existing.
+3. Terdapat dua checkout schema:
+   - lib/checkout-schema
+   - lib/validations/checkout-schema
+   Salah satunya tampaknya legacy/stale.
+4. Payment method mapping frontend saat ini hanya menampilkan:
+   - QRIS
+   - bank transfer
+   - e-wallet
+   sementara backend memiliki dukungan metode lain, tetapi jangan memperluas UI di luar desain existing.
+5. Production payment tetap belum diaktifkan.
+
+TUJUAN:
+
+Lakukan final hardening terhadap checkout/order flow yang sudah ada.
+
+Jangan membuat ulang arsitektur.
+Jangan redesign UI.
+Jangan mengaktifkan payment production.
+
+==================================================
+1. AUDIT CURRENT WORKTREE
+==================================================
+
+Sebelum coding:
+
+- baca git status
+- baca git diff
+- identifikasi semua file yang sudah berubah
+- pahami perubahan yang sudah dibuat oleh tahap sebelumnya.
+
+Jangan membuang perubahan existing.
+
+Pertahankan perubahan checkout/invoice yang sudah benar.
+
+==================================================
+2. RESTOCK ORDER FAILURE / EXPIRY
+==================================================
+
+Audit bagaimana stock sekarang dikurangi ketika order dibuat/payment dimulai.
+
+Tentukan secara pasti:
+
+- kapan stock dikurangi
+- apakah stock dianggap reserved
+- bagaimana order menjadi EXPIRED
+- bagaimana order menjadi FAILED
+- bagaimana order menjadi CANCELLED
+- apakah stock sudah pernah dikembalikan.
+
+Jika arsitektur existing memang melakukan stock deduction/reservation pada checkout, implementasikan mekanisme kompensasi yang aman untuk:
+
+EXPIRED
+FAILED
+CANCELLED
+
+Tetapi:
+
+JANGAN langsung membuat cron/job baru jika lifecycle existing sudah memiliki tempat yang tepat untuk melakukan ini.
+
+Gunakan helper/service existing jika tersedia.
+
+Pastikan restock idempotent.
+
+Contoh:
+
+Order diproses dua kali:
+
+EXPIRED callback
++
+expiry scheduler
+
+tidak boleh membuat stock kembali 2x.
+
+Gunakan status transition atau marker existing untuk memastikan hanya satu proses yang melakukan restock.
+
+Jangan mengubah schema jika tidak benar-benar diperlukan.
+
+Jika schema existing tidak menyediakan cara aman untuk membedakan stock yang sudah dikembalikan, jangan membuat migration otomatis.
+
+Laporkan kebutuhan schema sebagai remaining work.
+
+==================================================
+3. ORDER STATUS TRANSITION
+==================================================
+
+Audit seluruh perubahan status order.
+
+Pastikan transition tidak dapat regress.
+
+Contoh valid:
+
+PENDING → PAID
+PENDING → FAILED
+PENDING → EXPIRED
+PENDING → CANCELLED
+
+Contoh yang harus ditolak:
+
+PAID → PENDING
+PAID → FAILED
+PAID → EXPIRED
+
+FAILED → PAID hanya jika provider reconciliation yang valid memang mengizinkan dan arsitektur existing mendukungnya.
+
+Jangan mengubah status hanya berdasarkan frontend.
+
+Semua status penting harus berasal dari server/database/provider verification.
+
+==================================================
+4. PAYMENT STATUS + ORDER STATUS
+==================================================
+
+Pastikan payment status dan order status tetap konsisten.
+
+Audit:
+
+- create payment
+- payment pending
+- payment success
+- payment failed
+- payment expired
+- payment cancelled
+- webhook
+- redirect
+- status polling.
+
+Redirect frontend tidak boleh menjadi sumber kebenaran.
+
+Webhook harus tetap menggunakan mekanisme idempotency yang sudah dibuat.
+
+Jangan membuat webhook mechanism kedua.
+
+==================================================
+5. DUPLICATE CHECKOUT
+==================================================
+
+Audit ulang double-click/retry.
+
+Skenario:
+
+User klik Checkout.
+Request berjalan.
+User klik lagi.
+Network timeout.
+User retry.
+
+Pastikan tidak terjadi:
+
+- duplicate order
+- duplicate payment session
+- duplicate stock deduction.
+
+Gunakan mekanisme idempotency existing.
+
+Jangan membuat sistem idempotency kedua jika mekanisme existing sudah cukup.
+
+==================================================
+6. ORDER OWNERSHIP
+==================================================
+
+Audit:
+
+- order list
+- order detail
+- invoice
+- payment status.
+
+Pastikan user tidak dapat membaca order milik user lain hanya dengan mengganti:
+
+/orders/:id
+
+atau parameter order ID/reference.
+
+Server harus melakukan ownership check.
+
+Jangan hanya menyembunyikan order di frontend.
+
+Jika auth/session middleware existing sudah menyediakan user identity, gunakan itu.
+
+Jangan membuat authentication system baru.
+
+Jika authentication penuh masih merupakan TODO existing, dokumentasikan saja.
+
+==================================================
+7. FRONTEND ORDER LIST
+==================================================
+
+Periksa:
+
+InvoiceListContent.tsx
+InvoiceContent.tsx
+InvoiceStatusBadge.tsx
+
+Pastikan:
+
+- data berasal dari server.
+- tidak menggunakan mock order.
+- status ditampilkan sesuai server.
+- loading state benar.
+- empty state benar.
+- error state benar.
+- order yang bukan milik user tidak muncul.
+- tidak ada hardcoded payment status.
+
+Pertahankan desain existing.
+
+==================================================
+8. DUPLICATE CHECKOUT SCHEMA
+==================================================
+
+Audit dua file:
+
+lib/checkout-schema
+lib/validations/checkout-schema
+
+Tentukan:
+
+- mana yang benar-benar digunakan.
+- mana yang legacy.
+- apakah keduanya memiliki aturan validasi berbeda.
+- apakah ada import yang masih memakai file legacy.
+
+Jangan menghapus file secara membabi buta.
+
+Jika salah satu memang tidak digunakan dan aman dihapus, hapus hanya setelah memastikan:
+
+- tidak ada import.
+- tidak ada dynamic import.
+- tidak ada test yang menggunakannya.
+- tidak ada build dependency.
+- tidak ada reference di dokumentasi.
+
+Jika keduanya masih diperlukan untuk alasan kompatibilitas, jangan hapus.
+
+Tujuannya adalah satu source of truth untuk checkout validation.
+
+==================================================
+9. PAYMENT METHOD MAPPING
+==================================================
+
+Audit mapping payment method.
+
+Frontend saat ini menggunakan:
+
+- QRIS
+- bank transfer
+- e-wallet.
+
+Backend mungkin memiliki dukungan metode lain.
+
+Jangan menambahkan payment method baru hanya karena backend mendukungnya.
+
+Pastikan mapping existing:
+
+frontend value
+→ backend value
+→ provider value
+
+konsisten.
+
+Jika metode yang tidak ditampilkan UI memang sengaja berada di luar desain, pertahankan.
+
+Jangan redesign checkout.
+
+==================================================
+10. SECURITY AUDIT
+==================================================
+
+Periksa kembali:
+
+- price tampering
+- total tampering
+- quantity tampering
+- order ID enumeration
+- unauthorized invoice access
+- payment status spoofing
+- duplicate checkout
+- webhook replay
+- webhook duplicate callback
+- secret leakage.
+
+Pastikan client tidak dapat menentukan:
+
+- final price
+- final total
+- payment status
+- order ownership
+- stock result.
+
+Server/database tetap source of truth.
+
+==================================================
+11. TESTS
+==================================================
+
+Tambahkan atau perbaiki test hanya jika memang diperlukan.
+
+Minimal verifikasi:
+
+A. Checkout valid.
+
+B. Invalid product.
+
+C. Product inactive.
+
+D. Insufficient stock.
+
+E. Invalid quantity.
+
+F. Price tampering.
+
+G. Total tampering.
+
+H. Duplicate checkout.
+
+I. Payment session failure.
+
+J. Payment pending.
+
+K. Payment success.
+
+L. Payment failure.
+
+M. Payment expiry.
+
+N. Cancellation.
+
+O. Duplicate expiry processing tidak double-restock.
+
+P. Unauthorized order access.
+
+Q. Existing webhook idempotency.
+
+R. Existing payment lifecycle tests.
+
+Gunakan mock/stub provider.
+
+JANGAN melakukan transaksi payment nyata.
+
+==================================================
+12. BUILD VERIFICATION
+==================================================
+
+Jalankan:
+
+npm run typecheck
+
+npm run build
+
+Jika tersedia test command yang relevan, jalankan test checkout/payment/order.
+
+Jangan menjalankan migration reset.
+
+Jangan mengubah database production.
+
+Jika server perlu dijalankan untuk smoke test, gunakan environment testing/sandbox yang tersedia.
+
+==================================================
+13. DATABASE RULES
+==================================================
+
+Jangan:
+
+- prisma migrate reset
+- drop database
+- menghapus migration
+- membuat database baru
+- mengganti PostgreSQL
+- mengganti Prisma.
+
+Jika perubahan schema benar-benar wajib:
+
+BERHENTI sebelum membuat migration.
+
+Laporkan kebutuhan migration.
+
+==================================================
+14. PRODUCTION PAYMENT
+==================================================
+
+Tetap OFF.
+
+Jangan:
+
+- memasukkan MIDTRANS_SERVER_KEY production
+- memasukkan client key production
+- mengaktifkan production adapter
+- melakukan transaksi nyata
+- melakukan refund nyata
+- melakukan cancel nyata.
+
+Sandbox/mock tetap digunakan.
+
+==================================================
+15. GIT
+==================================================
+
+Setelah semua pekerjaan:
+
+git status --short
+
+git diff --check
+
+git diff --stat
+
+Pastikan:
+
+- tidak ada secret
+- tidak ada .env tracked
+- tidak ada node_modules tracked
+- tidak ada build artifact yang tidak seharusnya
+- tidak ada temporary file
+- tidak ada conflict marker.
+
+PENTING:
+
+JANGAN commit.
+JANGAN push.
+
+Berhenti setelah verification.
+
+==================================================
+FINAL REPORT
+==================================================
+
+Laporkan secara jelas:
+
+1. File yang diubah.
+2. Restock behavior.
+3. Status transition.
+4. Idempotency behavior.
+5. Order ownership.
+6. Checkout schema yang dipakai.
+7. Apakah schema duplicate dihapus atau dipertahankan dan alasannya.
+8. Payment method mapping.
+9. Security findings.
+10. Tests yang dijalankan.
+11. npm run typecheck.
+12. npm run build.
+13. Apakah membutuhkan migration.
+14. Remaining work.
+15. git status.
+16. git diff --check.
+
+Jangan commit/push.
+
+Berhenti setelah laporan.
 
 ```
 # Prompt berikutnya — Checkout End-to-End
