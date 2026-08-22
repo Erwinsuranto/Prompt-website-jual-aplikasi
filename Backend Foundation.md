@@ -173,10 +173,45 @@
 
 
 ```
-# 
+# Prompt: Commit & Push UI Navigation Fix
 ```
 
 
+
+Project: /root/toko-online
+
+Perubahan UI/navigation sudah diverifikasi dan PASS.
+
+Sebelum commit:
+- git status --short
+- git diff --check
+- pastikan hanya perubahan yang memang terkait perbaikan BottomNav/navigation.
+- jangan masukkan .env, secret, credential, build artifact, atau file temporary.
+
+Jalankan:
+npm run typecheck
+npm run build
+
+Jika semuanya PASS:
+1. git add hanya file perubahan terkait.
+2. git commit -m "fix(ui): repair bottom navigation routing"
+3. git push origin main
+
+Setelah push:
+- git status --short
+- git log -1 --oneline
+- pastikan branch main sudah sinkron dengan origin/main.
+
+Jangan membuat perubahan fitur lain.
+Jangan migration/reset database.
+Jangan mengubah Cloudflare/DNS/port.
+Jangan mengaktifkan payment production.
+
+Laporkan:
+- commit hash
+- push status
+- working tree status
+- build/typecheck status.
 
 ```
 
