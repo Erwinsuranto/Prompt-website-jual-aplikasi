@@ -8,7 +8,46 @@
 # 
 ```
 
+Prompt: Final Manual UI Verification
 
+Project: /root/toko-online
+
+Server testing sudah berjalan di port 3000.
+
+Sekarang jangan ubah kode dan jangan commit/push.
+
+Lakukan verifikasi final terhadap UI yang sudah diperbaiki.
+
+Cek route berikut:
+- /
+- /categories
+- /orders
+- /favorites
+- /profile
+
+Pastikan BottomNav:
+- Beranda bisa diklik dan pindah ke /
+- Kategori bisa diklik dan pindah ke /categories
+- Pesanan bisa diklik dan pindah ke /orders
+- Favorit bisa diklik dan pindah ke /favorites
+- Akun bisa diklik dan pindah ke /profile
+- active state sesuai halaman
+- tidak ada 404 atau server-side exception
+
+Cek juga:
+- tombol hamburger
+- dark mode
+- search
+- tombol filter
+- responsive mobile
+
+Jangan membuat fitur baru.
+Jangan membuat data dummy.
+Jangan mengubah database/schema/migration.
+Jangan commit/push.
+
+Jika semuanya normal, cukup laporkan PASS.
+Jika ada bug nyata, laporkan route dan error sebenarnya lalu berhenti.
 
 ```
 # 
