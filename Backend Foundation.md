@@ -41,11 +41,85 @@
 
 
 ```
-# 
+# Prompt: Commit & Push Final README
 ```
 
 
+Prompt: Commit & Push Final README
 
+Project: /root/toko-online
+
+KONDISI:
+- Audit deployment documentation selesai.
+- Hanya README.md yang berubah.
+- Tidak ada perubahan source code.
+- Tidak ada perubahan Prisma schema.
+- Tidak ada migration baru.
+- Tidak ada perubahan database.
+- Tidak ada perubahan Cloudflare/DNS/port.
+- Production payment tetap OFF.
+- Tidak ada production credential.
+- git diff --check sudah PASS.
+
+TUGAS:
+
+1. Jalankan:
+   git status --short
+
+2. Pastikan perubahan hanya:
+   M README.md
+
+3. Jalankan:
+   git diff --check
+
+4. Periksa diff README.md untuk memastikan:
+   - tidak ada secret
+   - tidak ada API key
+   - tidak ada password
+   - tidak ada DATABASE_URL asli
+   - tidak ada credential production
+   - tidak ada file temporary/build artifact.
+
+5. Jika semua aman, commit README.md dengan message:
+
+   docs: add VPS deployment and migration guide
+
+6. Push ke branch main:
+
+   git push origin main
+
+7. Setelah push selesai, verifikasi:
+
+   git status --short
+   git log -1 --oneline
+   git branch -vv
+
+8. Pastikan:
+   - working tree bersih
+   - origin/main sudah berada pada commit terbaru
+   - push berhasil
+   - tidak menggunakan force push.
+
+JANGAN:
+- mengubah source code
+- membuat migration
+- reset/drop database
+- mengaktifkan production payment
+- mengubah Cloudflare/DNS/port
+- melakukan transaksi nyata
+- force push
+- membuat commit tambahan jika tidak diperlukan.
+
+FINAL REPORT:
+Tampilkan:
+- commit hash
+- commit message
+- hasil push
+- status working tree
+- status branch terhadap origin/main
+- file yang masuk commit.
+
+SELESAI setelah verifikasi.
 ```
 # Prompt: Final VPS Migration Documentation
 ```
