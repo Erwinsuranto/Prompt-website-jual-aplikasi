@@ -23,10 +23,307 @@
 
 
 ```
-# 
+# Prompt: Fix Server-Side Exception Sebelum UI Test
 ```
 
+Prompt: Diagnose & Fix Online Server-Side Exception — toko-online
 
+Project:
+  /root/toko-online
+
+KONDISI SAAT INI:
+- Build sebelumnya PASS.
+- Next.js production server berhasil start.
+- Server berjalan di port 3000.
+- Saat dibuka melalui:
+  http://104.207.89.204:3000
+  browser menampilkan:
+
+  "Application error: a server-side exception has occurred
+   (see the server logs for more information)."
+
+- Digest:
+  1945587591
+
+TUJUAN:
+Cari ROOT CAUSE server-side exception tersebut dan perbaiki sampai homepage dapat dibuka normal melalui HTTP.
+
+==================================================
+ATURAN
+==================================================
+
+VPS ini hanya untuk coding/testing.
+
+JANGAN:
+- commit
+- push
+- migration
+- prisma migrate reset
+- db push
+- membuat migration baru
+- menghapus database
+- mengganti database
+- mengaktifkan production payment
+- menggunakan production credential
+- transaksi nyata
+- mengubah Cloudflare/DNS
+- mengubah port permanen
+- mengubah desain UI tanpa alasan
+- mengganti mock dengan data palsu hanya untuk membuat halaman tampil.
+
+Jangan menebak penyebab error.
+Cari error sebenarnya dari server log/stack trace.
+
+==================================================
+1. REPRODUCE ERROR
+==================================================
+
+Masuk:
+
+cd /root/toko-online
+
+Pastikan server production sedang berjalan.
+
+Tes:
+
+curl -i http://127.0.0.1:3000/
+
+Kemudian:
+
+curl -i http://104.207.89.204:3000/
+
+Catat HTTP status dan response.
+
+==================================================
+2. PERIKSA SERVER LOG
+==================================================
+
+Cari log proses Next.js yang sedang berjalan.
+
+Jika menggunakan terminal/background process/system process, identifikasi PID terlebih dahulu.
+
+Periksa stdout/stderr server.
+
+Cari:
+- Error
+- Exception
+- Prisma error
+- DATABASE_URL error
+- Environment variable error
+- Cannot find module
+- Server Component error
+- React/Next.js server error
+- authentication/session error
+- serialization error
+- database connection error.
+
+Jangan hanya membaca digest.
+Cari stack trace asli.
+
+Jika perlu restart server dalam mode yang memungkinkan log terlihat jelas, lakukan restart lokal/testing tanpa mengubah konfigurasi permanen.
+
+==================================================
+3. PERIKSA ENV TANPA MEMBOCORKAN SECRET
+==================================================
+
+Periksa apakah environment variable yang diperlukan tersedia.
+
+JANGAN print nilai asli.
+
+Minimal validasi keberadaan:
+- DATABASE_URL
+- SESSION_SECRET
+- environment variable lain yang benar-benar digunakan homepage/server.
+
+Jika variable tidak ada, tampilkan hanya:
+
+DATABASE_URL: MISSING/PRESENT
+SESSION_SECRET: MISSING/PRESENT
+
+Jangan tampilkan nilainya.
+
+==================================================
+4. PERIKSA DATABASE DEPENDENCY
+==================================================
+
+Cari apakah homepage/catalog/server component memanggil Prisma/database saat render.
+
+Audit:
+- prisma client
+- repositories
+- product service
+- category service
+- banner service
+- settings service
+- auth/session service.
+
+Tentukan dengan bukti:
+"Error terjadi karena database tidak tersedia"
+atau
+"Error terjadi karena bug kode lain."
+
+Jangan menganggap database sebagai penyebab sebelum melihat stack trace.
+
+==================================================
+5. JIKA ERROR MEMANG DATABASE
+==================================================
+
+Jika stack trace membuktikan bahwa homepage gagal karena DATABASE_URL/database belum tersedia:
+
+JANGAN:
+- membuat migration
+- reset database
+- db push
+- menghapus schema.
+
+Lakukan hanya diagnosis.
+
+Periksa:
+- apakah PostgreSQL service tersedia
+- apakah DATABASE_URL valid secara struktur tanpa menampilkan secret
+- apakah Prisma schema sesuai migration yang sudah ada
+- apakah database dapat diakses.
+
+Jika database belum siap, jangan membuat perubahan destructive.
+
+Kemudian jelaskan secara jelas:
+
+"Homepage membutuhkan database aktif sehingga UI belum dapat dirender pada VPS coding ini."
+
+Tetapi sebelum menyimpulkan, periksa apakah arsitektur existing memang memungkinkan homepage tetap render ketika database kosong.
+
+==================================================
+6. JIKA ERROR ADALAH BUG KODE
+==================================================
+
+Jika stack trace menunjukkan bug kode:
+
+- identifikasi file
+- identifikasi fungsi
+- jelaskan root cause
+- lakukan perbaikan minimal
+- jangan refactor besar
+- jangan mengubah schema
+- jangan menghapus fitur.
+
+Setelah fix:
+
+npm run typecheck
+npm run build
+
+Jika keduanya PASS, restart production server.
+
+==================================================
+7. TEST ULANG
+==================================================
+
+Test:
+
+curl -i http://127.0.0.1:3000/
+
+Target:
+HTTP 200 untuk homepage.
+
+Kemudian:
+
+curl -i http://104.207.89.204:3000/
+
+Target:
+HTTP 200.
+
+Pastikan response bukan Next.js error page.
+
+==================================================
+8. BROWSER TEST
+==================================================
+
+Setelah HTTP 200:
+
+Buka:
+
+http://104.207.89.204:3000
+
+Periksa homepage.
+
+Target:
+- tidak blank
+- tidak Application Error
+- tidak Next.js error page
+- tidak server-side exception.
+
+Jika homepage berhasil tampil, lanjutkan hanya ke:
+
+- catalog
+- product listing
+- product detail
+
+Jangan melakukan checkout/payment dulu.
+
+==================================================
+9. GIT SAFETY
+==================================================
+
+Setelah perbaikan:
+
+git status --short
+git diff --check
+
+Jangan commit.
+Jangan push.
+
+Jika ada perubahan source code:
+laporkan file yang berubah dan alasan perubahan.
+
+Jika tidak ada perubahan:
+laporkan bahwa masalah berasal dari environment/runtime.
+
+==================================================
+FINAL REPORT
+==================================================
+
+Tampilkan:
+
+1. ROOT CAUSE
+   Jelaskan penyebab server-side exception berdasarkan log.
+
+2. FIX
+   Jelaskan apa yang diperbaiki.
+
+3. DATABASE
+   - tersedia/tidak
+   - koneksi PASS/FAIL
+   - migration tidak dijalankan.
+
+4. BUILD
+   - typecheck:
+   - build:
+
+5. SERVER
+   - port:
+   - localhost HTTP:
+   - public IP HTTP:
+
+6. BROWSER
+   - homepage:
+   - catalog:
+   - product listing:
+   - product detail:
+
+7. GIT
+   - working tree:
+   - diff check:
+   - commit:
+   - push:
+
+8. STATUS
+   Pilih:
+   - FIXED — homepage online dan siap lanjut UI test
+   - BLOCKED — database/environment belum siap
+   - FAILED — masih ada server-side error
+
+BERHENTI setelah laporan.
+Jangan commit/push.
+Jangan migration/reset database.
 
 ```
 # Prompt: Full Online + UI Test Toko-Online
