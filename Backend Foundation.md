@@ -35,9 +35,308 @@
 
 
 ```
-# 
+# Prompt: Test Final Toko-Online di VPS Coding
 ```
+Prompt: Final Runtime Test — toko-online
 
+Project:
+  /root/toko-online
+
+TUJUAN:
+Lakukan pengujian menyeluruh terhadap aplikasi toko-online pada VPS coding ini sebelum project dipindahkan ke VPS production/deployment.
+
+PENTING:
+VPS ini HANYA untuk coding/testing.
+Jangan mengaktifkan production payment.
+Jangan menggunakan credential production.
+Jangan melakukan transaksi nyata.
+Jangan mengubah Cloudflare, DNS, atau konfigurasi port.
+Jangan reset/drop database.
+Jangan membuat migration baru kecuali benar-benar diperlukan untuk memperbaiki error yang sudah ada — dan jika migration ternyata diperlukan, BERHENTI dan laporkan, jangan menjalankannya.
+Jangan commit atau push GitHub.
+
+==================================================
+1. CEK GIT
+==================================================
+
+Jalankan:
+
+git status --short
+git branch -vv
+git log -3 --oneline
+
+Pastikan:
+- working tree bersih
+- branch main sinkron dengan origin/main
+- tidak ada perubahan kode yang tidak diketahui.
+
+==================================================
+2. CEK ENVIRONMENT
+==================================================
+
+Periksa environment tanpa menampilkan nilai secret.
+
+Validasi keberadaan variable yang dibutuhkan seperti:
+- DATABASE_URL
+- SESSION_SECRET
+- konfigurasi aplikasi lainnya
+
+JANGAN tampilkan nilai asli secret/API key/password/DATABASE_URL.
+
+Pastikan tidak ada:
+- production credential
+- API key production
+- payment provider production credential
+
+==================================================
+3. CEK DEPENDENCY
+==================================================
+
+Jalankan pemeriksaan dependency yang aman.
+
+Pastikan:
+- node_modules tersedia
+- Prisma tersedia
+- Next.js tersedia
+- package-lock/npm lock sesuai project
+
+Jangan melakukan upgrade dependency secara otomatis.
+
+==================================================
+4. PRISMA / DATABASE
+==================================================
+
+Validasi koneksi Prisma/PostgreSQL menggunakan database testing yang sudah dikonfigurasi.
+
+Jalankan pemeriksaan Prisma yang tidak mengubah schema.
+
+Gunakan:
+- prisma validate
+- prisma generate jika diperlukan
+- pemeriksaan koneksi/read-only
+
+JANGAN:
+- prisma migrate reset
+- db push
+- menghapus database
+- membuat migration
+- mengubah schema
+
+Jika database tidak tersedia, jangan membuat database baru secara otomatis.
+Laporkan error dengan jelas.
+
+==================================================
+5. TYPECHECK
+==================================================
+
+Jalankan:
+
+npm run typecheck
+
+Hasil harus PASS.
+
+Jika gagal:
+- identifikasi file dan error
+- perbaiki hanya jika error berasal dari kode project
+- ulangi typecheck
+
+==================================================
+6. PRODUCTION BUILD
+==================================================
+
+Jalankan:
+
+npm run build
+
+Pastikan production build berhasil.
+
+Jika gagal:
+- identifikasi root cause
+- perbaiki secara minimal
+- ulangi build
+
+Jangan mengubah arsitektur hanya untuk membuat build terlihat PASS.
+
+==================================================
+7. START APPLICATION
+==================================================
+
+Jalankan aplikasi production secara lokal sesuai konfigurasi project.
+
+Gunakan port project yang SUDAH ADA.
+Jangan mengubah port permanen.
+
+Validasi bahwa:
+- Next.js server berhasil start
+- tidak crash
+- tidak ada error Prisma saat startup
+- tidak ada error environment fatal
+
+==================================================
+8. HTTP SMOKE TEST
+==================================================
+
+Setelah server aktif, lakukan smoke test endpoint yang memang sudah tersedia.
+
+Minimal periksa:
+
+GET /
+GET /api/products
+
+Jika endpoint health/metrics memang sudah ada, periksa juga endpoint tersebut.
+
+Untuk setiap endpoint catat:
+- HTTP status
+- response berhasil/gagal
+- error jika ada
+
+Jangan membuat endpoint baru hanya untuk pengujian.
+
+==================================================
+9. DATABASE-BACKED FLOW
+==================================================
+
+Verifikasi secara read-only bahwa:
+
+- catalog/product dapat membaca database
+- category dapat membaca database jika endpoint tersedia
+- product detail menggunakan data server/database
+- service repository dapat terhubung ke Prisma
+- tidak terjadi fallback diam-diam ke mock catalog legacy
+
+Jangan membuat order/payment nyata.
+
+==================================================
+10. PAYMENT SAFETY CHECK
+==================================================
+
+Pastikan:
+
+- payment production tetap OFF
+- provider payment tidak dipanggil
+- tidak ada credential production
+- tidak ada transaksi nyata
+- webhook production tidak dikirim
+- tidak ada charge/refund nyata
+
+Jika ada payment flow yang bisa diuji secara mock/sandbox tanpa transaksi nyata, boleh lakukan hanya jika memang sudah tersedia.
+
+==================================================
+11. FRONTEND SMOKE TEST
+==================================================
+
+Validasi halaman utama dan flow penting yang tersedia:
+
+- homepage
+- catalog
+- product detail
+- cart
+- checkout
+- invoice/order detail jika tersedia
+
+Pastikan tidak ada error runtime JavaScript yang jelas.
+
+Jangan mengubah desain UI.
+
+==================================================
+12. API / SERVER ERROR CHECK
+==================================================
+
+Periksa log runtime selama smoke test.
+
+Cari:
+- Prisma error
+- database connection error
+- unhandled exception
+- TypeScript/runtime error
+- 404 yang tidak semestinya
+- 500
+- authentication error yang tidak semestinya
+
+Bedakan:
+- error yang memang expected karena fitur production belum aktif
+- error nyata yang harus diperbaiki
+
+==================================================
+13. FINAL VERIFICATION
+==================================================
+
+Setelah pengujian selesai:
+
+Jalankan:
+
+git status --short
+git diff --check
+
+Jangan commit/push.
+
+Jika ada perubahan file akibat test/build yang tidak seharusnya masuk Git, jangan commit.
+Identifikasi file tersebut.
+
+==================================================
+HASIL AKHIR
+==================================================
+
+Buat laporan dengan format:
+
+A. Environment
+- Node:
+- npm:
+- Next.js:
+- Prisma:
+- PostgreSQL:
+- Environment: PASS/FAIL
+
+B. Git
+- branch:
+- working tree:
+- origin/main:
+- perubahan file:
+
+C. Database
+- Prisma validate:
+- Database connection:
+- Schema unchanged:
+
+D. Build
+- typecheck:
+- build:
+- production start:
+
+E. HTTP Smoke Test
+- GET /
+- GET /api/products
+- endpoint lain yang tersedia
+
+F. Application Flow
+- catalog:
+- product detail:
+- cart:
+- checkout:
+- invoice/order:
+
+G. Payment Safety
+- production payment:
+- real transaction:
+- production credentials:
+- webhook production:
+
+H. Final Status
+Pilih salah satu:
+- PASS — siap dipindahkan ke VPS deployment
+- PASS WITH WARNINGS — bisa dipindahkan tetapi ada catatan
+- FAIL — jangan pindahkan sebelum masalah diperbaiki
+
+PENTING:
+Jangan commit.
+Jangan push.
+Jangan migration.
+Jangan reset database.
+Jangan transaksi nyata.
+Jangan production payment.
+Jangan ubah Cloudflare/DNS/port.
+
+Berhenti setelah laporan final.
 
 
 ```
