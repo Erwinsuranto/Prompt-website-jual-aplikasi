@@ -161,10 +161,53 @@
 
 
 ```
-# 
+# Prompt berikutnya — Fix UI & Runtime Data
 ```
 
+Prompt: Fix UI Runtime & Database Data
 
+Project: /root/toko-online
+
+Lanjutkan dari kondisi repository saat ini. Jangan mengulang pekerjaan yang sudah PASS.
+
+Tujuan:
+Pastikan UI benar-benar mengambil data dari backend/database dan tidak hanya berhasil render secara visual.
+
+Tugas:
+1. Audit halaman utama, kategori, produk, pesanan, favorit, akun, dan checkout.
+2. Periksa kenapa halaman kategori saat ini menampilkan "Belum Ada Kategori".
+3. Pastikan service/category/product yang dipakai frontend benar-benar terhubung ke Prisma/database.
+4. Jangan mengganti schema Prisma dan jangan membuat migration baru kecuali benar-benar diperlukan.
+5. Jika database kosong, jangan membuat mock data sebagai solusi. Pastikan UI menangani database kosong dengan benar.
+6. Periksa semua API/server action yang dipanggil halaman tersebut dan pastikan tidak menyebabkan server-side exception.
+7. Pastikan halaman tetap bisa dirender ketika database kosong.
+8. Perbaiki hanya bug yang benar-benar ditemukan. Jangan redesign UI.
+9. Jalankan:
+   - npm run typecheck
+   - npm run build
+   - npm run start / production server verification sesuai konfigurasi project
+   - cek HTTP homepage dan route utama
+10. Jangan menjalankan test dengan flag Node yang tidak didukung VPS ini.
+11. Jangan melakukan database reset, migration reset, transaksi production, atau memasukkan credential production.
+12. Setelah verifikasi PASS:
+   - git status --short
+   - git diff --check
+   - pastikan tidak ada .env, secret, credential, build artifact, atau temporary file
+   - git add perubahan yang relevan
+   - git commit -m "fix(ui): connect runtime data to backend"
+   - git push origin main
+   - git status --short
+   - git log -1 --oneline
+   - pastikan branch main sinkron dengan origin/main
+
+PENTING:
+- Jangan berhenti hanya karena database kosong.
+- Jangan mengganti database.
+- Jangan membuat mock data sebagai pengganti database.
+- Jangan force push.
+- Karena VPS berisiko mati, setelah perubahan sudah benar dan typecheck/build/production verification PASS, langsung commit dan push.
+- Jika tidak ada perubahan kode yang diperlukan, jangan membuat commit kosong. Laporkan bahwa repository tetap bersih.
+- Berikan laporan singkat: bug yang ditemukan, file yang diubah, hasil build, hasil HTTP, commit hash, dan status push.
 
 ```
 # Audit & Perbaiki Integrasi Backend Prisma
