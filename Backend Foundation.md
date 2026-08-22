@@ -71,10 +71,500 @@
 
 
 ```
-# 
+# Prompt berikutnya — Checkout End-to-End
 ```
 
+Prompt: Checkout End-to-End Integration & Verification
 
+Project: /root/toko-online
+Branch: main
+
+KONDISI TERAKHIR:
+
+Payment session, checkout integration, redirect payment flow, server-side status handling, webhook verification, webhook idempotency, transaction safety, status transition, dan concurrency handling sudah selesai.
+
+Commit terakhir:
+fix(payment): harden webhook idempotency
+
+Git:
+- main sudah ter-push ke origin/main
+- working tree sebelumnya bersih
+- Jangan membuat commit atau push pada tahap ini.
+
+TUJUAN:
+
+Sekarang audit dan selesaikan alur checkout secara END-TO-END dari frontend sampai backend/database.
+
+Fokus:
+Product → Cart → Checkout → Order → Payment Session → Payment Status → Redirect/Result.
+
+Tetap menggunakan Prisma/PostgreSQL sebagai sumber data utama.
+
+PENTING:
+Ini masih environment coding/testing.
+
+JANGAN:
+- mengaktifkan payment production
+- memasukkan credential Midtrans production
+- melakukan transaksi nyata
+- mengubah Cloudflare
+- mengubah DNS
+- mengubah port VPS
+- melakukan deployment production
+- membuat migration tanpa kebutuhan yang benar-benar terbukti
+- melakukan prisma migrate reset
+- menghapus migration existing
+- mengganti PostgreSQL dengan database lain
+- mengganti database dengan mock/static data.
+
+==================================================
+1. AUDIT FRONTEND CHECKOUT
+==================================================
+
+Baca implementasi frontend yang sudah ada.
+
+Identifikasi:
+- product listing
+- product detail
+- cart
+- checkout page/component
+- customer information
+- order summary
+- payment selection
+- payment button
+- loading state
+- error state
+- success state
+- redirect/payment result page.
+
+Jangan membuat UI baru jika komponen existing sudah dapat digunakan.
+
+Pertahankan desain/UI existing.
+
+Pastikan frontend tidak lagi menggunakan data hardcoded jika data tersebut seharusnya berasal dari backend/database.
+
+==================================================
+2. AUDIT PRODUCT → CART
+==================================================
+
+Pastikan product yang dipilih berasal dari database/server.
+
+Saat user memasukkan produk ke cart:
+
+- product ID harus valid
+- quantity harus valid
+- product harus masih aktif
+- product harus tersedia
+- harga yang ditampilkan harus berasal dari server
+- frontend tidak boleh menjadi sumber kebenaran harga.
+
+Jangan mempercayai:
+- price dari client
+- total dari client
+- stock dari client
+- active status dari client.
+
+==================================================
+3. CHECKOUT SERVER-SIDE VALIDATION
+==================================================
+
+Audit endpoint/server action checkout yang sudah ada.
+
+Server harus melakukan validasi ulang:
+
+- product existence
+- active status
+- stock
+- quantity
+- current price
+- total
+- customer information
+- order data.
+
+Harga dan total harus dihitung ulang di server.
+
+Jangan menggunakan total yang dikirim frontend sebagai sumber kebenaran.
+
+Jika data tidak valid:
+- return error yang sesuai
+- jangan membuat order
+- jangan membuat payment session
+- jangan mengurangi stock.
+
+==================================================
+4. ORDER CREATION
+==================================================
+
+Pastikan order dibuat secara transactional.
+
+Urutan logika harus aman:
+
+1. Validasi request.
+2. Ambil product dari database.
+3. Validasi active status.
+4. Validasi stock.
+5. Validasi quantity.
+6. Hitung subtotal server-side.
+7. Hitung total server-side.
+8. Buat order.
+9. Buat order item.
+10. Buat payment/session jika memang flow existing membutuhkannya.
+11. Commit transaction.
+
+Jangan membuat order setengah jadi.
+
+Jika salah satu operasi gagal:
+- transaction rollback.
+- tidak boleh ada order orphan.
+- tidak boleh ada order item orphan.
+- jangan mengurangi stock secara permanen jika payment/order creation gagal.
+
+Gunakan transaction Prisma yang sesuai dengan schema existing.
+
+==================================================
+5. PAYMENT SESSION
+==================================================
+
+Audit integration payment session yang sudah dibuat pada tahap sebelumnya.
+
+Pastikan:
+
+- payment session dibuat setelah order valid.
+- amount berasal dari server.
+- order reference berasal dari server.
+- customer/order information tidak dapat dimanipulasi client.
+- payment URL/token hanya berasal dari provider adapter existing.
+- sandbox/mock tetap menjadi default.
+
+Jangan mengubah adapter provider menjadi production.
+
+Jika provider tidak dikonfigurasi:
+- sistem harus memberikan response/error yang aman.
+- jangan crash.
+- jangan membuat transaksi nyata.
+
+==================================================
+6. CHECKOUT RETRY
+==================================================
+
+Audit kemungkinan user menekan tombol checkout berkali-kali.
+
+Pastikan double-click/retry tidak menyebabkan:
+
+- duplicate order
+- duplicate payment
+- duplicate stock deduction.
+
+Gunakan mekanisme existing jika sudah tersedia.
+
+Jika idempotency key/order reference sudah ada, gunakan kembali.
+
+Jangan membuat mekanisme kedua yang bertentangan dengan idempotency implementation sebelumnya.
+
+==================================================
+7. PAYMENT RESULT / REDIRECT
+==================================================
+
+Audit halaman setelah user kembali dari payment provider.
+
+Pastikan frontend:
+
+- tidak langsung menganggap payment PAID hanya karena redirect berhasil.
+- mengambil status dari backend.
+- backend/database menjadi sumber kebenaran.
+- status pending tetap pending.
+- status paid hanya muncul jika backend sudah memvalidasi status.
+- status failed/cancelled ditampilkan sesuai status server.
+
+Jangan mempercayai query parameter client sebagai bukti pembayaran.
+
+==================================================
+8. ORDER DETAIL
+==================================================
+
+Pastikan customer dapat melihat informasi order yang benar sesuai flow existing.
+
+Periksa:
+
+- order ID/reference
+- product
+- quantity
+- price
+- total
+- payment status
+- order status.
+
+Jangan membocorkan data sensitif.
+
+Jangan membuat endpoint publik yang memungkinkan user melihat order milik user lain hanya dengan mengganti ID.
+
+Jika authentication/customer ownership sudah tersedia, gunakan mekanisme tersebut.
+
+Jika ownership belum tersedia, dokumentasikan sebagai remaining work dan jangan membuat sistem authentication baru di luar scope.
+
+==================================================
+9. STATUS CONSISTENCY
+==================================================
+
+Audit hubungan:
+
+Payment status
+↕
+Order status
+
+Pastikan status tidak dapat regress secara sembarangan.
+
+Contoh:
+
+PENDING → PAID
+PENDING → FAILED
+PENDING → CANCELLED
+
+Tetapi callback lama tidak boleh mengubah:
+
+PAID → PENDING
+PAID → FAILED
+
+dan status final tidak boleh diturunkan hanya karena request frontend.
+
+Gunakan helper/status transition yang sudah ada jika tersedia.
+
+==================================================
+10. STOCK SAFETY
+==================================================
+
+Audit stock handling.
+
+Pastikan stock tidak:
+
+- berkurang dua kali
+- menjadi negatif
+- berkurang karena request checkout gagal
+- berkurang hanya karena frontend membuka checkout.
+
+Jika arsitektur existing memang menggunakan reservation atau stock deduction pada tahap tertentu, pertahankan pola tersebut dan verifikasi bahwa retry aman.
+
+Jangan membuat inventory architecture baru jika belum diperlukan.
+
+==================================================
+11. ERROR HANDLING
+==================================================
+
+Pastikan semua failure penting ditangani:
+
+- product tidak ditemukan
+- product inactive
+- stock habis
+- quantity invalid
+- price berubah
+- database error
+- payment provider unavailable
+- payment session gagal
+- webhook belum dikonfigurasi
+- invalid order
+- unauthorized order access.
+
+Error response harus konsisten dengan API architecture existing.
+
+Jangan expose:
+- DATABASE_URL
+- API key
+- provider secret
+- stack trace sensitif
+- internal credentials.
+
+==================================================
+12. TESTING
+==================================================
+
+Buat/perbaiki test hanya jika memang diperlukan.
+
+Minimal verifikasi:
+
+A. Product valid → checkout berhasil.
+
+B. Product tidak ditemukan → checkout ditolak.
+
+C. Product inactive → checkout ditolak.
+
+D. Stock tidak cukup → checkout ditolak.
+
+E. Quantity invalid → checkout ditolak.
+
+F. Client mengirim price palsu → server tetap menggunakan harga database.
+
+G. Client mengirim total palsu → server menghitung ulang.
+
+H. Checkout request duplicate → tidak menghasilkan transaksi/order duplicate.
+
+I. Payment session gagal → database tidak berada pada keadaan setengah jadi.
+
+J. Payment redirect pending → backend tetap menentukan status.
+
+K. Payment redirect paid → hanya backend/provider status yang menentukan PAID.
+
+L. Order milik user lain → tidak dapat diakses.
+
+M. Existing webhook idempotency tetap lulus.
+
+N. Existing payment tests tetap lulus.
+
+==================================================
+13. BUILD & TYPECHECK
+==================================================
+
+Setelah implementasi jalankan:
+
+npm run typecheck
+
+npm run build
+
+Jalankan test payment/order/checkout yang relevan.
+
+Jika server dapat dijalankan tanpa mengganggu process yang sudah aktif, lakukan smoke test endpoint yang relevan.
+
+Jangan mematikan process yang bukan milik task ini.
+
+==================================================
+14. DATABASE
+==================================================
+
+Gunakan schema Prisma existing sebagai sumber kebenaran.
+
+Sebelum mengubah schema:
+
+- periksa apakah field/relation yang diperlukan sebenarnya sudah tersedia.
+- jangan membuat migration hanya karena ingin merapikan schema.
+- jangan menghapus migration.
+- jangan reset database.
+- jangan membuat database baru.
+
+Jika ternyata ada kebutuhan schema yang benar-benar tidak dapat diselesaikan tanpa migration:
+
+JANGAN menjalankan migration production.
+
+Laporkan:
+- field/relation yang diperlukan
+- alasan
+- file schema yang perlu diubah
+- migration yang nantinya diperlukan.
+
+==================================================
+15. UI
+==================================================
+
+Jangan melakukan redesign.
+
+Pertahankan:
+- layout
+- warna
+- styling
+- komponen
+- navigasi.
+
+Perubahan UI hanya diperbolehkan jika diperlukan agar checkout benar-benar terhubung dengan backend.
+
+==================================================
+16. SECURITY
+==================================================
+
+Audit secara khusus:
+
+- client price tampering
+- client total tampering
+- client quantity tampering
+- order ID enumeration
+- unauthorized order access
+- duplicate checkout
+- duplicate payment
+- payment status spoofing
+- redirect parameter spoofing.
+
+Server/database harus menjadi source of truth.
+
+==================================================
+17. SCOPE YANG TIDAK BOLEH DIKERJAKAN
+==================================================
+
+Jangan mengerjakan:
+
+- production Midtrans activation
+- production credentials
+- real payment
+- real cancel/refund
+- dedicated providerEventId migration
+- email delivery
+- coupon engine
+- reviews
+- analytics
+- address management
+- favorites
+- admin user management
+- production VPS deployment
+- Cloudflare/DNS migration
+- UI redesign.
+
+Jika menemukan masalah di luar scope, catat sebagai FUTURE/REMAINING WORK.
+
+==================================================
+18. FINAL VERIFICATION
+==================================================
+
+Sebelum selesai jalankan:
+
+git status --short
+
+git diff --check
+
+Pastikan tidak ada:
+
+- secret
+- API key
+- production credential
+- .env tracked
+- temporary files
+- build artifacts yang tidak seharusnya di-track.
+
+JANGAN commit.
+JANGAN push.
+
+==================================================
+LAPORAN AKHIR
+==================================================
+
+Tampilkan:
+
+A. File yang diubah.
+
+B. Perubahan frontend checkout.
+
+C. Perubahan backend checkout.
+
+D. Validasi server-side yang ditambahkan/diperbaiki.
+
+E. Status order/payment flow.
+
+F. Idempotency/retry behavior.
+
+G. Stock safety.
+
+H. Security findings.
+
+I. Test yang dijalankan dan hasilnya.
+
+J. Hasil npm run typecheck.
+
+K. Hasil npm run build.
+
+L. Apakah membutuhkan Prisma migration.
+
+M. Remaining work/future.
+
+N. Git status.
+
+Berhenti setelah laporan.
+
+Jangan commit atau push sampai saya memberikan instruksi berikutnya.
 
 ```
 # Prompt — Commit & Push
