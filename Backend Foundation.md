@@ -47,10 +47,399 @@
 
 
 ```
-# 
+# Prompt: Final VPS Migration Documentation
 ```
 
+Prompt: Final VPS Migration Documentation
 
+Project: /root/toko-online
+
+KONDISI TERAKHIR:
+
+Final audit sudah selesai.
+
+Hasil:
+- Working tree bersih.
+- Branch main sinkron dengan origin/main.
+- Tidak ada perubahan file setelah audit.
+- Typecheck PASS.
+- Build PASS.
+- git diff --check PASS.
+- Tidak ada secret/API key/credential production yang ter-track.
+- Tidak ada migration baru.
+- Tidak ada reset/drop database.
+- Production payment tetap OFF.
+- Tidak ada perubahan Cloudflare/DNS/port.
+- VPS saat ini hanya digunakan untuk development/testing.
+
+Project akan dipindahkan ke VPS baru setelah coding selesai.
+
+TUJUAN:
+
+Siapkan dokumentasi migrasi dan deployment VPS yang lengkap di README.md/root documentation yang sudah ada.
+
+Jangan membuat README kedua jika README.md sudah tersedia.
+
+Jangan mengubah kode aplikasi kecuali ditemukan dokumentasi command yang salah dan harus dikoreksi.
+
+==================================================
+1. AUDIT README EXISTING
+==================================================
+
+Baca README.md yang sekarang.
+
+Jangan menghapus informasi existing yang masih valid.
+
+Jika README hampir kosong, lengkapi secara terstruktur.
+
+Gunakan satu README.md utama.
+
+==================================================
+2. PROJECT OVERVIEW
+==================================================
+
+Dokumentasikan:
+
+- nama project
+- stack
+- Next.js
+- TypeScript
+- Prisma
+- PostgreSQL
+- frontend/backend architecture
+- payment integration status
+- development vs production environment.
+
+Jangan memasukkan secret.
+
+==================================================
+3. REQUIREMENTS VPS BARU
+==================================================
+
+Dokumentasikan requirement:
+
+- Ubuntu/Linux yang sesuai
+- Node.js version yang benar berdasarkan package.json/lockfile
+- npm/package manager
+- Git
+- PostgreSQL
+- process manager jika memang diperlukan
+- Cloudflare Tunnel/reverse proxy jika memang digunakan.
+
+Jangan mengarang versi.
+
+Ambil versi dari:
+
+package.json
+lockfile
+engines
+config project.
+
+==================================================
+4. CLONE PROJECT
+==================================================
+
+Dokumentasikan langkah:
+
+git clone
+cd toko-online
+
+Gunakan repository URL yang benar berdasarkan git remote existing.
+
+Jangan memasukkan credential/token ke README.
+
+==================================================
+5. INSTALL DEPENDENCIES
+==================================================
+
+Dokumentasikan command install yang benar berdasarkan lockfile.
+
+Prioritaskan reproducible install.
+
+Jika package-lock.json tersedia, gunakan npm ci.
+
+Jika tidak tersedia, gunakan command yang sesuai.
+
+==================================================
+6. ENVIRONMENT
+==================================================
+
+Dokumentasikan environment variables yang dibutuhkan.
+
+Gunakan placeholder saja.
+
+Contoh:
+
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE"
+
+Jangan pernah memasukkan nilai asli.
+
+Pisahkan:
+
+Development
+Staging/Sandbox
+Production
+
+Jika variable tertentu hanya diperlukan production, tandai dengan jelas.
+
+==================================================
+7. DATABASE / PRISMA
+==================================================
+
+Dokumentasikan proses database VPS baru.
+
+PENTING:
+
+Jangan menggunakan:
+
+prisma migrate reset
+
+Jangan drop database.
+
+Untuk deployment database existing gunakan migration deployment yang aman.
+
+Dokumentasikan:
+
+- install PostgreSQL
+- create database/user jika memang diperlukan
+- set DATABASE_URL
+- prisma generate
+- prisma migrate deploy
+- verification Prisma.
+
+Jelaskan bahwa migration existing harus digunakan sebagai sumber schema database.
+
+Jangan membuat migration baru.
+
+==================================================
+8. BUILD
+==================================================
+
+Dokumentasikan:
+
+npm run typecheck
+npm run build
+
+Jika package.json memiliki script khusus, gunakan script existing.
+
+Jangan mengarang command.
+
+==================================================
+9. START PRODUCTION
+==================================================
+
+Audit package.json untuk memastikan command production yang benar.
+
+Dokumentasikan command yang benar untuk menjalankan aplikasi production.
+
+Pastikan dokumentasi sesuai dengan arsitektur Next.js saat ini.
+
+Jangan mengubah next.config hanya demi dokumentasi.
+
+Jika aplikasi menggunakan:
+
+npm run start
+
+dokumentasikan.
+
+Jika menggunakan command lain, dokumentasikan command tersebut.
+
+==================================================
+10. PROCESS MANAGER
+==================================================
+
+Periksa apakah project membutuhkan:
+
+systemd
+PM2
+Docker
+atau process manager lain.
+
+Jangan menambahkan dependency baru hanya untuk dokumentasi.
+
+Jika systemd/PM2 memang diperlukan untuk production, dokumentasikan contoh konfigurasi tanpa secret.
+
+==================================================
+11. CLOUDFLARE / DOMAIN
+==================================================
+
+Dokumentasikan secara konseptual:
+
+Domain
+→ Cloudflare
+→ Tunnel/reverse proxy
+→ VPS
+→ Next.js application
+
+Jangan mengubah DNS.
+
+Jangan mengubah Cloudflare Tunnel.
+
+Jangan mengubah port pada VPS development.
+
+Gunakan nilai placeholder jika port/domain belum seharusnya ditulis permanen.
+
+==================================================
+12. PAYMENT
+==================================================
+
+Dokumentasikan dengan sangat jelas:
+
+PRODUCTION PAYMENT = OFF selama development.
+
+Untuk VPS baru:
+
+- gunakan sandbox/mock
+- jangan masukkan production credentials sebelum siap
+- jangan melakukan transaksi nyata saat setup
+- webhook production belum diaktifkan.
+
+Dokumentasikan requirement activation production secara umum saja.
+
+Jangan memasukkan secret.
+
+==================================================
+13. SECURITY CHECKLIST
+==================================================
+
+Tambahkan checklist:
+
+- .env tidak di-commit
+- DATABASE_URL tidak di Git
+- payment secret tidak di Git
+- production credential tidak di Git
+- SSH key aman
+- PostgreSQL tidak dibuka public jika tidak diperlukan
+- firewall
+- Cloudflare/reverse proxy
+- application runs as non-root jika memungkinkan.
+
+Jangan mengubah VPS sekarang.
+
+==================================================
+14. BACKUP / ROLLBACK
+==================================================
+
+Dokumentasikan:
+
+- backup database sebelum migration production
+- backup environment configuration secara aman
+- Git commit sebagai rollback point
+- cara rollback aplikasi melalui Git.
+
+Jangan menyimpan backup secret ke repository.
+
+==================================================
+15. MIGRATION CHECKLIST
+==================================================
+
+Buat checklist yang bisa diikuti saat pindah VPS:
+
+[ ] Provision VPS
+[ ] Install required runtime
+[ ] Clone repository
+[ ] Configure environment
+[ ] Install dependencies
+[ ] Configure PostgreSQL
+[ ] Set DATABASE_URL
+[ ] npm run typecheck
+[ ] prisma generate
+[ ] prisma migrate deploy
+[ ] npm run build
+[ ] Start application
+[ ] Health check
+[ ] Verify products
+[ ] Verify checkout
+[ ] Verify order
+[ ] Verify invoice
+[ ] Verify payment sandbox
+[ ] Configure reverse proxy/Cloudflare
+[ ] Final security check
+[ ] Enable production payment only when explicitly ready
+
+==================================================
+16. TROUBLESHOOTING
+==================================================
+
+Tambahkan troubleshooting singkat untuk:
+
+- DATABASE_URL missing
+- Prisma connection failure
+- prisma generate failure
+- migration failure
+- build failure
+- port already in use
+- application not starting
+- Cloudflare cannot reach origin.
+
+Jangan memberikan perintah destructive sebagai solusi default.
+
+==================================================
+17. KNOWN REMAINING WORK
+==================================================
+
+Dokumentasikan remaining work yang memang ditemukan audit:
+
+- Full JWT auth Phase 27 masih TODO/out of current scope.
+- Production payment activation belum dilakukan.
+- Production credentials belum dikonfigurasi.
+- Real payment transaction belum dilakukan.
+- Production VPS deployment belum dilakukan.
+
+Jangan membuat seolah-olah fitur tersebut sudah selesai.
+
+==================================================
+18. IMPORTANT RULE
+==================================================
+
+Jangan:
+
+- mengubah database
+- membuat migration
+- menghapus migration
+- reset database
+- mengubah Cloudflare
+- mengubah DNS
+- mengubah port
+- mengaktifkan production payment
+- memasukkan secret
+- membuat fitur baru
+- membuat README kedua.
+
+Setelah README selesai:
+
+Jalankan:
+
+git diff --check
+git status --short
+git diff --stat
+
+Jangan commit.
+Jangan push.
+
+Jika hanya README.md yang berubah, tampilkan perubahan tersebut.
+
+==================================================
+FINAL REPORT
+==================================================
+
+Laporkan:
+
+1. README diperbarui atau tidak.
+2. Section yang ditambahkan.
+3. Command deployment yang didokumentasikan.
+4. Requirement VPS baru.
+5. Database/Prisma deployment procedure.
+6. Environment variables yang diperlukan tanpa secret.
+7. Payment production status.
+8. Remaining work.
+9. git diff --check.
+10. git status.
+11. File yang berubah.
+
+BERHENTI setelah laporan.
+
+Jangan commit/push.
 
 ```
 # Prompt: Final Production Readiness Audit
