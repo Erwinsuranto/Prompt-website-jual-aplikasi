@@ -53,10 +53,454 @@
 
 
 ```
-# 
+# Prompt: Final Production Readiness Audit
 ```
 
+Prompt: Final Production Readiness Audit — Toko Online
 
+Project: /root/toko-online
+Branch: main
+
+KONDISI:
+
+Tahap checkout/order hardening sudah selesai.
+
+Commit dan push terakhir SUDAH BERHASIL.
+Working tree bersih.
+Tidak ada migration baru.
+Tidak ada perubahan Cloudflare/DNS/port.
+Production payment masih OFF.
+VPS ini hanya digunakan untuk development/testing.
+
+SEKARANG LAKUKAN FINAL AUDIT PROJECT SEBELUM PROJECT DIPINDAHKAN KE VPS BARU.
+
+PENTING:
+Ini AUDIT dan perbaikan kecil hanya jika benar-benar diperlukan.
+Jangan menambahkan fitur baru.
+Jangan redesign UI.
+Jangan mengubah arsitektur besar.
+Jangan melakukan deployment production dari VPS ini.
+
+==================================================
+1. GIT / REPOSITORY AUDIT
+==================================================
+
+Periksa:
+
+git status --short
+git branch -vv
+git log -5 --oneline
+git remote -v
+git diff --check
+
+Pastikan:
+
+- working tree clean
+- branch main sinkron dengan origin/main
+- tidak ada uncommitted change
+- tidak ada conflict marker
+- tidak ada secret
+- tidak ada API key
+- tidak ada credential production
+- tidak ada .env tracked
+- tidak ada node_modules tracked
+- tidak ada build artifact yang salah tracked
+- tidak ada temporary file.
+
+Jangan melakukan force push.
+
+==================================================
+2. PROJECT STRUCTURE AUDIT
+==================================================
+
+Audit struktur project secara menyeluruh.
+
+Cari:
+
+- frontend
+- backend/server
+- Prisma
+- database
+- authentication
+- product
+- category
+- order
+- checkout
+- payment
+- webhook
+- notification
+- invoice
+- admin
+- repository/service layer
+- environment configuration.
+
+Pastikan tidak ada duplicate implementation yang tidak diperlukan.
+
+Jangan menghapus file hanya karena terlihat tidak digunakan sebelum memastikan semua import/reference.
+
+==================================================
+3. DATABASE / PRISMA AUDIT
+==================================================
+
+Periksa:
+
+- prisma/schema.prisma
+- prisma/migrations
+- Prisma client
+- repository/service database layer
+- DATABASE_URL usage.
+
+Pastikan:
+
+- Prisma schema valid.
+- Migration existing tetap utuh.
+- Tidak ada migration yang hilang.
+- Tidak ada prisma migrate reset.
+- Tidak ada database drop.
+- Tidak ada database destructive operation.
+- Tidak ada mock database yang menggantikan database production.
+
+Jalankan hanya validasi yang aman.
+
+Jika DATABASE_URL tidak tersedia di VPS development, jangan membuat database palsu hanya untuk menghilangkan error.
+
+==================================================
+4. API / SERVER AUDIT
+==================================================
+
+Audit endpoint yang digunakan frontend.
+
+Minimal periksa:
+
+- products
+- product detail
+- categories
+- checkout
+- order
+- invoice
+- payment
+- payment webhook
+- authentication
+- admin endpoint.
+
+Pastikan:
+
+- public endpoint hanya membuka data yang memang public.
+- endpoint customer/admin terlindungi.
+- order ownership diperiksa server-side.
+- price dihitung server-side.
+- stock diperiksa server-side.
+- quantity divalidasi server-side.
+- payment status tidak dapat dipalsukan frontend.
+
+Jangan membuat endpoint dummy.
+
+==================================================
+5. CHECKOUT AUDIT
+==================================================
+
+Pastikan flow:
+
+Product
+→ Checkout
+→ Validation
+→ Stock validation
+→ Order
+→ Payment session
+→ Payment status
+→ Invoice/order status
+
+tetap konsisten.
+
+Periksa:
+
+- inactive product
+- invalid product
+- quantity
+- stock
+- price tampering
+- total tampering
+- duplicate checkout
+- retry
+- timeout.
+
+Jangan membuat checkout system baru.
+
+==================================================
+6. ORDER LIFECYCLE AUDIT
+==================================================
+
+Periksa status:
+
+PENDING
+PAID
+FAILED
+EXPIRED
+CANCELLED
+
+Pastikan status transition aman.
+
+Tidak boleh terjadi regression seperti:
+
+PAID → PENDING
+
+PAID → FAILED
+
+PAID → EXPIRED
+
+Pastikan expiry/failure/cancel tidak menyebabkan:
+
+- duplicate restock
+- duplicate notification
+- duplicate payment update
+- duplicate order processing.
+
+Pastikan mekanisme idempotency existing tetap digunakan.
+
+==================================================
+7. PAYMENT AUDIT
+==================================================
+
+Production payment HARUS tetap OFF.
+
+Jangan:
+
+- memasukkan production credential
+- melakukan transaksi nyata
+- melakukan refund nyata
+- melakukan cancel nyata
+- mengaktifkan production provider.
+
+Audit saja:
+
+- payment session
+- redirect
+- status polling
+- webhook
+- signature validation
+- idempotency
+- retry handling.
+
+Pastikan webhook tidak dapat dipanggil melalui path lain untuk melewati protection.
+
+==================================================
+8. FRONTEND AUDIT
+==================================================
+
+Periksa:
+
+- product listing
+- product detail
+- checkout
+- invoice
+- order list
+- order detail
+- payment status.
+
+Pastikan tidak ada:
+
+- mock product
+- mock order
+- hardcoded payment status
+- hardcoded price
+- hardcoded stock
+- fake success state.
+
+Frontend harus menggunakan server/database untuk data dinamis.
+
+Jangan mengubah desain UI.
+
+==================================================
+9. AUTHORIZATION / SECURITY AUDIT
+==================================================
+
+Audit:
+
+- authentication
+- authorization
+- customer ownership
+- admin access
+- order access
+- invoice access
+- payment access.
+
+Tes minimal:
+
+User A tidak boleh membaca order User B.
+
+Customer tidak boleh mengakses endpoint admin.
+
+Client tidak boleh menentukan final price.
+
+Client tidak boleh menentukan payment success.
+
+Client tidak boleh menentukan stock.
+
+Jika authentication masih memiliki bagian TODO yang memang berada di luar scope project saat ini, jangan membuat sistem auth baru. Dokumentasikan.
+
+==================================================
+10. ENVIRONMENT AUDIT
+==================================================
+
+Periksa:
+
+- .env.example
+- environment variable references
+- README/documentation.
+
+Pastikan variable yang diperlukan terdokumentasi tanpa nilai secret.
+
+Contoh:
+
+DATABASE_URL=...
+PAYMENT_PROVIDER_KEY=...
+PAYMENT_WEBHOOK_SECRET=...
+
+Jangan memasukkan nilai asli.
+
+Pastikan tidak ada secret tertulis di source code.
+
+==================================================
+11. BUILD / TYPECHECK
+==================================================
+
+Jalankan:
+
+npm run typecheck
+npm run build
+
+Jika keduanya PASS, jangan melakukan perubahan hanya untuk alasan kosmetik.
+
+Jika gagal:
+
+- identifikasi error sebenarnya
+- perbaiki hanya jika error berasal dari project
+- jalankan ulang verification.
+
+Jangan melakukan migration reset.
+
+==================================================
+12. PRODUCTION START VALIDATION
+==================================================
+
+Karena project akan dipindahkan ke VPS baru, periksa apakah aplikasi memang membutuhkan:
+
+npm run start
+
+atau command production lain sesuai package.json.
+
+Jangan mengubah Cloudflare/DNS/port pada VPS ini.
+
+Jika start membutuhkan DATABASE_URL atau service eksternal yang memang belum tersedia di VPS development, dokumentasikan requirement tersebut.
+
+Jangan membuat workaround palsu.
+
+==================================================
+13. VPS MIGRATION CHECKLIST
+==================================================
+
+Buat laporan khusus untuk VPS baru:
+
+A. Runtime:
+- Node.js version
+- npm version
+- package manager
+- required system packages.
+
+B. Application:
+- install dependencies
+- environment variables
+- build command
+- start command.
+
+C. Database:
+- PostgreSQL requirement
+- DATABASE_URL
+- migration deployment command yang aman.
+
+D. Payment:
+- sandbox/mock configuration
+- production activation requirement.
+
+E. Cloudflare:
+- domain
+- DNS
+- tunnel
+- port
+- reverse proxy.
+
+JANGAN mengubah konfigurasi tersebut sekarang.
+
+Hanya dokumentasikan apa yang nanti harus dilakukan di VPS baru.
+
+==================================================
+14. README
+==================================================
+
+Jika README sudah ada, jangan membuat README baru.
+
+Tambahkan hanya informasi migration/deployment yang benar-benar diperlukan jika memang belum terdokumentasi.
+
+Jika README sudah cukup lengkap, jangan mengubahnya.
+
+==================================================
+15. FINAL VERIFICATION
+==================================================
+
+Setelah audit/perbaikan kecil selesai:
+
+git status --short
+
+git diff --check
+
+git diff --stat
+
+Jika ada perubahan:
+
+JANGAN commit/push.
+
+Berhenti dan laporkan perubahan agar bisa saya review.
+
+Jika tidak ada perubahan:
+
+working tree harus tetap clean.
+
+==================================================
+FINAL REPORT
+==================================================
+
+Berikan laporan dengan format:
+
+1. Repository status
+2. Commit terakhir
+3. Branch status
+4. Prisma/database status
+5. API/server status
+6. Checkout status
+7. Order lifecycle status
+8. Payment status
+9. Authentication/authorization status
+10. Frontend status
+11. Security status
+12. Typecheck result
+13. Build result
+14. Production start readiness
+15. VPS migration requirements
+16. Remaining issues
+17. Apakah ada perubahan file
+18. Apakah perlu commit baru
+
+PENTING:
+
+Jangan commit.
+Jangan push.
+Jangan migration.
+Jangan reset database.
+Jangan mengaktifkan production payment.
+Jangan mengubah Cloudflare/DNS/port.
+Jangan membuat fitur baru.
+
+Berhenti setelah final report.
 
 ```
 # Prompt: Commit & Push Final Checkout Hardening
