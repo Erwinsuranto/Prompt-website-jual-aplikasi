@@ -158,7 +158,87 @@
 # 
 ```
 
+Prompt: Audit Semua Interaksi UI
 
+Project: /root/toko-online
+
+Lanjut dari commit terbaru. Jangan mengulang pekerjaan yang sudah PASS.
+
+Tujuan:
+Audit semua tombol, navigasi, search, filter, dark mode, hamburger menu, bottom navigation, dan checkout agar benar-benar berfungsi.
+
+Periksa:
+1. Bottom navigation:
+   - Beranda
+   - Kategori
+   - Pesanan
+   - Favorit
+   - Akun
+
+2. Header:
+   - Hamburger menu
+   - Dark mode
+   - Search
+   - Filter
+
+3. Search:
+   - input search
+   - submit/search action
+   - query URL
+   - empty result state
+
+4. Kategori:
+   - daftar kategori
+   - klik kategori
+   - empty state ketika database kosong
+
+5. Produk:
+   - klik produk
+   - detail produk
+   - tombol beli
+   - tambah ke cart
+   - quantity/cart interaction
+
+6. Checkout:
+   - validasi form
+   - payment method
+   - submit/order flow
+   - login-gated route jika memang diperlukan
+
+7. Pesanan/Favorit/Akun:
+   - pastikan redirect/login-gate benar
+   - jangan membuat mock user/data
+
+8. Responsive:
+   - pastikan tidak ada tombol yang keluar layar
+   - mobile layout tetap benar
+
+Peraturan:
+- Jangan redesign UI.
+- Jangan membuat mock data.
+- Jangan mengubah schema/migration.
+- Jangan reset database.
+- Jangan memasukkan credential production.
+- Perbaiki hanya bug interaksi yang benar-benar ditemukan.
+- Jika database kosong, anggap empty state sebagai kondisi valid, bukan bug.
+
+Verifikasi:
+- npm run typecheck
+- npm run build
+- jalankan production server
+- cek route utama HTTP
+- git diff --check
+- git status --short
+
+Jika ada perubahan kode dan semua verifikasi PASS:
+- git add perubahan
+- git commit -m "fix(ui): audit interactive navigation and controls"
+- git push origin main
+- verifikasi git status dan git log -1 --oneline
+
+Jangan force push.
+Karena VPS berisiko mati, setelah semua PASS langsung commit dan push.
+Laporkan hanya bug yang ditemukan, file yang diubah, hasil verifikasi, commit hash, dan status push.
 
 ```
 # Prompt berikutnya — Fix UI & Runtime Data
