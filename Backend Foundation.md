@@ -65,10 +65,68 @@
 
 
 ```
-# 
+# Prompt: Phase 35 — Add 1 Test Product
 ```
 
+Prompt: Phase 35 — Add One Test Product for Admin CRUD
 
+Project: Digital Cell / toko-online
+
+Kondisi:
+- Admin Panel sudah terimplementasi dan terverifikasi.
+- Development mode sedang digunakan untuk testing.
+- Jangan ubah desain UI.
+- Jangan ubah schema/migration.
+- Jangan aktifkan payment production.
+
+Tugas:
+
+1. Gunakan database development yang sedang dipakai project.
+2. Tambahkan tepat 1 produk test melalui mekanisme database/service yang memang digunakan aplikasi, bukan hardcode/mock di frontend.
+
+Data produk:
+- Nama: Netflix Premium Test
+- Slug: netflix-premium-test
+- Kategori: gunakan kategori Streaming yang sudah ada.
+- Harga: 65000
+- Stok: 50
+- Status: aktif
+- Deskripsi: Produk test untuk verifikasi CRUD Admin Panel.
+
+3. Jika kategori Streaming belum ada, gunakan kategori existing yang paling sesuai. Jangan membuat perubahan schema.
+4. Pastikan produk benar-benar tersimpan di database dan muncul di:
+   - /products
+   - /category/[slug]
+   - /admin/products
+5. Jangan membuat produk duplikat jika produk dengan slug tersebut sudah ada.
+6. Setelah data tersedia, verifikasi Admin CRUD:
+   - produk tampil
+   - edit nama/harga/stok
+   - simpan perubahan
+   - refresh tetap tersimpan
+   - jangan hapus produk test sebelum verifikasi selesai.
+7. Jalankan:
+   - npm run typecheck
+   - npm run build
+   - development server
+   - smoke test produk dan admin
+   - git diff --check
+   - git status --short
+8. Jika hanya terjadi perubahan data development dan tidak ada perubahan kode:
+   - jangan membuat empty commit.
+   - jangan push perubahan kode yang tidak diperlukan.
+9. Jika perlu membuat seed/script kecil agar data test reproducible, buat secara modular dan aman, lalu commit + push tanpa force.
+10. Jangan menyentuh Midtrans/payment production.
+
+Laporan akhir:
+- Produk berhasil dibuat atau sudah ada.
+- ID/slug produk.
+- Harga dan stok.
+- Verifikasi halaman customer.
+- Verifikasi Admin CRUD.
+- typecheck/build status.
+- apakah ada perubahan kode.
+- commit/push hanya jika memang ada perubahan kode.
 
 ```
 # Prompt berikutnya — Phase 34: Admin Panel Dev Verification
