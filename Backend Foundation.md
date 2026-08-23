@@ -137,10 +137,73 @@
 
 
 ```
-# 
+# Prompt: Payment Flow
 ```
 
+Project: /root/toko-online
 
+Lanjut dari kondisi repository terbaru. Cart → Checkout → Order sudah PASS.
+Jangan mengulang atau merombak bagian yang sudah PASS.
+
+Fokus:
+Payment Session → Checkout Payment → Redirect → Webhook → Order Status.
+
+Tugas:
+1. Audit payment-service dan seluruh payment flow existing.
+2. Pastikan order yang sudah dibuat dapat memiliki payment session yang valid.
+3. Implementasikan payment flow menggunakan mekanisme sandbox/mock yang sudah tersedia.
+4. Payment method yang didukung harus mengikuti backend/UI existing.
+5. Pastikan payment session terhubung ke order yang benar.
+6. Implementasikan redirect/payment callback sesuai arsitektur existing.
+7. Implementasikan webhook verification secara aman:
+   - validasi signature/token sesuai mekanisme existing
+   - idempotent
+   - webhook yang sama tidak boleh memproses order dua kali
+   - webhook invalid harus ditolak
+8. Pastikan status order berubah secara konsisten:
+   pending → paid/failed/expired sesuai hasil payment.
+9. Jangan mengurangi stok dua kali akibat webhook duplikat.
+10. Pastikan payment failure/expiry tidak merusak order.
+11. Pastikan payment status dapat ditampilkan di halaman Pesanan.
+12. Tambahkan test untuk:
+   - payment success
+   - payment failure
+   - expired payment
+   - duplicate webhook
+   - invalid webhook
+   - webhook untuk order yang tidak ditemukan
+13. Jangan menggunakan credential/payment provider production.
+14. Jangan melakukan transaksi uang nyata.
+15. Jangan mengaktifkan production payment.
+16. Jangan mengubah schema/migration kecuali benar-benar diperlukan.
+17. Jangan reset database.
+18. Jangan redesign UI.
+
+Verifikasi:
+- npm run typecheck
+- npm run build
+- production server
+- test payment session
+- test success/failure/expired
+- test duplicate webhook
+- test invalid webhook
+- verifikasi order status dan stok
+- git diff --check
+- git status --short
+
+Jika semua PASS:
+- git add perubahan
+- git commit -m "feat(payment): complete sandbox payment flow"
+- git push origin main
+- git status --short
+- git log -1 --oneline
+- pastikan main sinkron dengan origin/main
+
+Jangan force push.
+
+Jika tidak ada perubahan yang diperlukan, jangan membuat empty commit.
+Jika ada blocker, jangan commit perubahan rusak; laporkan blocker dan penyebabnya.
+Karena VPS berisiko mati, setelah seluruh verifikasi PASS langsung commit dan push.
 
 ```
 # Prompt: Cart → Checkout → Order Flow
