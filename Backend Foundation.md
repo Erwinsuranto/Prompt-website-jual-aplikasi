@@ -119,10 +119,359 @@
 
 
 ```
-# 
+# Prompt: Phase 29 — Admin Panel & Dashboard
 ```
 
+## Phase 29 — Admin Panel & Dashboard
 
+Project: Digital Cell / toko-online
+Direktori: /root/toko-online
+
+Lanjutkan dari kondisi repository SAAT INI.
+
+PENTING:
+- Phase 27 Full JWT Authentication sudah PASS.
+- Phase 28 Customer Account & Order Flow sudah PASS.
+- Jangan mengulang pekerjaan JWT/customer flow yang sudah benar.
+- Sekarang fokus khusus ADMIN PANEL.
+- Jangan mengaktifkan production payment.
+- Jangan membuat migration/schema baru kecuali benar-benar diperlukan.
+- Jangan reset database.
+- Jangan redesign halaman customer.
+- Jangan force push.
+- Karena VPS bisa mati, setelah implementasi dan seluruh verifikasi PASS langsung commit + push.
+
+==================================================
+1. AUDIT ADMIN YANG SUDAH ADA
+==================================================
+
+Audit terlebih dahulu:
+- role/authentication admin yang sudah tersedia
+- route `/admin`
+- middleware/protection admin
+- API yang berhubungan dengan admin
+- service product/category/order/user yang sudah tersedia
+- komponen UI existing yang bisa digunakan kembali
+
+Jangan membuat duplikasi service/API jika sudah tersedia.
+
+Jika admin route sudah ada tetapi belum lengkap, lanjutkan dari implementasi existing.
+
+==================================================
+2. ADMIN ROUTING & SECURITY
+==================================================
+
+Buat/rapikan struktur Admin Panel secara modular.
+
+Minimal:
+- `/admin`
+- `/admin/dashboard`
+- `/admin/products`
+- `/admin/categories`
+- `/admin/orders`
+
+Semua halaman admin wajib:
+- membutuhkan authentication
+- membutuhkan role `admin`
+- customer biasa tidak boleh masuk
+- unauthorized user diarahkan/ditolak dengan benar
+- jangan hanya mengandalkan pengecekan UI; protection harus server-side
+
+Jangan memberikan akses admin hanya karena URL diketahui.
+
+==================================================
+3. ADMIN UI DESIGN
+==================================================
+
+Buat desain Admin Panel yang konsisten dengan branding Digital Cell, tetapi berbeda jelas dari customer UI.
+
+Desain:
+- clean
+- modern
+- profesional
+- responsive
+- desktop-first tetapi tetap nyaman di mobile
+- warna utama tetap mengikuti Digital Cell
+- sidebar desktop
+- mobile navigation/drawer
+- topbar
+- breadcrumb/page title bila diperlukan
+- card statistik
+- table/list yang rapi
+- loading state
+- empty state
+- error state
+
+Jangan melakukan redesign pada halaman customer.
+
+Gunakan komponen reusable agar halaman admin berikutnya mudah ditambahkan.
+
+==================================================
+4. ADMIN DASHBOARD
+==================================================
+
+Dashboard minimal menampilkan data nyata dari backend/database jika datanya tersedia:
+
+- total products
+- total categories
+- total orders
+- total users
+- recent orders
+- ringkasan order berdasarkan status jika service/schema sudah mendukung
+
+Jangan menggunakan angka dummy jika data backend tersedia.
+
+Jika database kosong:
+- tampilkan 0
+- gunakan empty state yang jelas
+- jangan membuat fake transaction.
+
+Dashboard harus aman jika sebagian data belum tersedia.
+
+==================================================
+5. PRODUCT MANAGEMENT
+==================================================
+
+Buat halaman `/admin/products`.
+
+Minimal:
+- daftar produk
+- nama produk
+- kategori
+- harga
+- stok
+- status aktif/nonaktif
+- aksi edit/delete jika backend memang sudah mendukung
+
+Tambahkan:
+- tombol tambah produk
+- form tambah/edit yang rapi
+- validasi input
+- error handling
+- loading state
+
+Gunakan API/service/database existing.
+
+Jangan membuat CRUD palsu yang hanya mengubah state frontend.
+
+Jika endpoint CRUD tertentu belum ada, implementasikan server-side secara modular dan aman.
+
+Pastikan customer tidak dapat menggunakan endpoint admin tersebut.
+
+==================================================
+6. CATEGORY MANAGEMENT
+==================================================
+
+Buat `/admin/categories`.
+
+Minimal:
+- daftar kategori
+- nama
+- slug jika digunakan
+- status
+- tambah
+- edit
+- hapus jika aman sesuai relasi database
+
+Jangan menghapus kategori secara destruktif jika masih memiliki produk tanpa menangani relasinya dengan benar.
+
+Gunakan database nyata.
+
+==================================================
+7. ORDER MANAGEMENT
+==================================================
+
+Buat `/admin/orders`.
+
+Minimal:
+- daftar order
+- order ID
+- customer
+- total
+- status
+- tanggal
+- detail order
+
+Admin dapat melihat order customer.
+
+Jangan mengubah flow payment production.
+
+Jika perubahan status order belum diperlukan oleh roadmap saat ini, cukup buat read-only terlebih dahulu daripada membuat logic yang belum aman.
+
+==================================================
+8. USER / ROLE
+==================================================
+
+Jangan membuat halaman user management penuh dulu jika belum diperlukan roadmap.
+
+Tetapi pastikan:
+- role admin tersimpan/terbaca dengan benar
+- customer tidak bisa elevate role sendiri
+- API admin memvalidasi role server-side
+
+Jangan membuat endpoint yang memungkinkan customer mengubah role menjadi admin.
+
+==================================================
+9. API & SECURITY
+==================================================
+
+Audit seluruh endpoint admin.
+
+Pastikan:
+- authentication diverifikasi server-side
+- role admin diverifikasi server-side
+- input divalidasi
+- jangan expose password/hash/secret
+- jangan expose DATABASE_URL
+- jangan expose credential payment
+- jangan menerima `userId` dari client sebagai sumber utama ownership jika bisa diambil dari session
+- jangan percaya harga/total dari client untuk operasi sensitif
+
+Jangan merusak endpoint customer yang sudah PASS.
+
+==================================================
+10. RESPONSIVE UI
+==================================================
+
+Verifikasi minimal:
+- desktop
+- mobile sekitar 390px width
+
+Pastikan:
+- sidebar tidak merusak layout mobile
+- table tidak menyebabkan halaman rusak
+- form mudah digunakan
+- tombol tidak keluar layar
+- navigation admin tetap dapat digunakan
+
+Jangan menggunakan browser automation jika environment VPS tidak mendukungnya.
+Gunakan HTTP/render verification dan pemeriksaan source bila perlu.
+
+==================================================
+11. DATABASE
+==================================================
+
+Gunakan Prisma/database existing.
+
+ATURAN KERAS:
+- jangan reset database
+- jangan drop database
+- jangan membuat migration hanya untuk kebutuhan UI
+- jangan mengganti database
+- jangan membuat mock database
+- jangan seed transaksi palsu
+
+Jika database belum memiliki data tertentu, tampilkan empty state.
+
+==================================================
+12. VERIFIKASI
+==================================================
+
+Jalankan:
+
+npm run typecheck
+npm run build
+
+Kemudian jalankan production server sesuai arsitektur project.
+
+Smoke test minimal:
+
+PUBLIC:
+- /
+- /categories
+- /products
+- /search
+
+CUSTOMER:
+- /profile
+- /orders
+- /checkout
+
+ADMIN:
+- /admin
+- /admin/dashboard
+- /admin/products
+- /admin/categories
+- /admin/orders
+
+Security test:
+- guest → admin harus ditolak/login
+- customer → admin harus ditolak
+- customer → admin API harus ditolak
+- admin → admin dashboard harus berhasil
+
+Pastikan tidak ada server-side exception.
+
+==================================================
+13. GIT
+==================================================
+
+Sebelum commit:
+
+git status --short
+git diff --check
+
+Pastikan tidak ada:
+- `.env`
+- secret
+- API key
+- password
+- DATABASE_URL
+- credential
+- build artifact
+- temporary file
+
+Jika semua PASS:
+
+git add <file yang memang berubah>
+git commit -m "feat(admin): add admin dashboard and management panel"
+git push origin main
+
+JANGAN force push.
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+git status -sb
+
+Pastikan branch sinkron dengan `origin/main`.
+
+==================================================
+14. HASIL AKHIR
+==================================================
+
+Laporkan:
+- struktur Admin Panel yang dibuat
+- halaman yang dibuat
+- API/service yang dibuat atau digunakan kembali
+- security/role protection
+- hasil typecheck
+- hasil build
+- hasil smoke test
+- responsive verification
+- commit hash
+- status push
+- status working tree
+
+Jika semua PASS, langsung commit dan push.
+
+Jika ada blocker nyata:
+- jangan commit kode rusak
+- jangan force push
+- jelaskan blocker secara jelas.
+
+BATASAN PHASE 29:
+- Admin Panel: YA
+- Admin Dashboard: YA
+- Product management: YA
+- Category management: YA
+- Order management: YA
+- Production payment: TIDAK
+- Payment gateway live: TIDAK
+- Cloudflare/DNS: TIDAK
+- Database reset: TIDAK
+- Customer redesign: TIDAK
 
 ```
 # Prompt: Phase 28 — Customer Account & Order Flow Finalization
