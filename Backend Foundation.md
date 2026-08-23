@@ -61,7 +61,66 @@
 ```
 # 
 ```
+Prompt: Phase 36 — Fix Mobile Responsive Product Detail
 
+Project: Digital Cell / toko-online
+
+Kondisi:
+- Backend, authentication, product CRUD, admin panel, dan customer flow sudah PASS.
+- Produk test sudah tersedia di development database.
+- Saat dibuka di mobile, halaman detail produk masih mengalami horizontal overflow.
+- Screenshot menunjukkan tombol "Beli Sekarang" terpotong di sisi kanan dan action bar terlalu lebar.
+- Jangan membuat desain baru.
+
+Tugas:
+
+1. Audit halaman detail produk /product/[slug] khusus viewport mobile.
+2. Perbaiki responsive layout agar:
+   - tidak ada horizontal scroll/overflow.
+   - seluruh konten berada dalam viewport.
+   - tombol "Tambah ke Keranjang" tidak melebar keluar layar.
+   - tombol "Beli Sekarang" selalu terlihat penuh.
+   - action bar responsif pada layar kecil.
+   - harga, badge, thumbnail, gambar utama, dan informasi produk tetap proporsional.
+   - sticky/fixed bottom navigation tidak menutupi tombol/action area.
+3. Gunakan CSS/Tailwind responsive yang sudah digunakan project.
+4. Jangan mengubah:
+   - database/schema
+   - API
+   - authentication
+   - payment
+   - cart logic
+   - admin logic
+   - desain desktop yang sudah benar
+5. Fokus hanya pada responsive behavior.
+6. Pastikan breakpoint mobile, tablet, dan desktop tetap valid.
+7. Jangan menggunakan hardcoded width yang menyebabkan overflow.
+8. Pastikan tombol action bisa:
+   - stack/resize pada mobile jika diperlukan
+   - tetap horizontal pada layar yang cukup lebar.
+9. Cari juga elemen lain di halaman detail yang menyebabkan `overflow-x`.
+
+Verifikasi wajib:
+- npm run typecheck
+- npm run build
+- jalankan development server
+- test viewport mobile sekitar 360px, 375px, 390px, 414px
+- test desktop
+- pastikan tidak ada horizontal overflow
+- pastikan tombol "Beli Sekarang" terlihat penuh
+- pastikan "Tambah ke Keranjang" tetap berfungsi
+- git diff --check
+- git status --short
+
+Jika semua PASS:
+- langsung commit perubahan.
+- langsung push ke origin main.
+- jangan force push.
+
+Commit:
+fix(ui): fix mobile product detail responsiveness
+
+Jangan mengubah fitur selain responsive UI.
 
 
 ```
