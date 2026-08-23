@@ -95,10 +95,157 @@
 
 
 ```
-# 
+# Prompt — Phase 33: Admin Panel Functional Audit
 ```
 
+## Phase 33 — Admin Panel Functional Audit
 
+Project: /root/toko-online
+
+Lanjutkan roadmap dari kondisi terakhir. Jangan mengulang fitur yang sudah PASS.
+
+STATUS:
+- Customer UI: PASS
+- Catalog/product/category: PASS
+- Cart: PASS
+- Checkout/order: PASS
+- JWT authentication: PASS
+- Authorization/authz: PASS
+- Admin Panel: sudah diimplementasikan
+- Prisma/backend: PASS
+- Payment integration: PASS
+- Midtrans production: BLOCKED hanya karena Server Key belum tersedia
+- Typecheck: PASS
+- Build: PASS
+- Production server: PASS
+- Git: sinkron dengan origin/main
+
+TUJUAN:
+Audit dan pastikan Admin Panel benar-benar usable menggunakan data backend nyata.
+
+JANGAN:
+- jangan membuat payment production aktif
+- jangan membutuhkan Midtrans credential
+- jangan mengubah schema/database
+- jangan reset database
+- jangan redesign customer UI
+- jangan menghapus fitur existing
+- jangan membuat mock data sebagai pengganti database
+- jangan force push
+
+AUDIT ADMIN PANEL:
+
+1. Admin Dashboard
+- dashboard hanya dapat diakses admin
+- customer/guest tidak boleh masuk
+- KPI tidak error ketika database kosong
+- angka 0 ditampilkan dengan benar ketika belum ada data
+- order/status breakdown tidak menghasilkan NaN/null/error
+- dashboard menggunakan data backend nyata
+
+2. Product Management
+- list produk tampil dari database
+- create product
+- edit product
+- delete product
+- validasi input
+- harga tersimpan benar
+- stok tersimpan benar
+- status aktif/nonaktif bekerja
+- produk yang dihapus tidak dapat diakses dari customer
+- error state dan empty state benar
+
+3. Category Management
+- list kategori dari database
+- create/edit/delete jika fitur memang sudah tersedia
+- slug/name tervalidasi
+- kategori kosong tidak menyebabkan error
+- customer catalog tetap normal setelah perubahan
+
+4. Order Management
+- admin dapat melihat order
+- order customer tampil dengan benar
+- order item dan total benar
+- status order ditampilkan benar
+- jangan menambahkan transaksi payment nyata
+- jangan mengubah payment provider
+
+5. User Management
+- admin dapat melihat user jika route/fitur memang sudah dibuat
+- passwordHash/credential tidak pernah ditampilkan
+- customer tidak dapat mengubah role dirinya sendiri
+- authorization tetap aman
+
+6. Admin Security
+Verifikasi:
+- guest -> admin = 401/redirect login
+- customer -> admin = 403 atau redirect yang sesuai
+- admin -> admin = 200
+- API admin harus tetap protected
+- tidak ada endpoint admin yang bocor ke customer
+
+7. UI Admin
+Jangan redesign besar.
+Hanya perbaiki bug fungsional:
+- tombol tidak bekerja
+- form tidak submit
+- link salah
+- loading state
+- error state
+- empty state
+- mobile overflow
+- route/navigation rusak
+- data tidak refresh setelah mutation
+
+8. Regression
+Jalankan:
+- npm run typecheck
+- npm run build
+- npm run start / production server
+- smoke test route customer
+- smoke test route admin
+- authorization test guest/customer/admin
+- git diff --check
+- git status --short
+
+Jika ada bug, perbaiki sampai PASS.
+
+GIT:
+Jika ada perubahan kode:
+- commit dengan message:
+  feat(admin): complete admin panel functional audit
+- git push origin main
+- jangan force push
+
+Jika tidak ada perubahan:
+- jangan membuat empty commit.
+
+Karena VPS berisiko mati:
+- setelah implementasi selesai
+- typecheck PASS
+- build PASS
+- production server PASS
+- langsung commit dan push
+- jangan berhenti hanya karena dokumentasi/laporan
+
+LAPORKAN:
+- Admin Dashboard
+- Product Management
+- Category Management
+- Order Management
+- User Management
+- Admin Security
+- UI/functionality
+- typecheck
+- build
+- production server
+- commit hash
+- push status
+- blocker yang tersisa
+
+Catatan:
+Satu-satunya blocker payment production tetap Midtrans Server Key.
+Jangan mencoba mengatasi blocker tersebut pada phase ini.
 
 ```
 # Prompt berikutnya — langsung kerjakan & push jika ada perubahan
