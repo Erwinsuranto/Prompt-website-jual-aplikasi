@@ -101,10 +101,135 @@
 
 
 ```
-# 
+# Prompt berikutnya — langsung kerjakan & push jika ada perubahan
 ```
 
+## Phase 32 — Final Customer Purchase Flow Audit
 
+Project: /root/toko-online
+
+Lanjutkan roadmap. Jangan mengulang pekerjaan yang sudah PASS.
+
+STATUS SAAT INI:
+- Prisma/backend: PASS
+- Customer catalog: PASS
+- Cart: PASS
+- JWT authentication: PASS
+- Orders: PASS
+- Admin Panel: PASS
+- Payment integration layer: PASS
+- Midtrans integration: production-ready, tetapi credential production belum tersedia
+- Typecheck: PASS
+- Build: PASS
+- Production server: PASS
+- Git clean dan sinkron dengan origin/main
+
+TUJUAN:
+Audit final seluruh alur customer sebelum masuk tahap production payment activation.
+
+Alur yang harus diverifikasi:
+
+Homepage
+→ Kategori
+→ Produk
+→ Detail Produk
+→ Tambah ke Keranjang
+→ Cart
+→ Checkout
+→ Login jika diperlukan
+→ Create Order
+→ Payment
+→ Order Status
+
+PERIKSA:
+
+1. Produk
+- harga berasal dari database/server
+- stok benar
+- produk nonaktif tidak dapat dibeli
+- produk tidak ditemukan menampilkan state yang benar
+
+2. Cart
+- tambah produk
+- ubah quantity jika memang didukung
+- hapus produk
+- total dihitung benar
+- cart tidak boleh memanipulasi harga server
+
+3. Checkout
+- user wajib login
+- order menggunakan data server-side
+- stok divalidasi ulang saat create order
+- total order dihitung ulang di server
+- tidak bisa membeli melebihi stok
+- tidak bisa memanipulasi productId/harga/total melalui request
+
+4. Order
+- order hanya milik user terkait
+- user lain tidak dapat melihat order
+- order berhasil dibuat
+- order gagal tidak meninggalkan data yang rusak
+- status order/payment konsisten
+
+5. Payment
+- jangan melakukan transaksi uang nyata
+- jangan membutuhkan credential production untuk test
+- jangan mengubah integration layer yang sudah PASS
+- pastikan checkout siap menerima payment reference/status dari provider
+
+6. UI
+Jangan redesign.
+Hanya perbaiki jika ada:
+- tombol yang tidak bekerja
+- link salah
+- loading/error state rusak
+- halaman blank
+- data tidak tampil
+- mobile overflow
+- route salah
+
+7. Regression test
+Jalankan:
+- npm run typecheck
+- npm run build
+- production server
+- smoke test route customer utama
+
+Pastikan tidak ada:
+- server-side exception
+- 500
+- broken navigation
+- authentication regression
+- authorization regression
+
+8. Git
+Jika ADA perubahan kode:
+- git diff --check
+- git status --short
+- commit dengan message yang sesuai
+- git push origin main
+- jangan force push
+
+Jika TIDAK ADA perubahan:
+- jangan membuat empty commit.
+
+Setelah selesai laporkan:
+- customer flow status
+- cart status
+- checkout status
+- order status
+- payment handoff status
+- UI issues jika ada
+- typecheck
+- build
+- production server
+- commit/push status
+- blocker yang masih tersisa
+
+Jangan membuat admin panel baru.
+Jangan mengubah schema/database.
+Jangan mengubah payment provider.
+Jangan memasukkan credential production.
 
 ```
 # Prompt: Phase 31 — Production Payment Integration
