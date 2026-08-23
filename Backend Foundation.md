@@ -83,10 +83,145 @@
 
 
 ```
-# 
+# Phase 35 — Production Operations & Backup Readiness
 ```
 
+## Phase 35 — Production Operations & Backup Readiness
 
+Project: /root/toko-online
+
+Lanjutkan roadmap dari kondisi terakhir.
+
+STATUS:
+- Customer flow: PASS
+- Cart/Checkout/Order: PASS
+- JWT/Auth/Authz: PASS
+- Admin Panel: PASS
+- Payment integration: PASS
+- Security audit: PASS
+- Typecheck: PASS
+- Build: PASS
+- Production server: PASS
+- Payment tests: 103 PASS / 0 fail
+- Security tests: 25/25 PASS
+- Git clean dan sinkron origin/main
+- Midtrans production hanya menunggu Server Key
+
+TUJUAN:
+Pastikan project siap secara operasional untuk production tanpa mengaktifkan payment production.
+
+AUDIT:
+
+1. Database Safety
+- identifikasi database yang digunakan production
+- pastikan DATABASE_URL hanya berasal dari environment
+- jangan reset database
+- jangan menghapus migration
+- jangan mengubah schema jika tidak diperlukan
+- pastikan migration yang ada dapat digunakan untuk deployment baru
+
+2. Backup Readiness
+- audit apakah mekanisme backup database sudah tersedia
+- jika project sudah memiliki script backup, verifikasi script tersebut
+- jika belum ada, buat mekanisme backup sederhana yang aman dan terdokumentasi
+- backup harus tidak memasukkan credential ke Git
+- jangan menjalankan destructive restore/reset
+- jangan menghapus data production
+
+3. Recovery Readiness
+- dokumentasikan langkah restore database
+- dokumentasikan migration deploy
+- dokumentasikan cara menjalankan production server
+- dokumentasikan environment variable yang dibutuhkan TANPA menuliskan nilai secret
+
+4. Environment
+- .env tetap gitignored
+- .env.example hanya berisi nama variable, bukan secret
+- cek DATABASE_URL
+- SESSION/JWT secret
+- payment environment variables
+- pastikan tidak ada secret di source/client bundle
+
+5. Production Process
+- pastikan npm run build berhasil
+- pastikan npm run start berhasil
+- pastikan server dapat restart dengan benar
+- jangan mengubah port production yang sekarang
+- jangan mengubah Cloudflare/DNS
+- jangan mengaktifkan payment production
+
+6. Monitoring/Error
+- audit apakah error production menghasilkan log yang berguna
+- jangan membocorkan secret/password/database URL
+- pastikan server-side exception tidak ditampilkan ke client
+
+7. Documentation
+Jika README.md sudah ada, gunakan README.md yang sama.
+Jangan membuat README baru.
+
+Tambahkan hanya dokumentasi yang benar-benar diperlukan:
+- production setup
+- database migration
+- backup
+- restore
+- restart server
+- environment variables yang diperlukan
+
+Jangan menulis credential asli.
+
+8. Regression
+Jalankan:
+- npm run typecheck
+- npm run build
+- production server
+- smoke test public/customer/admin
+- git diff --check
+- git status --short
+
+Jika ada masalah:
+- perbaiki minimal
+- jangan redesign UI
+- jangan mengubah payment provider
+- jangan reset database
+
+GIT:
+Jika ADA perubahan:
+- git diff --check
+- git status --short
+- commit dengan message:
+  chore(ops): harden production backup and recovery
+- git push origin main
+- jangan force push
+- verifikasi origin/main sinkron
+
+Jika TIDAK ADA perubahan:
+- jangan membuat empty commit.
+
+KARENA VPS BERISIKO MATI:
+Setelah verifikasi PASS, langsung commit dan push jika memang ada perubahan.
+Jangan berhenti hanya untuk laporan sebelum push.
+
+BATASAN:
+- jangan aktifkan Midtrans production
+- jangan masukkan Server Key
+- jangan transaksi uang nyata
+- jangan reset database
+- jangan ubah schema kecuali benar-benar wajib
+- jangan force push
+
+LAPORKAN:
+- database readiness
+- backup readiness
+- recovery readiness
+- environment/security
+- production process
+- monitoring/error handling
+- dokumentasi
+- typecheck
+- build
+- production server
+- commit/push
+- blocker tersisa
 
 ```
 # Prompt Phase 34 — langsung push jika ada perubahan
