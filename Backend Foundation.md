@@ -71,10 +71,92 @@
 
 
 ```
-# 
+# Prompt berikutnya — Phase 34: Admin Panel Dev Verification
 ```
 
+Prompt: Phase 34 — Admin Panel Development Verification
 
+Project: Digital Cell / toko-online
+
+Lanjutkan dari kondisi repository saat ini. Jangan membuat ulang project dan jangan mengubah desain customer yang sudah selesai.
+
+Fokus tahap ini:
+VERIFIKASI DAN PERBAIKI ADMIN PANEL DALAM MODE DEVELOPMENT SAJA.
+
+Batasan:
+- Jangan membutuhkan Midtrans Server Key.
+- Jangan melakukan transaksi pembayaran nyata.
+- Jangan mengubah schema/migration database.
+- Jangan redesign UI.
+- Jangan menghapus fitur existing.
+- Jangan membuat mock payment production.
+- Jangan force push.
+
+Tugas:
+
+1. Jalankan project dalam development mode.
+2. Audit seluruh route admin yang sudah tersedia:
+   - /admin/dashboard
+   - /admin/products
+   - /admin/categories
+   - /admin/orders
+   - /admin/users
+   - /admin/payments jika sudah tersedia
+3. Pastikan admin authentication/requireAdmin bekerja:
+   - guest -> redirect/login
+   - customer -> tidak boleh mengakses admin
+   - admin -> bisa membuka seluruh halaman admin yang memang tersedia.
+4. Test CRUD produk:
+   - list produk
+   - tambah produk
+   - edit produk
+   - hapus produk
+   - validasi form
+   - refresh halaman harus mempertahankan data database.
+5. Test kategori:
+   - list
+   - tambah
+   - edit
+   - hapus
+   - validasi relasi dengan produk.
+6. Test orders:
+   - admin dapat melihat order customer
+   - detail order dapat dibuka
+   - status order tampil benar
+   - jangan membuat transaksi/payment baru.
+7. Test users:
+   - admin dapat melihat data user yang memang diizinkan
+   - passwordHash/secret tidak boleh ditampilkan.
+8. Periksa loading state, empty state, error state, dan tombol/form pada admin.
+9. Pastikan tidak ada server-side exception/500.
+10. Jalankan:
+    - npm run typecheck
+    - npm run build
+    - development server dan smoke test route admin
+    - git diff --check
+    - git status --short
+
+Jika ada bug nyata, perbaiki hanya bagian yang diperlukan.
+
+Setelah semua PASS:
+- jangan membuat empty commit;
+- commit seluruh perubahan yang memang diperlukan;
+- git push origin main tanpa force;
+- setelah push verifikasi:
+  git status --short
+  git log -1 --oneline
+  git status -sb
+
+Laporan akhir harus berisi:
+- route admin yang berhasil diverifikasi
+- CRUD yang PASS
+- authentication/authorization PASS
+- typecheck/build PASS
+- commit hash
+- push status
+- blocker jika masih ada.
+
+Jika tidak ada perubahan kode, jangan commit.
 
 ```
 # Prompt — Phase 35: Midtrans Sandbox / Dev Test
