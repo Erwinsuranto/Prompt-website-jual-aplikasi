@@ -107,10 +107,258 @@
 
 
 ```
-# 
+# Prompt: Phase 31 — Production Payment Integration
 ```
 
+## Phase 31 — Production Payment Integration
 
+Project: /root/toko-online
+
+STATUS:
+- Customer flow: PASS
+- JWT authentication: PASS
+- Admin Panel: PASS
+- Product/category/order/user management: PASS
+- Typecheck: PASS
+- Build: PASS
+- Git clean & synced
+- Jangan redesign UI customer/admin.
+
+TUJUAN:
+Lanjutkan roadmap ke tahap Production Payment dengan aman.
+
+ATURAN PENTING:
+- Audit kode payment yang SUDAH ADA terlebih dahulu.
+- Jangan mengganti payment provider jika sudah ada provider yang dipilih di project.
+- Jangan mengarang API/credential/provider.
+- Jangan meminta atau menulis secret langsung ke source code.
+- Jangan commit .env atau credential.
+- Jangan melakukan transaksi uang nyata hanya untuk testing.
+- Jangan reset database.
+- Jangan membuat migration/schema baru kecuali benar-benar diperlukan.
+- Jangan force push.
+- Jika credential production belum tersedia, implementasikan integration layer dan validasi sampai batas yang aman, lalu laporkan blocker credential.
+
+==================================================
+1. AUDIT PAYMENT EXISTING
+==================================================
+
+Periksa seluruh:
+- payment-service
+- payment API/routes
+- payment models
+- order/payment relation
+- webhook handler
+- payment configuration
+- checkout flow
+- payment status handling
+
+Gunakan kode dan schema yang sudah ada sebagai sumber utama.
+
+Pastikan alurnya jelas:
+
+Customer
+→ Checkout
+→ Create Order
+→ Create Payment
+→ Payment Provider
+→ Payment Status
+→ Webhook
+→ Verify Payment
+→ Update Order
+
+==================================================
+2. PAYMENT STATE MACHINE
+==================================================
+
+Audit status payment/order agar konsisten.
+
+Minimal bedakan:
+- pending
+- paid/success
+- failed
+- expired/cancelled
+
+Jangan sampai:
+- order dibayar dua kali
+- webhook menggandakan update
+- payment sukses tetapi order tetap pending
+- payment gagal dianggap paid
+
+Implementasikan idempotency pada webhook jika belum ada.
+
+==================================================
+3. CHECKOUT
+==================================================
+
+Pastikan checkout:
+- hanya membutuhkan user authenticated
+- membaca produk dari database
+- menggunakan harga server-side
+- tidak mempercayai harga dari client
+- memvalidasi stok
+- membuat order dengan benar
+- membuat payment berdasarkan total server-side
+
+Jangan menggunakan harga yang dikirim frontend sebagai sumber kebenaran.
+
+==================================================
+4. WEBHOOK
+==================================================
+
+Audit webhook payment.
+
+Pastikan:
+- signature/webhook verification dilakukan server-side
+- payload divalidasi
+- event diproses idempotent
+- payment tidak bisa dipalsukan melalui request client
+- order hanya berubah menjadi paid setelah status payment valid
+- webhook tidak membocorkan secret
+
+Jika provider membutuhkan endpoint tertentu, ikuti dokumentasi provider yang SUDAH digunakan project.
+
+==================================================
+5. PAYMENT PROVIDER CONFIG
+==================================================
+
+Cari konfigurasi provider yang sudah ada.
+
+Jika credential production tersedia melalui environment:
+- gunakan environment variable
+- jangan tampilkan nilainya
+- jangan commit secret
+
+Jika credential production BELUM tersedia:
+- jangan membuat credential palsu
+- jangan melakukan transaksi nyata
+- jangan memaksa production activation
+
+Tetap lakukan seluruh verifikasi code yang bisa dilakukan tanpa credential.
+
+==================================================
+6. ADMIN PAYMENT
+==================================================
+
+Hubungkan payment dengan Admin Panel yang sudah dibuat.
+
+Admin minimal dapat melihat:
+- order ID
+- user
+- total
+- payment status
+- order status
+- payment provider
+- waktu pembayaran
+- reference/transaction ID jika tersedia
+
+Jangan membuat tombol "force paid" yang dapat melewati verifikasi provider kecuali memang sudah menjadi bagian roadmap.
+
+==================================================
+7. SECURITY
+==================================================
+
+Pastikan:
+- customer tidak dapat mengubah status payment
+- customer tidak dapat mengubah total order
+- customer tidak dapat mengubah order milik user lain
+- webhook hanya menerima event valid
+- secret hanya server-side
+- admin endpoint tetap requireAdmin
+- tidak ada credential di client bundle
+
+==================================================
+8. TEST TANPA UANG NYATA
+==================================================
+
+Lakukan test:
+- checkout valid
+- harga dimanipulasi dari client
+- stok tidak cukup
+- order user A tidak bisa diakses user B
+- payment pending
+- webhook invalid
+- webhook duplicate
+- payment failed
+- payment success menggunakan mekanisme test/sandbox jika provider memang menyediakannya
+
+JANGAN melakukan pembayaran uang nyata.
+
+==================================================
+9. VERIFIKASI
+==================================================
+
+Jalankan:
+
+npm run typecheck
+npm run build
+
+Jalankan production server dan smoke test:
+
+/
+ /products
+ /categories
+ /search
+ /checkout
+ /orders
+ /admin
+ /admin/dashboard
+ /admin/orders
+
+Pastikan tidak ada server-side exception.
+
+==================================================
+10. GIT & PUSH
+==================================================
+
+Sebelum commit:
+
+git status --short
+git diff --check
+
+Pastikan tidak ada:
+- .env
+- credential
+- secret
+- build artifact
+- temporary file
+
+Jika ada perubahan kode dan seluruh verifikasi PASS:
+
+git add <file yang benar-benar berubah>
+git commit -m "feat(payment): integrate production payment flow"
+git push origin main
+
+Jangan force push.
+
+Setelah push:
+
+git status --short
+git status -sb
+git log -1 --oneline
+
+Jika tidak ada perubahan kode, jangan membuat empty commit.
+
+==================================================
+HASIL AKHIR
+==================================================
+
+Laporkan:
+- payment provider yang ditemukan
+- file/service payment yang diaudit
+- checkout status
+- webhook status
+- idempotency status
+- security test
+- sandbox/test payment status
+- typecheck
+- build
+- production server
+- commit hash jika ada
+- push status
+- blocker credential jika ada
+
+Jangan mengaktifkan transaksi production nyata jika credential/configuration belum siap.
 
 ```
 # Prompt: Phase 30 — Admin Panel Final Audit
