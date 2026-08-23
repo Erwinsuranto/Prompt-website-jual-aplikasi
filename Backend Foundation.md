@@ -113,11 +113,338 @@
 
 
 ```
-# 
+# Prompt: Phase 30 — Admin Panel Final Audit
 ```
 
 
+## Phase 30 — Final Audit & Stabilization Admin Panel
 
+Project: Digital Cell / toko-online
+Direktori: /root/toko-online
+
+Lanjutkan dari repository SAAT INI.
+
+STATUS:
+- Phase 27 Full JWT Authentication: PASS
+- Phase 28 Customer Flow: PASS
+- Phase 29 Admin Panel: PASS
+- Commit terakhir: c9facf3
+- Admin dashboard/products/categories/orders/users sudah tersedia.
+
+TUJUAN:
+Finalisasi dan audit Admin Panel sebelum masuk tahap production payment.
+
+PENTING:
+- Jangan mengulang JWT.
+- Jangan redesign customer UI.
+- Jangan membuat production payment.
+- Jangan reset database.
+- Jangan membuat migration/schema baru kecuali benar-benar diperlukan.
+- Jangan menggunakan mock data jika database nyata tersedia.
+- Jangan force push.
+- Jika tidak ada perubahan yang diperlukan, jangan membuat commit kosong.
+
+==================================================
+1. AUDIT SELURUH ADMIN PANEL
+==================================================
+
+Periksa:
+
+/admin
+/admin/dashboard
+/admin/products
+/admin/categories
+/admin/orders
+/admin/users
+
+Pastikan semua route:
+- hanya dapat diakses admin
+- guest diarahkan/ditolak
+- customer mendapat 403 atau redirect yang sesuai
+- tidak ada route admin yang hanya dilindungi frontend
+
+Audit middleware, layout admin, repository/service, dan API.
+
+==================================================
+2. DASHBOARD
+==================================================
+
+Pastikan dashboard menggunakan data database nyata.
+
+Periksa:
+- total users
+- total products
+- total categories
+- total orders
+- recent orders
+- order status breakdown
+
+Pastikan:
+- database kosong → angka 0 / empty state
+- tidak ada NaN
+- tidak ada undefined
+- tidak ada error server-side
+- loading/error state ditangani
+
+Jangan membuat transaksi dummy hanya untuk mengisi dashboard.
+
+==================================================
+3. PRODUCT MANAGEMENT
+==================================================
+
+Audit `/admin/products`.
+
+Pastikan:
+- list produk
+- tambah produk
+- edit produk
+- hapus produk
+- harga
+- stok
+- kategori
+- status aktif/nonaktif
+
+CRUD harus benar-benar menggunakan backend/database.
+
+Validasi:
+- nama tidak kosong
+- harga valid
+- stok tidak negatif
+- kategori valid jika wajib
+- ID produk divalidasi server-side
+
+Setelah delete, pastikan produk benar-benar tidak dapat ditemukan lagi.
+
+Pastikan customer tidak bisa memakai endpoint CRUD admin.
+
+==================================================
+4. CATEGORY MANAGEMENT
+==================================================
+
+Audit `/admin/categories`.
+
+Pastikan:
+- list
+- create
+- edit
+- delete jika aman
+- slug/name validation
+- relasi produk tidak rusak
+
+Jika kategori masih digunakan produk, jangan melakukan delete destruktif yang menyebabkan data rusak.
+
+==================================================
+5. ORDER MANAGEMENT
+==================================================
+
+Audit `/admin/orders`.
+
+Pastikan admin dapat:
+- melihat daftar order
+- melihat customer
+- melihat total
+- melihat status
+- melihat tanggal
+- melihat item order/detail
+
+Pastikan order berasal dari database.
+
+Jangan mengaktifkan payment production.
+
+Jika status order belum perlu diedit pada roadmap, jangan menambahkan logic status baru hanya untuk memenuhi UI.
+
+==================================================
+6. USER MANAGEMENT
+==================================================
+
+Audit `/admin/users`.
+
+Minimal:
+- daftar user
+- email/identifier yang aman
+- role
+- tanggal dibuat jika tersedia
+
+JANGAN menampilkan:
+- password
+- passwordHash
+- secret
+- token
+- credential
+
+Pastikan customer tidak dapat mengubah role dirinya sendiri menjadi admin.
+
+Jika fitur edit/delete user belum diperlukan roadmap, jangan menambah CRUD yang tidak diperlukan.
+
+==================================================
+7. ADMIN UI / RESPONSIVE
+==================================================
+
+Audit tampilan tanpa redesign besar.
+
+Desktop:
+- sidebar
+- topbar
+- content
+- table
+- form
+- dashboard cards
+
+Mobile sekitar 390px:
+- sidebar/drawer tidak merusak layout
+- table dapat discroll atau responsive
+- form tidak keluar layar
+- tombol dapat ditekan
+- navigation tetap berfungsi
+
+Perbaiki hanya bug UI yang ditemukan.
+
+==================================================
+8. ERROR & LOADING STATE
+==================================================
+
+Pastikan setiap halaman admin penting memiliki:
+- loading state
+- empty state
+- error state
+- success feedback setelah operasi CRUD
+
+Jangan membiarkan exception server muncul sebagai halaman error Next.js.
+
+==================================================
+9. SECURITY AUDIT
+==================================================
+
+Verifikasi:
+
+guest:
+- GET /admin → ditolak
+- admin API → ditolak
+
+customer:
+- GET /admin → ditolak
+- POST/PUT/DELETE admin API → 403
+
+admin:
+- admin pages → 200
+- admin API → berhasil
+
+Pastikan:
+- role diperiksa server-side
+- JWT/session diverifikasi
+- tidak ada secret di client bundle
+- passwordHash tidak dikirim ke frontend
+- tidak ada endpoint privilege escalation
+
+==================================================
+10. REGRESSION TEST CUSTOMER
+==================================================
+
+Jangan merusak fitur yang sudah PASS.
+
+Smoke test:
+- /
+- /categories
+- /products
+- /search
+- /profile
+- /orders
+- /checkout
+
+Pastikan:
+- public route tetap 200
+- protected customer route tetap protected
+- customer order isolation tetap berjalan
+
+==================================================
+11. VERIFIKASI
+==================================================
+
+Jalankan:
+
+npm run typecheck
+npm run build
+
+Kemudian jalankan production server sesuai environment project.
+
+Lakukan smoke test HTTP untuk:
+- public routes
+- customer routes
+- admin routes
+- admin API
+
+Jika ada browser automation yang tersedia dan aman digunakan, boleh gunakan untuk memeriksa UI.
+Jika tidak tersedia, gunakan HTTP/render verification dan source inspection.
+
+Jangan memasang tool berat hanya untuk test jika VPS berisiko kehabisan resource.
+
+==================================================
+12. GIT
+==================================================
+
+Sebelum commit:
+
+git status --short
+git diff --check
+
+Pastikan tidak ada:
+- .env
+- API key
+- password
+- DATABASE_URL
+- credential
+- build artifact
+- temporary file
+
+Jika memang ada perubahan valid:
+
+git add <hanya file yang berubah>
+git commit -m "fix(admin): stabilize admin panel"
+git push origin main
+
+JANGAN force push.
+
+Setelah push:
+
+git status --short
+git status -sb
+git log -1 --oneline
+
+Pastikan main sinkron dengan origin/main.
+
+Jika tidak ada perubahan kode:
+- jangan membuat empty commit
+- cukup laporkan bahwa audit PASS dan working tree clean.
+
+==================================================
+13. HASIL AKHIR
+==================================================
+
+Laporkan:
+- masalah yang ditemukan
+- perbaikan yang dilakukan
+- admin routes yang diverifikasi
+- security test
+- CRUD test
+- customer regression test
+- typecheck
+- build
+- production server
+- commit hash jika ada perubahan
+- push status
+- working tree status
+
+Jika semua PASS, langsung commit dan push.
+Jika tidak ada perubahan, jangan commit.
+
+BATASAN:
+- Admin Panel: audit + stabilization
+- Production payment: TIDAK
+- Payment gateway live: TIDAK
+- Cloudflare/DNS: TIDAK
+- Database reset: TIDAK
+- Customer redesign: TIDAK
+- Force push: TIDAK
 ```
 # Prompt: Phase 29 — Admin Panel & Dashboard
 ```
