@@ -53,10 +53,88 @@
 
 
 ```
-# 
+# Prompt berikutnya — Phase 37
 ```
 
+Prompt: Phase 37 — Fix Mobile Client-Side Exception
 
+Project: Digital Cell / toko-online
+
+Kondisi:
+- Phase sebelumnya memperbaiki responsive halaman detail produk dan sudah di-commit/push.
+- Saat halaman dibuka melalui mobile browser, muncul:
+  "Application error: a client-side exception has occurred"
+- Jangan menganggap masalah ini hanya CSS/responsive.
+- Jangan membuat redesign.
+- Gunakan development mode untuk diagnosis dan testing.
+- Jangan menyentuh payment production.
+
+Tugas:
+
+1. Audit error runtime client-side secara nyata.
+2. Jalankan development server dan reproduksi halaman yang menghasilkan:
+   "Application error: a client-side exception has occurred".
+3. Periksa terminal/server log dan browser console/stack trace jika tersedia.
+4. Identifikasi file, component, function, atau dependency yang benar-benar menyebabkan exception.
+5. Audit perubahan terakhir pada commit:
+   `43986ce fix(ui): fix mobile product detail responsiveness`
+   terutama file yang diubah pada commit tersebut.
+6. Perbaiki root cause saja.
+7. Jangan menutupi error dengan try/catch kosong, suppress error, atau fallback palsu.
+8. Jangan mengubah:
+   - database/schema
+   - Prisma
+   - authentication
+   - payment
+   - cart logic
+   - admin logic
+   - API contract
+   - desain utama
+9. Setelah diperbaiki, pastikan halaman berikut tetap normal:
+   - /products
+   - /categories
+   - /category/streaming
+   - /product/netflix-premium-test
+   - /search
+   - /cart
+   - /profile
+10. Pastikan halaman detail produk tetap responsive pada:
+   - 360px
+   - 375px
+   - 390px
+   - 414px
+   - desktop
+11. Pastikan tidak ada horizontal overflow.
+
+Verifikasi:
+- npm run typecheck
+- npm run build
+- development server
+- smoke test halaman public
+- smoke test product detail
+- test mobile viewport
+- git diff --check
+- git status --short
+
+Jika semua PASS:
+- commit perubahan
+- push ke origin main
+- jangan force push
+
+Commit message:
+fix(ui): resolve mobile client runtime exception
+
+Laporan akhir harus menyebut:
+- root cause exception
+- file yang menyebabkan
+- perubahan yang dilakukan
+- hasil test
+- commit hash
+- push status
+
+PENTING:
+Jangan membuat perubahan jika belum menemukan root cause.
+Jangan hanya mengatakan "build PASS" karena error ini terjadi saat runtime browser.
 
 ```
 # 
