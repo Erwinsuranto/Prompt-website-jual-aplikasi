@@ -77,10 +77,116 @@
 
 
 ```
-# 
+# Prompt — Phase 35: Midtrans Sandbox / Dev Test
 ```
 
+## Phase 35 — Midtrans Sandbox Payment Test
 
+Project: /root/toko-online
+
+Jangan aktifkan Midtrans production.
+
+TUJUAN:
+Aktifkan dan test payment menggunakan Midtrans Sandbox/Development terlebih dahulu.
+
+Kondisi:
+- Payment integration sudah PASS
+- Checkout/order sudah PASS
+- Admin Panel sudah PASS
+- Security audit PASS
+- Typecheck PASS
+- Build PASS
+- Production server PASS
+- Midtrans production Server Key BELUM ADA
+
+TUGAS:
+
+1. Audit payment integration yang sudah ada.
+2. Gunakan mode sandbox/development Midtrans.
+3. Credential sandbox HARUS berasal dari environment variable.
+4. Jangan hardcode Server Key/Client Key.
+5. Jangan commit credential atau .env.
+6. Jangan mengubah database schema/migration.
+7. Jangan mengubah desain UI kecuali ada bug pada payment flow.
+
+TEST FLOW:
+
+Customer
+→ Login
+→ Pilih produk
+→ Tambah ke cart
+→ Checkout
+→ Create Order
+→ Generate payment
+→ Buka payment page/checkout Midtrans Sandbox
+→ Simulasikan pembayaran sandbox
+→ Terima callback/webhook sandbox
+→ Verifikasi status payment/order berubah benar
+
+WAJIB VERIFIKASI:
+
+- order dibuat dengan benar
+- payment reference tersimpan benar
+- status pending benar sebelum pembayaran
+- callback/webhook tervalidasi
+- status berubah setelah pembayaran sandbox
+- order tidak bisa dibayar dua kali secara tidak valid
+- user hanya dapat melihat order miliknya
+- nominal pembayaran berasal dari server
+- client tidak dapat memanipulasi total
+- webhook tidak boleh dipercaya tanpa validasi signature
+- error payment tidak menyebabkan 500
+- failed/expired/cancel status ditangani dengan benar
+
+ADMIN:
+- admin dapat melihat status order/payment
+- jangan membuat fitur baru yang tidak diperlukan
+
+ENVIRONMENT:
+- gunakan variable sandbox yang memang sudah didukung project
+- jika variable belum jelas, audit kode dan .env.example terlebih dahulu
+- jangan menebak nama credential
+- jangan menampilkan nilai credential dalam laporan
+
+REGRESSION:
+- npm run typecheck
+- npm run build
+- production server
+- payment sandbox test
+- webhook/callback test
+- git diff --check
+- git status --short
+
+GIT:
+Jika ada perubahan kode:
+- commit
+- git push origin main
+- jangan force push
+
+Jika tidak ada perubahan kode:
+- jangan membuat empty commit.
+
+BATASAN KERAS:
+- Sandbox/Development ONLY
+- Tidak ada transaksi uang nyata
+- Jangan gunakan Midtrans Production
+- Jangan meminta atau memasukkan Production Server Key
+- Jangan reset database
+- Jangan ubah schema/migration
+- Jangan redesign UI
+- Jangan force push
+
+Setelah selesai laporkan:
+- payment sandbox status
+- create payment status
+- callback/webhook status
+- order status update
+- security validation
+- typecheck
+- build
+- server
+- commit/push
+- blocker yang masih tersisa
 
 ```
 # Phase 35 — Production Operations & Backup Readiness
