@@ -143,10 +143,59 @@
 
 
 ```
-# 
+# Prompt: Cart → Checkout → Order Flow
 ```
 
+Project: /root/toko-online
 
+Lanjut dari commit terbaru. Seed catalog dan UI audit sudah PASS.
+
+Fokus tahap ini:
+Cart → Checkout → Create Order → Order Status.
+
+Tugas:
+1. Audit cart menggunakan data produk dari database.
+2. Pastikan tambah produk ke cart bekerja.
+3. Pastikan quantity, subtotal, total, remove item, dan empty cart bekerja.
+4. Pastikan produk stok 0 tidak bisa dibeli.
+5. Pastikan checkout membaca item cart yang benar.
+6. Validasi checkout sebelum order dibuat.
+7. Pastikan order dibuat melalui backend/Prisma, bukan hanya state frontend.
+8. Pastikan OrderItem tersimpan dengan data yang benar.
+9. Pastikan harga/order total menggunakan nilai yang aman dan konsisten dari database.
+10. Pastikan race condition stok tidak menyebabkan stok negatif atau double order.
+11. Setelah order berhasil, cart dikosongkan dengan benar.
+12. Pastikan halaman Pesanan dapat membaca order yang dibuat.
+13. Login-gate tetap dipertahankan jika checkout/order memang membutuhkan user.
+14. Jangan menggunakan mock order sebagai pengganti database.
+15. Jangan mengaktifkan payment production.
+16. Jangan mengubah schema/migration kecuali benar-benar diperlukan.
+17. Jangan reset database.
+18. Jangan redesign UI.
+
+Verifikasi:
+- typecheck
+- build
+- production server
+- test cart dengan produk stok tersedia
+- test produk stok 0
+- test checkout validation
+- test create order menggunakan database
+- cek order tersimpan
+- cek halaman Pesanan
+- git diff --check
+- git status --short
+
+Jika semua PASS:
+- langsung commit
+- git push origin main
+- jangan force push
+- verifikasi main sinkron dengan origin/main
+
+Commit message:
+feat(order): complete cart checkout and order flow
+
+Jika ada blocker, jangan membuat commit rusak. Laporkan blocker dan penyebabnya.
 
 ```
 # Prompt: Seed Data Test & Verify UI
