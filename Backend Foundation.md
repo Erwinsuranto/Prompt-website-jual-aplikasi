@@ -131,10 +131,74 @@
 
 
 ```
-# 
+# Prompt — Full JWT Authentication + Commit & Push
 ```
 
+PROMPT: Full JWT Authentication — Phase 27
 
+Project: Digital Cell / toko-online
+
+Lanjutkan roadmap dari kondisi repo TERKINI. Jangan mengulang pekerjaan payment sandbox, catalog, cart, order, atau UI navigation yang sudah PASS.
+
+Tugas utama:
+1. Audit implementasi authentication yang sudah ada.
+2. Implementasikan Full JWT Authentication sesuai arsitektur project dan Prisma schema yang sudah tersedia.
+3. Gunakan user/database asli melalui Prisma, bukan mock user atau in-memory auth.
+4. Pastikan:
+   - register/login berjalan benar
+   - password di-hash dengan aman
+   - JWT/session tervalidasi di server
+   - user identity tersedia untuk server/API yang membutuhkan authentication
+   - protected route benar-benar membutuhkan user yang valid
+   - user A tidak dapat melihat/mengakses order milik user B
+   - logout/invalidation mengikuti arsitektur auth yang digunakan project
+5. Integrasikan auth dengan flow existing:
+   - /profile
+   - /orders
+   - /checkout
+   - API yang menggunakan requireUser()
+6. Jangan merusak route public seperti:
+   - /
+   - /categories
+   - /products
+   - /category/*
+   - /search
+   - /cart
+7. Jangan mengubah desain UI kecuali memang diperlukan agar login/register/auth state berfungsi.
+8. Jangan membuat mock database.
+9. Jangan membuat migration baru jika schema yang ada sudah mencukupi.
+10. Jangan reset database dan jangan menghapus migration.
+11. Jangan mengaktifkan production payment atau menggunakan credential production.
+12. Jangan mengubah Cloudflare/DNS/port.
+13. Jangan memasukkan .env, secret, password, DATABASE_URL, credential, atau build artifact ke Git.
+
+Verifikasi:
+- npm run typecheck
+- npm run build
+- jalankan production server
+- verifikasi route public tetap HTTP 200
+- verifikasi protected route tanpa session → redirect/401 sesuai arsitektur
+- verifikasi login menghasilkan session/JWT valid
+- verifikasi user authenticated dapat mengakses profile/orders/checkout
+- verifikasi isolasi user/order
+- git diff --check
+- git status --short
+
+Jika semua PASS:
+- langsung commit
+- langsung push ke origin main
+- JANGAN force push
+- verifikasi:
+  git status --short
+  git log -1 --oneline
+  git status -sb
+
+Gunakan commit message:
+feat(auth): implement full jwt authentication
+
+Karena VPS berisiko mati, jangan berhenti setelah implementasi jika seluruh verifikasi sudah PASS. Langsung commit dan push.
+
+Jika ada blocker nyata, jangan commit kode rusak. Laporkan blocker dan kondisi repo terakhir.
 
 ```
 # Prompt: Payment Flow
