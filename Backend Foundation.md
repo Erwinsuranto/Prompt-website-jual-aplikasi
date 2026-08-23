@@ -89,10 +89,146 @@
 
 
 ```
-# 
+# Prompt Phase 34 — langsung push jika ada perubahan
 ```
 
+## Phase 34 — Production Hardening & Final Security Audit
 
+Project: /root/toko-online
+
+Lanjutkan roadmap dari kondisi terakhir. Jangan mengulang fitur yang sudah PASS.
+
+STATUS:
+- Customer UI: PASS
+- Catalog/category/product: PASS
+- Cart: PASS
+- Checkout/order: PASS
+- JWT authentication: PASS
+- Authorization/authz: PASS
+- Admin Panel: PASS
+- Admin CRUD: PASS
+- Payment integration: PASS
+- Midtrans production: BLOCKED hanya karena Server Key belum tersedia
+- Typecheck: PASS
+- Build: PASS
+- Production server: PASS
+- Git clean dan sinkron origin/main
+
+TUJUAN:
+Lakukan final security dan production-readiness audit tanpa redesign.
+
+AUDIT:
+
+1. Authentication
+- JWT/session aman
+- guest tidak dapat mengakses halaman protected
+- customer tidak dapat mengakses admin
+- admin tetap dapat mengakses admin
+- login/register tidak membocorkan credential
+- passwordHash tidak pernah dikirim ke client
+
+2. Authorization
+- verifikasi seluruh endpoint mutation
+- customer hanya dapat mengubah data miliknya
+- customer tidak dapat mengubah role
+- customer tidak dapat mengakses order user lain
+- admin endpoint benar-benar protected
+- jangan hanya mengandalkan proteksi UI
+
+3. Product/Cart/Order Security
+- harga selalu berasal dari server/database
+- client tidak dapat memanipulasi total pembayaran
+- stok divalidasi server-side
+- quantity divalidasi
+- productId divalidasi
+- order item tidak dapat dimanipulasi oleh user lain
+- race condition stok tidak menimbulkan stok negatif jika architecture saat ini sudah mendukung proteksi
+
+4. API Security
+- validasi input pada endpoint penting
+- method yang salah menghasilkan response yang benar
+- unauthorized = 401
+- forbidden = 403
+- not found = 404
+- jangan membocorkan stack trace/secret ke response production
+
+5. Environment & Secrets
+- .env tetap gitignored
+- DATABASE_URL tidak masuk source
+- JWT/session secret tidak masuk source
+- Midtrans credential tidak di-hardcode
+- tidak ada credential di client bundle
+- tidak ada temporary/build artifact yang ter-track
+
+6. Admin Security
+- /admin dan API admin protected
+- customer tidak dapat POST/PUT/DELETE admin
+- user tidak dapat menaikkan role sendiri
+- passwordHash dan credential sensitif tidak tampil
+
+7. Production Error Handling
+- tidak ada server-side exception untuk route utama
+- tidak ada 500 pada smoke test
+- error state UI tetap aman
+- jangan menampilkan detail internal database/stack trace
+
+8. Regression
+Jalankan:
+- npm run typecheck
+- npm run build
+- production server
+- smoke test public routes
+- smoke test customer routes
+- smoke test admin routes
+- authorization test guest/customer/admin
+- git diff --check
+- git status --short
+
+Jika menemukan masalah keamanan/fungsional kecil:
+- perbaiki secara minimal
+- jangan redesign
+- jangan ubah schema/database kecuali benar-benar wajib
+- jangan mengubah payment provider
+
+GIT:
+Jika ADA perubahan:
+- git diff --check
+- git status --short
+- commit:
+  security: harden production access and validation
+- git push origin main
+- jangan force push
+- verifikasi git status dan origin/main
+
+Jika TIDAK ADA perubahan:
+- jangan membuat empty commit.
+
+Karena VPS berisiko mati:
+setelah typecheck + build + production verification PASS,
+langsung commit dan push jika memang ada perubahan.
+
+JANGAN:
+- jangan aktifkan payment production
+- jangan membutuhkan Midtrans Server Key
+- jangan melakukan transaksi uang nyata
+- jangan reset database
+- jangan membuat mock payment
+- jangan redesign UI
+- jangan force push
+
+LAPORKAN:
+- authentication
+- authorization
+- API security
+- order/cart security
+- admin security
+- secrets/environment
+- production error handling
+- typecheck
+- build
+- production server
+- commit/push
+- blocker tersisa
 
 ```
 # Prompt — Phase 33: Admin Panel Functional Audit
