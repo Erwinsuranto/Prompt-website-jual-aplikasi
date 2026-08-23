@@ -149,10 +149,68 @@
 
 
 ```
-# 
+# Prompt: Seed Data Test & Verify UI
 ```
 
+Project: /root/toko-online
 
+Lanjut dari commit terbaru. UI dan backend integration sudah PASS.
+
+Tujuan:
+Menyediakan data TEST yang aman di database VPS agar seluruh UI Digital Cell bisa diuji dengan data nyata.
+
+Tugas:
+
+1. Audit apakah project sudah memiliki seed script Prisma.
+2. Jika belum ada, buat seed script modular dan idempotent untuk development/testing.
+3. Jangan mengubah schema Prisma dan jangan membuat migration baru.
+4. Gunakan data dummy/test saja, bukan credential atau data production.
+5. Buat minimal:
+   - beberapa kategori produk
+   - beberapa produk aktif
+   - produk dengan stok
+   - produk habis stok
+   - produk dari kategori berbeda
+6. Pastikan seed bisa dijalankan ulang tanpa membuat duplicate data.
+7. Jangan menghapus data existing secara massal.
+8. Jangan melakukan prisma migrate reset.
+9. Jangan memasukkan API key, password, payment credential, atau secret asli.
+10. Setelah seed tersedia, jalankan seed pada DATABASE_URL VPS yang sedang digunakan untuk testing.
+11. Verifikasi database melalui Prisma/query yang sesuai.
+12. Pastikan:
+   - /categories menampilkan kategori
+   - /products menampilkan produk
+   - klik kategori menampilkan produk kategori tersebut
+   - search menemukan produk
+   - product detail dapat dibuka
+   - produk stok habis menampilkan status yang benar
+   - cart dapat menambahkan produk
+13. Jangan redesign UI.
+14. Jangan mengubah payment production.
+15. Jangan mengaktifkan transaksi/payment production.
+
+Verifikasi akhir:
+- npm run typecheck
+- npm run build
+- production server tetap berjalan
+- cek HTTP route utama
+- git diff --check
+- git status --short
+- pastikan tidak ada .env/secret/credential/build artifact
+
+Jika semua PASS:
+- git add perubahan kode yang relevan
+- git commit -m "feat(seed): add test catalog data"
+- git push origin main
+- git status --short
+- git log -1 --oneline
+- pastikan main sinkron dengan origin/main
+
+Jangan force push.
+Jangan reset database.
+Jangan membuat migration.
+Jika seed sudah tersedia dan cukup, gunakan yang existing dan jangan membuat duplikat.
+Jika ada blocker, berhenti dan laporkan blocker tanpa commit perubahan rusak.
 
 ```
 # 
