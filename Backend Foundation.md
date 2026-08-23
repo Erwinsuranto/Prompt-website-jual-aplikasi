@@ -125,10 +125,190 @@
 
 
 ```
-# 
+# Prompt: Phase 28 — Customer Account & Order Flow Finalization
 ```
 
+## Phase 28 — Finalisasi Customer Account & Order Flow
 
+Project: Digital Cell / toko-online
+Direktori: /root/toko-online
+
+Lanjutkan roadmap dari kondisi repository SAAT INI.
+
+PENTING:
+- Full JWT Authentication Phase 27 SUDAH SELESAI. Jangan mengulang atau merombak JWT yang sudah PASS.
+- Jangan membuat halaman Admin sekarang.
+- Jangan mengaktifkan production payment.
+- Jangan mengubah schema/migration/database tanpa kebutuhan yang benar-benar terbukti.
+- Jangan redesign UI.
+- Jangan menggunakan mock order/payment sebagai pengganti database.
+- Jangan force push.
+- Jika tidak ada perubahan yang memang diperlukan, jangan membuat commit kosong.
+
+TUJUAN PHASE 28:
+Pastikan seluruh pengalaman customer setelah login benar-benar konsisten dari:
+login/register → session → profile → catalog → product → cart → checkout → order → logout.
+
+1. AUDIT KONDISI SAAT INI
+Periksa implementasi yang SUDAH ADA terlebih dahulu:
+- login/register
+- JWT/session
+- logout
+- profile/account
+- product/catalog
+- category
+- search
+- product detail
+- favorites
+- cart
+- checkout
+- orders/order history
+- protected routes
+- user ownership/isolation
+
+Jangan mengubah fitur yang sudah benar.
+
+2. CUSTOMER SESSION
+Pastikan:
+- user yang login tetap dikenali saat berpindah halaman
+- authenticated request menggunakan session/JWT yang benar
+- logout benar-benar menghapus/mematikan session client
+- setelah logout, halaman protected tidak dapat diakses
+- user tidak dapat melihat order milik user lain
+- user yang belum login tetap diarahkan ke login pada halaman protected
+
+3. PROFILE / ACCOUNT
+Audit `/profile`:
+- data user ditampilkan dari backend/database
+- tidak menggunakan data dummy
+- state loading/error/empty ditangani dengan baik
+- logout berfungsi
+- jangan menambahkan fitur yang belum ada di roadmap hanya untuk memperbanyak fitur
+
+4. ORDER HISTORY
+Audit `/orders`:
+- hanya menampilkan order milik user yang sedang login
+- data berasal dari Prisma/backend
+- status order ditampilkan dengan benar
+- empty state tetap bagus jika belum ada order
+- detail order tidak bocor ke user lain
+- akses tanpa login harus tetap protected
+
+5. CART → CHECKOUT → ORDER
+Pastikan flow:
+product → tambah ke keranjang → cart → checkout → create order
+
+berjalan menggunakan data backend yang benar.
+
+Periksa:
+- product ID valid
+- quantity valid
+- stock divalidasi server-side
+- total harga tidak boleh dipercaya dari client
+- order hanya dibuat untuk authenticated user
+- cart dibersihkan hanya setelah order berhasil
+- kegagalan create order tidak boleh menghapus cart
+- jangan membuat mock order
+
+6. UI NAVIGATION
+Pastikan navigation customer yang sudah ada tetap bekerja:
+- Beranda
+- Kategori
+- Pesanan
+- Favorit
+- Akun
+
+Periksa mobile bottom navigation dan desktop navigation.
+Jangan redesign. Hanya perbaiki link/action yang benar-benar rusak.
+
+7. SECURITY CHECK
+Pastikan:
+- API protected tetap membutuhkan JWT/session
+- customer tidak dapat mengakses endpoint admin
+- customer tidak dapat membuat/mengubah data produk
+- order ownership diperiksa server-side
+- jangan expose secret, password, DATABASE_URL, atau credential ke client
+- jangan commit `.env`
+
+8. VERIFIKASI
+Jalankan sesuai environment project:
+
+npm run typecheck
+npm run build
+
+Kemudian jalankan production server jika aman untuk environment VPS.
+
+Lakukan smoke test HTTP minimal:
+- homepage
+- categories
+- products
+- product detail
+- search
+- cart
+- profile
+- orders
+- checkout
+- login/register protection
+
+Untuk protected endpoint, pastikan hasil tanpa authentication tetap sesuai implementasi:
+401 atau redirect login.
+
+9. DATABASE
+Jangan reset database.
+Jangan membuat migration baru kecuali audit benar-benar membuktikan schema memang kurang dan perubahan tersebut memang bagian Phase 28.
+Jangan menghapus data existing.
+
+10. GIT
+Sebelum commit:
+
+git status --short
+git diff --check
+
+Pastikan:
+- tidak ada `.env`
+- tidak ada secret
+- tidak ada credential
+- tidak ada build artifact
+- tidak ada temporary file
+
+Jika ada perubahan valid:
+
+git add <hanya file yang diperlukan>
+git commit -m "feat(customer): finalize account and order flow"
+git push origin main
+
+JANGAN force push.
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+git status -sb
+
+Pastikan branch sudah sinkron dengan origin/main.
+
+11. HASIL AKHIR
+Laporkan:
+- file yang berubah
+- fitur yang diperbaiki
+- hasil typecheck
+- hasil build
+- hasil smoke test
+- hasil git commit
+- hasil push
+- apakah working tree clean
+
+Jika semua sudah benar, langsung commit dan push.
+Jangan berhenti hanya setelah coding.
+
+BATASAN:
+- Tidak membuat Admin Panel.
+- Tidak mengaktifkan production payment.
+- Tidak mengubah Cloudflare/DNS/port.
+- Tidak reset database.
+- Tidak membuat migration tanpa kebutuhan.
+- Tidak redesign UI.
+- Jangan mengulang pekerjaan Phase 27 JWT Authentication yang sudah PASS.
 
 ```
 # Prompt — Full JWT Authentication + Commit & Push
