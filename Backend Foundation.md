@@ -1,11 +1,634 @@
 
 
 
+# 
+```
 
+
+
+```
+# 
+```
+
+
+
+```
 
 # 
 ```
 
+
+
+```
+# Prompt: Admin Payment Settings — DEV/Sandbox
+```
+## Prompt: Admin Payment Settings — DEV/Sandbox
+
+Project: Digital Cell / toko-online
+
+Lanjutkan development dari kondisi project saat ini.
+
+STATUS SEBELUMNYA:
+- Admin Categories sudah PASS.
+- Admin Products sudah PASS.
+- Admin Orders sudah PASS.
+- Customer UI sudah stabil pada mobile.
+- Checkout UI sudah tersedia.
+- Payment flow sudah ada tetapi belum boleh menggunakan transaksi nyata.
+- Typecheck/build/smoke test sebelumnya sudah PASS.
+- Jangan merusak fitur yang sudah PASS.
+
+TUJUAN:
+Implementasikan dan rapikan halaman/settings pembayaran di Admin Panel agar admin dapat mengelola metode pembayaran untuk DEV/Sandbox.
+
+PENTING:
+Ini hanya DEV/Sandbox.
+JANGAN menggunakan payment production.
+JANGAN membutuhkan transaksi uang nyata.
+JANGAN memasukkan Midtrans production key.
+JANGAN melakukan reset database.
+JANGAN mengubah database/schema secara destruktif.
+JANGAN menghapus fitur existing.
+
+==================================================
+1. AUDIT TERLEBIH DAHULU
+==================================================
+
+Sebelum coding:
+
+- Audit struktur frontend/admin.
+- Cari payment-service yang sudah ada.
+- Cari Prisma model yang berhubungan dengan payment/order/settings.
+- Cari endpoint/API payment existing.
+- Cari komponen checkout yang sudah menggunakan payment method.
+- Cari konfigurasi Midtrans/payment provider.
+- Cari apakah sudah ada model PaymentMethod atau Settings.
+- Cari environment variable payment yang tersedia.
+- Jangan membuat struktur baru jika struktur existing masih bisa digunakan.
+
+Tampilkan secara internal hasil audit dan gunakan struktur existing sebagai dasar implementasi.
+
+==================================================
+2. ADMIN PAYMENT SETTINGS
+==================================================
+
+Buat/rapikan halaman:
+
+/admin/settings/payment
+
+atau gunakan route settings payment yang sudah tersedia jika project sudah memiliki route tersebut.
+
+Admin harus dapat melihat daftar metode pembayaran.
+
+Minimal metode:
+
+1. QRIS
+2. Transfer Bank
+3. E-Wallet
+
+Setiap metode memiliki:
+
+- nama
+- tipe
+- status aktif/nonaktif
+- deskripsi
+- urutan
+- konfigurasi yang diperlukan
+- tombol Edit
+- toggle Aktif/Nonaktif
+
+UI harus konsisten dengan Admin Panel existing.
+
+==================================================
+3. QRIS
+==================================================
+
+Admin dapat:
+
+- mengaktifkan/nonaktifkan QRIS
+- upload/ganti gambar QRIS
+- melihat preview QRIS
+- menghapus QRIS jika diperlukan
+- menyimpan perubahan
+
+Untuk DEV:
+
+- file boleh disimpan menggunakan mekanisme storage existing.
+- jangan hardcode URL.
+- jangan menyimpan secret ke frontend.
+- validasi tipe file.
+- validasi ukuran file.
+- tampilkan error yang jelas jika upload gagal.
+
+Jika project belum memiliki storage production, gunakan mekanisme DEV yang sudah tersedia.
+
+Jangan membuat integrasi storage baru yang kompleks jika belum diperlukan.
+
+==================================================
+4. TRANSFER BANK
+==================================================
+
+Admin dapat menambahkan rekening bank.
+
+Field minimal:
+
+- bank name
+- account name
+- account number
+- logo optional
+- status aktif/nonaktif
+
+Contoh data DEV:
+
+BCA
+Digital Cell
+1234567890
+
+Mandiri
+Digital Cell
+9876543210
+
+BNI
+Digital Cell
+1122334455
+
+Data contoh hanya untuk DEV.
+
+Admin dapat:
+
+- tambah rekening
+- edit rekening
+- aktif/nonaktif
+- hapus rekening
+
+Jangan hardcode data bank ke frontend.
+
+==================================================
+5. E-WALLET
+==================================================
+
+Admin dapat menambahkan metode e-wallet.
+
+Minimal:
+
+- provider
+- account name
+- account number
+- logo optional
+- status aktif/nonaktif
+
+Contoh DEV:
+
+GoPay
+Digital Cell
+081234567890
+
+OVO
+Digital Cell
+081234567890
+
+DANA
+Digital Cell
+081234567890
+
+Data hanya untuk DEV.
+
+Admin dapat:
+
+- tambah
+- edit
+- aktif/nonaktif
+- hapus
+
+==================================================
+6. SORT / ORDER
+==================================================
+
+Admin dapat mengatur urutan metode pembayaran.
+
+Gunakan field sortOrder/order yang sesuai dengan struktur database existing.
+
+Customer checkout harus menampilkan metode aktif berdasarkan urutan tersebut.
+
+Metode nonaktif:
+
+- tidak boleh muncul di checkout customer
+- tetap terlihat di admin
+- status harus jelas
+
+==================================================
+7. CUSTOMER CHECKOUT
+==================================================
+
+Hubungkan payment settings dengan checkout.
+
+Checkout hanya menampilkan payment method:
+
+WHERE active = true
+
+Jangan menampilkan metode yang dinonaktifkan.
+
+Jika hanya satu metode aktif:
+- otomatis pilih metode tersebut jika UX existing mendukung.
+
+Jika tidak ada metode aktif:
+- tampilkan pesan yang jelas:
+  "Belum ada metode pembayaran yang tersedia."
+
+Jangan membuat checkout crash.
+
+==================================================
+8. PAYMENT DETAIL
+==================================================
+
+Setelah customer memilih metode pembayaran, tampilkan detail yang sesuai.
+
+QRIS:
+- tampilkan QRIS image
+- tombol/perilaku zoom jika komponen existing mendukung
+- nominal pembayaran
+- instruksi pembayaran
+
+Transfer Bank:
+- nama bank
+- nomor rekening
+- nama pemilik
+- tombol copy nomor rekening
+- nominal pembayaran
+- instruksi pembayaran
+
+E-Wallet:
+- provider
+- nomor/account
+- tombol copy
+- nominal pembayaran
+- instruksi pembayaran
+
+Gunakan komponen reusable jika memungkinkan.
+
+==================================================
+9. DEV PAYMENT FLOW
+==================================================
+
+Karena masih DEV/Sandbox:
+
+Customer dapat membuat order/payment intent tanpa transaksi uang nyata.
+
+Gunakan status payment yang sudah ada di project.
+
+Contoh lifecycle:
+
+PENDING
+→ WAITING_PAYMENT
+→ PAID
+→ FAILED
+→ EXPIRED
+
+Jangan mengubah status order secara sembarangan.
+
+Payment status dan Order status harus tetap dipisahkan.
+
+Jika existing project sudah memiliki enum/status berbeda, gunakan enum existing.
+
+==================================================
+10. ADMIN PAYMENT MANAGEMENT
+==================================================
+
+Tambahkan ringkasan payment di admin jika struktur existing mendukung.
+
+Minimal admin dapat melihat:
+
+- order ID
+- customer
+- total
+- payment method
+- payment status
+- order status
+- createdAt
+
+Admin dapat melakukan aksi yang memang sudah didukung architecture existing.
+
+Untuk DEV:
+
+- jangan menghubungkan tombol "Confirm Paid" ke payment provider nyata.
+- jika membutuhkan manual verification, buat flow DEV yang aman.
+
+==================================================
+11. VALIDATION
+==================================================
+
+Validasi:
+
+QRIS:
+- file image saja
+- ukuran file dibatasi
+- upload gagal → error jelas
+
+Bank:
+- bank name wajib
+- account name wajib
+- account number wajib
+
+E-wallet:
+- provider wajib
+- account number wajib
+
+Jangan menyimpan data invalid.
+
+Gunakan server-side validation untuk mutation.
+
+Jangan hanya mengandalkan client-side validation.
+
+==================================================
+12. SECURITY
+==================================================
+
+Pastikan seluruh admin mutation dilindungi requireAdmin atau mekanisme auth admin existing.
+
+Guest/customer tidak boleh:
+
+- menambah payment method
+- edit payment method
+- delete payment method
+- toggle payment method
+- mengubah QRIS
+- mengubah rekening
+
+Customer hanya boleh membaca payment method aktif.
+
+Jangan expose credential/payment secret ke client.
+
+Jangan commit:
+
+.env
+.env.local
+secret
+API key
+production credential
+payment credential
+
+==================================================
+13. DATABASE
+==================================================
+
+Gunakan Prisma/database existing.
+
+Sebelum membuat migration:
+
+- audit schema terlebih dahulu.
+- jika model payment method sudah ada, gunakan model tersebut.
+- jika belum ada dan memang diperlukan, buat model minimal dan modular.
+
+Jangan menghapus data existing.
+
+Jangan reset database.
+
+Jangan menjalankan:
+
+prisma migrate reset
+
+Jangan menggunakan mock database sebagai pengganti database DEV.
+
+Jika migration diperlukan, buat migration normal dan aman.
+
+==================================================
+14. UI ADMIN
+==================================================
+
+UI harus mengikuti style Admin Panel existing.
+
+Desktop:
+- table/card yang rapi
+- status badge
+- action menu
+- modal/form yang jelas
+
+Mobile:
+- jangan membuat horizontal overflow
+- table boleh berubah menjadi card/list
+- tombol tidak keluar viewport
+- form full width
+- modal tidak terpotong
+
+Gunakan komponen existing jika tersedia.
+
+Jangan redesign seluruh Admin Panel.
+
+==================================================
+15. ERROR HANDLING
+==================================================
+
+Semua mutation harus memiliki error handling.
+
+Tidak boleh ada:
+
+- unhandled exception
+- blank page
+- React client-side exception
+- HTTP 500 untuk validation error
+- silent failure
+
+Gunakan response error yang konsisten dengan API existing.
+
+Validation:
+400
+
+Unauthorized:
+401
+
+Forbidden:
+403
+
+Not found:
+404
+
+Unexpected server error:
+500
+
+Jangan mengubah error 400/404 menjadi 500.
+
+==================================================
+16. CHECKOUT REGRESSION
+==================================================
+
+Pastikan perubahan payment tidak merusak:
+
+- homepage
+- category
+- product detail
+- cart
+- checkout detail
+- payment selection
+- order creation
+- orders page
+- admin orders
+- admin products
+- admin categories
+
+Khusus masalah sebelumnya:
+
+Jika customer sudah berada di checkout lalu kembali ke halaman utama dan membeli produk lain, jangan menyebabkan cart/order menjadi duplikat secara tidak sengaja.
+
+Pastikan state checkout/cart tetap konsisten.
+
+==================================================
+17. TEST
+==================================================
+
+Buat test yang relevan.
+
+Minimal test:
+
+A. Admin:
+- list payment methods
+- create QRIS/config
+- create bank
+- edit bank
+- toggle bank
+- delete bank
+- create e-wallet
+- edit e-wallet
+- toggle e-wallet
+- delete e-wallet
+
+B. Customer:
+- hanya melihat active payment methods
+- inactive method tidak muncul
+- payment detail benar
+- checkout tidak crash jika payment method kosong
+
+C. Auth:
+- guest tidak dapat mutation admin
+- customer tidak dapat mutation admin
+- admin dapat mutation
+
+D. Error:
+- invalid bank
+- invalid e-wallet
+- invalid upload
+- missing payment method
+- nonexistent payment method
+
+==================================================
+18. RESPONSIVE TEST
+==================================================
+
+Verifikasi minimal:
+
+360px
+375px
+390px
+414px
+768px
+1280px
+1440px
+
+Pastikan:
+
+- tidak ada horizontal overflow
+- tombol tidak keluar layar
+- modal tidak terpotong
+- form tidak melebar
+- table/list tetap usable
+- checkout tetap usable
+
+==================================================
+19. BUILD VERIFICATION
+==================================================
+
+Setelah implementasi:
+
+npm run typecheck
+
+npm run build
+
+Jalankan development server dan lakukan smoke test route terkait.
+
+Verifikasi minimal:
+
+/admin
+/admin/settings/payment
+/products
+/product/[slug]
+/checkout
+/orders
+
+Gunakan route yang benar sesuai struktur project.
+
+Jika ada test existing:
+jalankan test yang relevan.
+
+Jangan berhenti hanya karena build PASS jika runtime masih error.
+
+==================================================
+20. GIT
+==================================================
+
+Sebelum commit:
+
+git status --short
+
+git diff --check
+
+Pastikan:
+
+- tidak ada .env
+- tidak ada secret
+- tidak ada credential
+- tidak ada temporary test file
+- tidak ada build artifact
+- tidak ada debug file
+
+Jika semua PASS:
+
+git add <file yang memang berubah>
+
+git commit -m "feat(admin): add payment settings"
+
+git push origin main
+
+JANGAN force push.
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+git status -sb
+
+Pastikan branch sinkron dengan origin/main.
+
+==================================================
+21. OUTPUT AKHIR
+==================================================
+
+Setelah selesai, tampilkan:
+
+1. File yang diubah
+2. Database/schema yang berubah jika ada
+3. API/route yang ditambahkan
+4. Fitur Admin Payment Settings yang berhasil
+5. Fitur Customer Checkout yang berhasil
+6. Test yang dijalankan
+7. Hasil typecheck
+8. Hasil build
+9. Hasil smoke test
+10. Commit hash
+11. Push status
+12. Blocker jika ada
+
+ATURAN PALING PENTING:
+
+- DEV/Sandbox saja.
+- Tidak ada transaksi uang nyata.
+- Tidak ada production payment key.
+- Jangan reset database.
+- Jangan hapus fitur existing.
+- Jangan merusak UI customer yang sudah PASS.
+- Jangan merusak Admin Products/Categories/Orders.
+- Jangan membuat mock sebagai pengganti database.
+- Jangan force push.
+- Jika menemukan error, perbaiki dan test ulang.
+- Jika semuanya PASS, commit dan push.
 
 
 ```
