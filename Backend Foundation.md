@@ -41,10 +41,70 @@
 
 
 ```
-# 
+# Prompt: Diagnose Production Host Error
 ```
 
+Sekarang jangan ubah fitur Facebook, UI, upload, atau architecture.
 
+Fokus hanya memperbaiki production host error pada:
+
+https://contentpilot.biz.id
+
+Browser = Working
+Cloudflare = Working
+Host = Error / Bad Gateway
+
+Lakukan diagnosis terlebih dahulu, jangan menebak.
+
+Periksa:
+
+1. Status service web Content Pilot.
+2. Status API/backend.
+3. Status nginx.
+4. Port yang sedang digunakan oleh web dan API.
+5. Apakah nginx upstream mengarah ke port/service yang benar.
+6. Apakah process web/backend sedang running.
+7. Apakah service crash setelah restart.
+8. Cek:
+   - systemctl status nginx
+   - systemctl status terkait Content Pilot jika ada
+   - ss -lntp
+   - nginx -t
+   - nginx error log
+   - service/application log
+9. Test endpoint dari server:
+   - /health
+   - /ready
+   - /api/platforms
+10. Test origin secara lokal menggunakan curl ke port sebenarnya.
+11. Pastikan production tidak menggunakan localhost:4000 jika service sebenarnya berjalan pada port lain.
+12. Pastikan nginx → upstream → application chain benar.
+13. Jangan mengubah source code fitur Facebook.
+14. Jangan mengubah database.
+15. Jangan menghapus konfigurasi.
+16. Jangan melakukan reinstall dependency kecuali benar-benar diperlukan.
+
+Setelah menemukan penyebabnya:
+
+- jelaskan root cause terlebih dahulu
+- lakukan perbaikan minimal
+- restart service yang memang diperlukan
+- jalankan nginx config test
+- test endpoint dari server
+- test domain production melalui HTTPS
+- pastikan Cloudflare kembali menunjukkan Host Working
+
+Kemudian lakukan verification:
+
+API HEALTH: PASS
+WEB: PASS
+NGINX: PASS
+PRODUCTION HTTPS: PASS
+CONTENTPILOT.BIZ.ID: PASS
+
+Jika semuanya PASS, STOP.
+
+Jangan melanjutkan ke Facebook upload sebelum host production benar-benar sehat.
 
 ```
 # Prompt: UI Final Audit & Responsive Verification
