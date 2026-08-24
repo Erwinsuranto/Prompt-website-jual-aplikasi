@@ -23,9 +23,49 @@
 
 
 ```
-# 
+# Prompt: Perbaiki Reset Cart Saat Kembali Belanja
 ```
+Perbaiki bug customer cart flow pada project toko-online.
 
+Masalah yang ditemukan:
+- User sudah berada di halaman checkout.
+- Jika user kembali ke halaman utama lalu membeli produk lagi, cart lama masih terbawa.
+- Akibatnya checkout berikutnya menjadi 2 produk / 2 item padahal user hanya ingin membeli 1 produk baru.
+- State cart harus benar-benar mencerminkan produk yang sedang dipilih user.
+- Jangan sampai quantity, subtotal, atau total pembayaran menjadi tidak sinkron.
+
+Tugas:
+1. Audit implementasi cart state saat:
+   - tambah produk
+   - buka checkout
+   - kembali ke halaman utama
+   - membeli produk lagi
+   - refresh halaman
+   - logout/login
+2. Tentukan sumber state cart yang sebenarnya digunakan (client state, localStorage, session, atau lainnya).
+3. Perbaiki agar ketika user keluar dari checkout untuk kembali berbelanja, cart lama tidak otomatis menggandakan transaksi baru.
+4. Jangan menghapus cart secara sembarangan saat user hanya berpindah antar-step checkout.
+5. Jika user memang memilih "Beli Sekarang" dari halaman produk, pastikan flow tersebut menghasilkan cart/order context yang sesuai dengan produk yang dipilih.
+6. Pastikan produk yang sama tidak menjadi duplikat hanya karena navigasi/re-entry.
+7. Pastikan quantity, subtotal, total dan daftar item selalu dihitung dari state cart terbaru.
+8. Setelah perbaikan, test minimal:
+   - beli 1 produk → checkout = 1 produk / 1 item
+   - kembali ke beranda → pilih produk → checkout lagi = hanya 1 produk / 1 item
+   - tambah quantity 2 → checkout = 1 produk / 2 item
+   - refresh checkout → state tetap konsisten
+   - kembali antar-step checkout → cart tidak hilang
+9. Jangan mengubah database schema, authentication, payment gateway, admin panel, atau desain UI.
+10. Jangan membuat mock payment.
+11. Jalankan typecheck dan build.
+12. Jalankan smoke test customer flow.
+13. Jika semua PASS, commit dan push ke origin main tanpa force push.
+14. Sebelum commit:
+   git diff --check
+   git status --short
+15. Jangan commit jika ada error atau secret.
+
+PENTING:
+Fokus hanya pada bug cart/state dan konsistensi subtotal/total. Jangan melakukan redesign UI atau perubahan backend yang tidak diperlukan.
 
 
 ```
