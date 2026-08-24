@@ -1,7 +1,717 @@
 
+
+
+
+
 # 
 ```
 
+
+
+```
+# 
+```
+
+
+
+```
+# Prompt: Admin Dashboard — Full Implementation & Verification
+```
+PROMPT: ADMIN DASHBOARD — FULL IMPLEMENTATION & VERIFICATION
+
+Project: Digital Cell / toko-online
+
+Konteks:
+- Admin Categories sudah selesai dan terverifikasi.
+- Admin Category CRUD sudah PASS.
+- Admin Product CRUD sudah PASS.
+- Product aktif/nonaktif sudah bekerja.
+- Database development sudah berisi data test.
+- Customer UI mobile sudah diperbaiki dan responsive.
+- Typecheck/build/smoke test sebelumnya PASS.
+- Jangan mengulang atau merusak fitur yang sudah PASS.
+
+TUJUAN:
+Sekarang implementasikan dan rapikan ADMIN DASHBOARD menggunakan data nyata dari database development.
+
+PENTING:
+Dashboard harus benar-benar mengambil data dari backend/database.
+Jangan menggunakan angka dummy/hardcoded untuk KPI.
+
+==================================================
+1. AUDIT ADMIN DASHBOARD TERLEBIH DAHULU
+==================================================
+
+Audit struktur project sebelum mengubah kode.
+
+Cari:
+- route admin dashboard
+- layout admin
+- middleware/auth admin
+- repository/service
+- Prisma schema
+- model User
+- model Product
+- model Category
+- model Order
+- model OrderItem
+- model Payment
+- model PaymentMethod jika ada
+- model Stock jika ada
+- service/repository terkait
+- komponen chart/statistik jika sudah ada
+
+Gunakan architecture existing.
+
+Jangan membuat ulang sistem yang sudah ada.
+
+Jika dashboard sudah ada tetapi masih menggunakan mock/static data:
+- ganti hanya bagian data source-nya
+- pertahankan UI yang sudah bagus jika memungkinkan.
+
+==================================================
+2. SECURITY ADMIN
+==================================================
+
+Pastikan seluruh dashboard benar-benar protected.
+
+Requirement:
+
+Guest:
+- tidak boleh melihat dashboard
+- redirect ke login
+
+Customer:
+- tidak boleh membuka dashboard
+- response/redirect sesuai pola auth existing
+
+Admin:
+- boleh membuka dashboard
+
+Gunakan middleware/requireAdmin/layout admin existing.
+
+Jangan membuat bypass authentication.
+
+Jangan menaruh secret di client bundle.
+
+Jangan expose:
+- passwordHash
+- secret
+- payment credential
+- API key
+- environment variable
+
+==================================================
+3. KPI DASHBOARD
+==================================================
+
+Dashboard harus menampilkan minimal:
+
+A. Total User
+- jumlah user/customer yang valid
+- gunakan database
+
+B. Total Produk
+- jumlah seluruh produk
+
+C. Produk Aktif
+- jumlah produk dengan status aktif
+
+D. Produk Nonaktif
+- jumlah produk nonaktif
+
+E. Total Kategori
+- jumlah kategori
+
+F. Total Order
+- jumlah order
+
+G. Order Pending
+- jumlah order yang masih pending
+
+H. Order Berhasil
+- jumlah order sukses/paid/completed sesuai enum/status existing
+
+I. Total Pendapatan
+- hitung dari order yang valid/berhasil
+- jangan menghitung order gagal/cancel
+- gunakan field amount/total existing
+- jangan membuat asumsi nama field jika schema berbeda
+
+J. Stok
+Jika schema memiliki stock:
+- total stok
+- produk stok rendah
+- produk habis
+
+Jika stock bukan field/model terpisah:
+- gunakan struktur stock existing.
+
+Jangan mengubah schema hanya untuk membuat KPI.
+
+==================================================
+4. STATISTIK ORDER
+==================================================
+
+Buat section statistik order.
+
+Minimal tampilkan:
+- Pending
+- Processing jika tersedia
+- Paid/Success
+- Completed jika tersedia
+- Failed
+- Cancelled
+
+Gunakan status enum yang benar-benar ada di schema.
+
+Jangan membuat enum/status baru hanya untuk dashboard.
+
+Dashboard harus aman jika database kosong.
+
+Jika database kosong:
+- KPI tetap tampil 0
+- chart tidak crash
+- tampilkan empty state yang rapi.
+
+==================================================
+5. RECENT ORDERS
+==================================================
+
+Tambahkan tabel/list:
+
+Recent Orders
+
+Minimal:
+- Order ID
+- Customer
+- Product
+- Total
+- Status
+- Created At
+- Action/detail
+
+Ambil misalnya 5–10 order terbaru.
+
+Customer information harus aman.
+
+Jangan tampilkan:
+- password
+- passwordHash
+- secret
+- token
+- payment credential
+
+Jika order memiliki banyak item:
+- tampilkan ringkasan item dengan benar
+- jangan menyebabkan duplicate row yang membingungkan.
+
+Tambahkan tombol:
+"Lihat Semua"
+
+arah ke halaman admin orders existing jika sudah tersedia.
+
+==================================================
+6. TOP PRODUCTS
+==================================================
+
+Buat section:
+Produk Terlaris
+
+Gunakan data order/order item yang benar-benar ada.
+
+Tampilkan:
+- nama produk
+- jumlah terjual
+- revenue jika datanya tersedia
+
+Jangan menggunakan angka dummy.
+
+Jika belum ada order:
+- tampilkan empty state:
+  "Belum ada data penjualan"
+
+Jangan membuat seed baru hanya untuk dashboard.
+
+==================================================
+7. LOW STOCK
+==================================================
+
+Jika product memiliki stock:
+
+Buat section:
+Stok Menipis
+
+Tampilkan:
+- nama produk
+- stok
+- status
+
+Minimal kategori:
+- habis
+- rendah
+- tersedia
+
+Threshold stok rendah harus mengikuti konfigurasi existing jika sudah tersedia.
+
+Jika belum ada konfigurasi:
+gunakan threshold sederhana yang tidak mengubah database/schema.
+
+Misalnya:
+stock <= 5 dianggap rendah.
+
+Jangan mengurangi stok hanya karena membuka dashboard.
+
+==================================================
+8. QUICK ACTION
+==================================================
+
+Tambahkan Quick Actions:
+
+- Tambah Produk
+- Kelola Produk
+- Kelola Kategori
+- Kelola Order
+- Kelola User
+- Pengaturan Payment jika route tersebut sudah ada
+
+Gunakan route existing.
+
+Jangan membuat route palsu.
+
+Jika route belum ada:
+jangan membuat fitur baru besar-besaran.
+Tampilkan action hanya untuk fitur yang memang tersedia.
+
+==================================================
+9. REFRESH DATA
+==================================================
+
+Dashboard harus bisa mendapatkan data terbaru.
+
+Gunakan mekanisme existing yang sesuai:
+- server-side fetch
+- revalidation
+- router refresh
+- API/service
+
+Setelah:
+- tambah produk
+- edit produk
+- toggle produk
+- delete produk
+- tambah kategori
+- edit kategori
+- toggle kategori
+- order berubah
+
+Dashboard tidak boleh menampilkan data stale secara permanen.
+
+Jangan membuat polling agresif.
+
+==================================================
+10. LOADING STATE
+==================================================
+
+Buat loading state yang rapi.
+
+Saat dashboard sedang mengambil data:
+- jangan tampilkan halaman kosong
+- gunakan skeleton/loading state sesuai design existing.
+
+==================================================
+11. ERROR STATE
+==================================================
+
+Jika database/API error:
+
+Jangan tampilkan:
+- stack trace
+- SQL error mentah
+- Prisma internal error
+- secret
+- environment variable
+
+Tampilkan pesan user-friendly.
+
+Contoh:
+"Data dashboard gagal dimuat. Silakan coba lagi."
+
+Jika aman:
+- tombol Retry.
+
+==================================================
+12. EMPTY DATABASE
+==================================================
+
+WAJIB dites dengan kondisi database kosong secara aman.
+
+Dashboard harus tetap render.
+
+Expected:
+- Total User = 0
+- Total Produk = 0
+- Total Kategori = 0
+- Total Order = 0
+- Pendapatan = Rp 0
+- chart/list empty state
+- tidak ada NaN
+- tidak ada undefined
+- tidak ada hydration error
+- tidak ada exception
+
+Jangan reset database production.
+
+Gunakan environment development/test jika perlu untuk verifikasi.
+
+==================================================
+13. RESPONSIVE UI
+==================================================
+
+Dashboard harus responsive.
+
+WAJIB cek:
+- 360px
+- 375px
+- 390px
+- 414px
+- desktop 1280px+
+- desktop 1440px+
+
+Mobile:
+- tidak boleh horizontal overflow
+- KPI card harus wrap menjadi 1–2 kolom sesuai ruang
+- tabel boleh berubah menjadi card/list jika diperlukan
+- chart tidak boleh keluar layar
+- sidebar/admin navigation tidak boleh menutupi content
+- tombol tetap bisa ditekan
+- text tidak terpotong secara buruk
+
+Desktop:
+- gunakan ruang dengan baik
+- KPI tidak terlalu besar
+- tidak ada empty space berlebihan
+- tabel tetap mudah dibaca.
+
+Jangan mengubah desain customer storefront yang sudah PASS.
+
+==================================================
+14. VISUAL CONSISTENCY
+==================================================
+
+Ikuti design system Digital Cell yang sudah ada:
+
+- clean
+- white/light base
+- midnight/dark navy
+- rounded card
+- subtle border/shadow
+- typography konsisten
+- spacing konsisten
+- icon konsisten
+
+Jangan membuat dashboard dengan desain berbeda total dari admin panel existing.
+
+Jangan mengubah customer UI kecuali ada bug yang benar-benar berasal dari shared component.
+
+==================================================
+15. ADMIN NAVIGATION
+==================================================
+
+Pastikan admin navigation memiliki minimal:
+
+Dashboard
+Products
+Categories
+Orders
+Users
+Payment/Settings jika tersedia
+
+Active menu harus jelas.
+
+Mobile admin navigation:
+- tidak boleh overflow
+- menu bisa dibuka/tutup
+- tidak menutupi content secara permanen.
+
+Gunakan layout admin existing.
+
+==================================================
+16. DATA ACCESS / PERFORMANCE
+==================================================
+
+Jangan melakukan query berulang tanpa alasan.
+
+Jika memungkinkan:
+- gunakan aggregate/count/groupBy Prisma
+- gunakan select field seperlunya
+- jangan fetch seluruh database hanya untuk menghitung KPI
+- gunakan Promise.all untuk query independen jika aman
+
+Hindari N+1 query.
+
+Recent orders dan top products harus memiliki limit.
+
+Jangan membuat dashboard lambat hanya karena terlalu banyak query.
+
+==================================================
+17. PRISMA
+==================================================
+
+Gunakan Prisma/schema existing.
+
+Jangan:
+- membuat migration baru
+- mengubah schema
+- menghapus migration
+- mengganti database
+- mengganti provider database
+- reset DB
+
+Kecuali ditemukan bug kritis yang benar-benar mengharuskan perubahan schema.
+
+Jika schema sudah cukup:
+jangan menyentuh schema.
+
+==================================================
+18. API / SERVICE ARCHITECTURE
+==================================================
+
+Ikuti architecture existing.
+
+Jika project menggunakan:
+- repository
+- service
+- API route
+- server action
+
+ikuti pola yang sudah digunakan.
+
+Jangan membuat semua logic dalam page.tsx.
+
+Dashboard data harus modular.
+
+Contoh struktur yang boleh digunakan jika cocok dengan architecture:
+
+dashboard-service
+dashboard repository
+dashboard statistics helper
+
+Tetapi jangan membuat file hanya untuk formalitas.
+
+==================================================
+19. TESTING
+==================================================
+
+Setelah implementasi:
+
+A. Typecheck
+npm run typecheck
+
+HARUS:
+PASS
+
+B. Build
+npm run build
+
+HARUS:
+PASS
+
+C. Jalankan development server.
+
+Verifikasi route admin dashboard.
+
+D. Smoke test:
+
+Guest:
+- /admin/dashboard -> redirect/login
+
+Customer:
+- /admin/dashboard -> 401/403/redirect sesuai architecture
+
+Admin:
+- /admin/dashboard -> 200
+
+E. Verifikasi KPI.
+
+Dengan data development:
+- angka harus sesuai database.
+
+F. Verifikasi recent orders.
+
+G. Verifikasi top products.
+
+H. Verifikasi low stock.
+
+I. Verifikasi empty database behavior jika aman dilakukan tanpa reset production.
+
+==================================================
+20. BROWSER / MOBILE VERIFICATION
+==================================================
+
+Verifikasi dashboard secara visual pada:
+
+360px
+375px
+390px
+414px
+desktop
+
+Perhatikan:
+
+- horizontal scrollbar
+- card overflow
+- table overflow
+- chart overflow
+- sidebar
+- header
+- buttons
+- typography
+- spacing
+- modal
+- dropdown
+
+Jika ada masalah responsive:
+perbaiki hanya dashboard/admin component terkait.
+
+Jangan merusak customer storefront yang sebelumnya sudah dinyatakan stabil.
+
+==================================================
+21. REGRESSION TEST
+==================================================
+
+Pastikan fitur existing tetap PASS:
+
+Customer:
+- /
+- /products
+- /categories
+- /search
+- /product/[slug]
+- /checkout
+- /orders
+- /profile
+
+Admin:
+- /admin/dashboard
+- /admin/products
+- /admin/categories
+- /admin/orders
+- /admin/users
+
+Pastikan:
+- tidak ada 500
+- tidak ada client-side exception
+- tidak ada hydration error
+- tidak ada authentication bypass.
+
+==================================================
+22. JANGAN MENYENTUH PAYMENT PRODUCTION
+==================================================
+
+PENTING:
+
+Jangan mengaktifkan Midtrans production.
+
+Jangan meminta atau membuat credential payment.
+
+Jangan memasukkan:
+- PAYMENT_PROVIDER_MIDTRANS_SERVER_KEY
+- secret payment
+- API key
+
+ke source code.
+
+Jangan melakukan transaksi uang nyata.
+
+Payment production tetap menjadi tahap berikutnya setelah dashboard dan seluruh admin flow stabil.
+
+==================================================
+23. GIT
+==================================================
+
+Sebelum commit:
+
+git status --short
+git diff --check
+
+Pastikan:
+- working tree hanya berisi perubahan yang memang diperlukan
+- tidak ada .env
+- tidak ada secret
+- tidak ada credential
+- tidak ada build artifact
+- tidak ada temporary test file
+
+Jika ada file temporary dari testing:
+hapus sebelum commit.
+
+==================================================
+24. COMMIT & PUSH
+==================================================
+
+Jika seluruh implementasi dan verifikasi PASS:
+
+commit:
+
+feat(admin): add real dashboard statistics
+
+Lalu:
+
+git push origin main
+
+TANPA force push.
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+git status -sb
+
+Pastikan:
+- working tree bersih
+- origin/main sinkron
+- commit berhasil masuk.
+
+==================================================
+25. FINAL REPORT
+==================================================
+
+Setelah selesai laporkan:
+
+1. File yang diubah
+2. Dashboard features yang ditambahkan
+3. KPI yang tersedia
+4. Sumber data masing-masing KPI
+5. Recent orders
+6. Top products
+7. Low stock
+8. Authentication verification
+9. Mobile responsive verification
+10. Empty database verification
+11. typecheck result
+12. build result
+13. smoke test result
+14. git commit hash
+15. push status
+
+Jika ada blocker:
+jelaskan blocker sebenarnya.
+
+Jangan mengklaim PASS jika belum benar-benar dites.
+
+ATURAN PALING PENTING:
+
+- Jangan reset database.
+- Jangan menghapus data existing.
+- Jangan mengubah schema tanpa alasan kuat.
+- Jangan membuat mock data untuk menggantikan database.
+- Jangan mengaktifkan payment production.
+- Jangan merusak Categories/Product yang sudah PASS.
+- Jangan merusak customer UI.
+- Jangan force push.
+- Jangan commit secret.
+- Jangan berhenti hanya karena UI terlihat benar; lakukan typecheck, build, smoke test, dan regression.
 
 
 ```
