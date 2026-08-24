@@ -9,10 +9,855 @@
 
 
 ```
-# 
+# Prompt: Admin Orders — Full Implementation & Verification
 ```
 
+PROMPT: ADMIN ORDERS — FULL IMPLEMENTATION & VERIFICATION
 
+Project: Digital Cell / toko-online
+
+STATUS SEBELUMNYA:
+- Admin Categories: PASS
+- Admin Products: PASS
+- Admin Dashboard: PASS
+- Dashboard menggunakan data nyata dari database
+- Authentication admin/customer/guest sudah diverifikasi
+- Responsive customer UI sudah stabil
+- Typecheck/build/smoke/regression sebelumnya PASS
+- Git branch main sinkron dengan origin/main
+
+TUJUAN:
+Implementasikan dan selesaikan ADMIN ORDERS secara production-ready dari sisi kode dan development environment.
+
+Fokus:
+- daftar order
+- pencarian
+- filter
+- status
+- pagination
+- order detail
+- customer information
+- order items
+- total
+- update status
+- validasi backend
+- responsive admin UI
+- integrasi database nyata
+
+JANGAN menyentuh payment production/Midtrans production pada tahap ini.
+
+==================================================
+1. AUDIT SEBELUM IMPLEMENTASI
+==================================================
+
+Audit terlebih dahulu struktur project.
+
+Cari dan pahami:
+- admin layout
+- admin navigation
+- admin orders route/page
+- order-service
+- order repository jika ada
+- Prisma schema
+- Order
+- OrderItem
+- Product
+- User/Customer
+- Payment
+- PaymentMethod
+- status enum
+- existing API/server action
+- auth middleware
+
+Jangan langsung membuat file baru sebelum memahami architecture existing.
+
+Gunakan service/repository yang sudah ada jika memungkinkan.
+
+Jangan membuat duplicate order service.
+
+==================================================
+2. AUTHORIZATION
+==================================================
+
+Semua halaman dan mutation admin order WAJIB protected.
+
+Guest:
+- tidak boleh mengakses admin orders
+- redirect/login sesuai architecture existing
+
+Customer:
+- tidak boleh mengakses admin order management
+- harus mendapatkan 401/403/redirect sesuai pola existing
+
+Admin:
+- boleh melihat dan mengelola order.
+
+Jangan membuat endpoint yang bisa mengubah status order tanpa requireAdmin.
+
+Jangan mempercayai role yang dikirim dari client.
+
+Role harus diverifikasi dari session/server.
+
+==================================================
+3. ORDER LIST
+==================================================
+
+Buat/rapikan:
+
+/admin/orders
+
+Tampilkan order dari database nyata.
+
+Kolom desktop minimal:
+
+- Order ID
+- Customer
+- Produk
+- Total
+- Payment Status
+- Order Status
+- Created At
+- Action
+
+Jika order memiliki banyak item:
+jangan membuat satu order muncul sebagai banyak row.
+
+Satu order tetap satu row.
+
+Produk dapat diringkas:
+contoh:
+"Mobile Legends 500 + 1 item"
+
+atau format yang sesuai design existing.
+
+==================================================
+4. SEARCH
+==================================================
+
+Tambahkan search.
+
+Search minimal dapat berdasarkan:
+- Order ID
+- nama customer
+- nomor WhatsApp jika tersedia
+
+Gunakan query/database filtering yang benar.
+
+Jangan mengambil seluruh order ke browser hanya untuk search.
+
+Jika search dilakukan server-side:
+gunakan parameter URL/query yang aman.
+
+Contoh:
+
+/admin/orders?search=...
+
+Search harus:
+- case-insensitive jika database mendukung
+- aman
+- tidak menyebabkan exception
+- tetap bekerja bersama filter/pagination.
+
+==================================================
+5. FILTER STATUS
+==================================================
+
+Tambahkan filter berdasarkan status yang benar-benar ada di schema.
+
+Contoh jika enum tersedia:
+
+Pending
+Processing
+Paid
+Completed
+Failed
+Cancelled
+
+JANGAN membuat status baru.
+
+Gunakan enum/schema existing.
+
+Filter harus bekerja bersama:
+- search
+- pagination
+
+Contoh:
+
+/admin/orders?status=pending
+/admin/orders?status=completed
+
+Jika status tidak valid:
+jangan crash.
+
+Gunakan fallback:
+- semua order
+atau
+- tampilkan error validasi yang aman.
+
+==================================================
+6. FILTER PAYMENT
+==================================================
+
+Jika model Payment tersedia:
+
+Tambahkan filter:
+- Unpaid
+- Pending
+- Paid
+- Failed
+- Expired
+
+HANYA gunakan status yang memang ada.
+
+Jika payment status belum tersedia dalam schema:
+jangan mengubah schema hanya untuk membuat filter.
+
+==================================================
+7. DATE FILTER
+==================================================
+
+Jika architecture existing mendukung:
+
+Tambahkan:
+- Today
+- 7 days
+- 30 days
+
+Gunakan CreatedAt/order date existing.
+
+Jangan mengubah database.
+
+Jika date filter membuat UI terlalu kompleks:
+prioritaskan search + status terlebih dahulu.
+
+==================================================
+8. PAGINATION
+==================================================
+
+Order list harus menggunakan pagination.
+
+Default:
+10 order/page.
+
+Tampilkan:
+- current page
+- total pages
+- next
+- previous
+
+Jangan fetch seluruh order jika database sudah besar.
+
+Gunakan:
+- skip/take
+atau
+- cursor pagination
+
+sesuai architecture existing.
+
+Pagination harus tetap bekerja dengan:
+- search
+- status filter
+- payment filter
+- date filter jika tersedia.
+
+==================================================
+9. ORDER DETAIL
+==================================================
+
+Buat/rapikan detail order.
+
+Contoh:
+
+/admin/orders/[id]
+
+Tampilkan:
+
+ORDER INFORMATION
+- Order ID
+- Created At
+- Order Status
+
+CUSTOMER
+- Nama
+- WhatsApp
+- email jika tersedia
+
+PRODUCTS
+- Product
+- Quantity
+- Unit price
+- Subtotal
+
+PAYMENT
+- Payment status
+- Payment method
+- Payment amount
+- Payment reference jika aman ditampilkan
+
+TOTAL
+- subtotal
+- discount jika memang ada
+- fee jika memang ada
+- total
+
+Jangan tampilkan:
+- passwordHash
+- API key
+- secret
+- payment server key
+- internal credential.
+
+==================================================
+10. ORDER ITEM
+==================================================
+
+Pastikan order detail menggunakan relation order -> orderItems -> product.
+
+Jangan mengambil product berdasarkan nama.
+
+Gunakan relation/ID yang benar.
+
+Jika product sudah dihapus tetapi OrderItem masih memiliki snapshot:
+gunakan data snapshot yang memang tersedia.
+
+Jangan menyebabkan order lama rusak hanya karena product dihapus.
+
+==================================================
+11. UPDATE ORDER STATUS
+==================================================
+
+Admin harus bisa mengubah status order.
+
+Contoh jika status enum mendukung:
+
+Pending
+→ Processing
+→ Completed
+
+atau flow yang memang sesuai schema.
+
+WAJIB:
+- validasi status di server
+- validasi order ID
+- requireAdmin
+- update database
+- return result aman
+- refresh data setelah berhasil.
+
+Jangan hanya mengubah status di UI.
+
+==================================================
+12. STATUS TRANSITION
+==================================================
+
+Periksa status transition yang benar-benar cocok dengan architecture.
+
+Jangan mengizinkan perubahan status sembarangan jika business logic existing melarangnya.
+
+Contoh:
+Completed -> Pending
+
+tidak boleh dilakukan jika memang status completed bersifat final.
+
+Jangan membuat aturan baru tanpa memeriksa existing order-service.
+
+Jika order-service sudah memiliki transition validation:
+gunakan itu.
+
+==================================================
+13. PAYMENT STATUS
+==================================================
+
+Jangan mencampur:
+
+Order Status
+
+dengan
+
+Payment Status
+
+Jika keduanya memang field berbeda di schema:
+
+Order Status:
+- Pending
+- Processing
+- Completed
+- Cancelled
+
+Payment Status:
+- Pending
+- Paid
+- Failed
+- Expired
+
+Gunakan status yang sebenarnya ada.
+
+Jangan mengubah payment status secara otomatis hanya karena admin mengubah order status kecuali existing service memang mendesain demikian.
+
+==================================================
+14. ORDER ACTIONS
+==================================================
+
+Pada order list minimal:
+
+View Detail
+
+Jika status dapat diubah:
+- Update Status
+
+Jangan menambahkan:
+- Delete order
+
+kecuali architecture existing memang memiliki kebutuhan tersebut.
+
+Order history sebaiknya tidak dihapus sembarangan.
+
+==================================================
+15. CONFIRMATION
+==================================================
+
+Update status harus memiliki confirmation UI jika perubahan bersifat penting.
+
+Contoh:
+
+"Ubah status order menjadi Completed?"
+
+Tombol:
+- Batal
+- Konfirmasi
+
+Jangan melakukan mutation hanya karena user memilih dropdown tanpa confirmation jika design existing memerlukan confirmation.
+
+==================================================
+16. SUCCESS / ERROR FEEDBACK
+==================================================
+
+Setelah update:
+
+Success:
+"Status order berhasil diperbarui."
+
+Error:
+"Gagal memperbarui status order. Silakan coba lagi."
+
+Jangan tampilkan:
+- Prisma error
+- SQL error
+- stack trace
+- internal exception
+- secret.
+
+Jika order tidak ditemukan:
+
+404 / not found yang sesuai architecture.
+
+==================================================
+17. LOADING STATE
+==================================================
+
+Tambahkan loading state untuk:
+- order list
+- detail
+- status update
+
+Jangan membuat halaman blank.
+
+Gunakan skeleton/spinner sesuai design system existing.
+
+==================================================
+18. EMPTY STATE
+==================================================
+
+Jika tidak ada order:
+
+Tampilkan:
+
+"Belum ada pesanan"
+
+dengan penjelasan singkat.
+
+Jika filter menghasilkan 0:
+
+"Pesanan tidak ditemukan"
+
+Jangan menampilkan error server.
+
+==================================================
+19. RESPONSIVE ADMIN ORDERS
+==================================================
+
+WAJIB verifikasi:
+
+360px
+375px
+390px
+414px
+1280px
+1440px
+
+Mobile:
+
+Jangan menggunakan tabel yang menyebabkan horizontal overflow.
+
+Jika tabel terlalu lebar:
+ubah menjadi card/list responsive.
+
+Setiap order card minimal menampilkan:
+- Order ID
+- customer
+- total
+- status
+- waktu
+- tombol detail.
+
+Search/filter harus tetap mudah digunakan di mobile.
+
+Desktop:
+- tabel boleh digunakan
+- gunakan ruang dengan baik
+- jangan terlalu besar
+- jangan terlalu padat.
+
+Tidak boleh:
+- horizontal page overflow
+- button keluar layar
+- modal keluar viewport
+- dropdown terpotong.
+
+==================================================
+20. ADMIN NAVIGATION
+==================================================
+
+Pastikan:
+
+Dashboard
+Products
+Categories
+Orders
+Users
+Settings/payment jika tersedia
+
+Orders menjadi active menu saat berada di:
+- /admin/orders
+- /admin/orders/[id]
+
+Jangan membuat duplicate navigation.
+
+==================================================
+21. DATABASE PERFORMANCE
+==================================================
+
+Order list:
+- gunakan pagination
+- select field seperlunya
+- include relation seperlunya
+
+Hindari N+1 query.
+
+Untuk total count:
+gunakan count/aggregate.
+
+Untuk order list:
+gunakan query yang terlimit.
+
+Untuk order detail:
+gunakan satu query relation yang sesuai jika memungkinkan.
+
+Jangan fetch seluruh product/user/order database.
+
+==================================================
+22. SECURITY
+==================================================
+
+Pastikan:
+
+- admin authorization server-side
+- mutation server-side
+- ID validation
+- status validation
+- tidak ada mass assignment berbahaya
+- customer tidak dapat mengubah order miliknya melalui admin endpoint
+- customer tidak dapat mengakses order admin lainnya
+- tidak ada secret di response.
+
+Jangan menerima:
+
+{
+  role: "admin"
+}
+
+dari client sebagai bukti admin.
+
+==================================================
+23. CUSTOMER REGRESSION
+==================================================
+
+Setelah Admin Orders selesai, jangan merusak customer:
+
+/products
+/categories
+/product/[slug]
+/checkout
+/orders
+/profile
+
+Pastikan customer order history tetap dapat bekerja sesuai architecture.
+
+Jika customer order status mengambil data dari order yang sama:
+pastikan perubahan admin terlihat setelah refresh.
+
+==================================================
+24. PAYMENT SAFETY
+==================================================
+
+PENTING:
+
+Jangan mengaktifkan:
+- Midtrans production
+- transaksi uang nyata
+- production server key
+
+Jangan meminta credential payment.
+
+Jangan mengubah payment provider.
+
+Admin Orders hanya mengelola data order yang sudah tersedia.
+
+Development/sandbox tetap aman.
+
+==================================================
+25. TEST DATA
+==================================================
+
+Gunakan data development yang sudah tersedia.
+
+Jangan membuat banyak mock order hanya untuk membuat dashboard terlihat penuh.
+
+Jika perlu satu order tambahan untuk testing:
+gunakan service/API existing dan data development saja.
+
+Jangan seed data production.
+
+==================================================
+26. TESTING
+==================================================
+
+Jalankan:
+
+npm run typecheck
+
+Expected:
+PASS
+
+Kemudian:
+
+npm run build
+
+Expected:
+PASS
+
+Jalankan development server.
+
+Test:
+
+1. Guest -> /admin/orders
+Expected:
+redirect/login
+
+2. Customer -> /admin/orders
+Expected:
+403/redirect
+
+3. Admin -> /admin/orders
+Expected:
+200
+
+4. Admin -> order detail
+Expected:
+200
+
+5. Search order
+Expected:
+hasil benar
+
+6. Filter status
+Expected:
+hasil benar
+
+7. Pagination
+Expected:
+berfungsi
+
+8. Update status
+Expected:
+database berubah
+
+9. Refresh
+Expected:
+status tetap benar
+
+10. Invalid order ID
+Expected:
+404/not found
+
+11. Invalid status
+Expected:
+ditolak dengan aman
+
+12. Empty result
+Expected:
+empty state
+
+13. Mobile
+Expected:
+tanpa overflow
+
+==================================================
+27. DATABASE VERIFICATION
+==================================================
+
+Setelah update status:
+
+verifikasi langsung ke database/service bahwa status benar-benar berubah.
+
+Jangan hanya mengandalkan UI.
+
+Contoh:
+
+Order sebelum:
+PENDING
+
+Admin update:
+COMPLETED
+
+Refresh:
+COMPLETED
+
+Database:
+COMPLETED
+
+Semua harus konsisten.
+
+==================================================
+28. ERROR / NO-500 VERIFICATION
+==================================================
+
+Smoke test:
+
+/admin/orders
+/admin/orders/[valid-id]
+/admin/orders/[invalid-id]
+
+Pastikan:
+- tidak ada 500 yang tidak tertangani
+- tidak ada client-side exception
+- tidak ada hydration error
+- tidak ada server-side exception.
+
+Jika order ID invalid:
+404/Not Found adalah expected behavior.
+
+==================================================
+29. GIT CHECK
+==================================================
+
+Sebelum commit:
+
+git status --short
+
+git diff --check
+
+Pastikan tidak ada:
+- .env
+- secret
+- credential
+- database dump
+- temporary test file
+- build artifact.
+
+Review diff.
+
+==================================================
+30. COMMIT
+==================================================
+
+Jika seluruh test PASS:
+
+git add <file yang benar-benar berubah>
+
+git commit -m "feat(admin): add order management"
+
+Jangan membuat empty commit.
+
+Jangan force push.
+
+Kemudian:
+
+git push origin main
+
+==================================================
+31. FINAL VERIFICATION
+==================================================
+
+Setelah push:
+
+git status --short
+
+git log -1 --oneline
+
+git status -sb
+
+Expected:
+- working tree clean
+- main sinkron dengan origin/main
+
+==================================================
+32. FINAL REPORT
+==================================================
+
+Laporkan:
+
+1. File yang diubah
+2. Order list
+3. Search
+4. Filter
+5. Pagination
+6. Order detail
+7. Customer information
+8. Order items
+9. Payment information
+10. Status update
+11. Status validation
+12. Authentication test
+13. Responsive test
+14. Database verification
+15. Typecheck
+16. Build
+17. Smoke test
+18. Regression test
+19. Commit hash
+20. Push status
+
+Jika ada blocker:
+jelaskan blocker sebenarnya.
+
+Jangan mengklaim PASS jika belum dites.
+
+ATURAN KERAS:
+
+- Jangan reset database.
+- Jangan menghapus order existing.
+- Jangan mengubah Prisma schema jika tidak diperlukan.
+- Jangan membuat mock data sebagai pengganti database.
+- Jangan mengaktifkan payment production.
+- Jangan memasukkan credential.
+- Jangan merusak Admin Dashboard.
+- Jangan merusak Categories/Product.
+- Jangan merusak customer storefront.
+- Jangan force push.
+- Jangan commit secret.
+- Jangan membuat empty commit.
+- Jangan berhenti hanya setelah coding; wajib typecheck + build + smoke + regression.
 
 ```
 # Prompt: Admin Dashboard — Full Implementation & Verification
