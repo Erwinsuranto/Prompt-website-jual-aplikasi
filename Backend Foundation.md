@@ -37,7 +37,15 @@
 ```
 # 
 ```
+Jalankan development server project toko-online sekarang.
 
+- Pastikan berada di /root/toko-online
+- Gunakan mode development saja: npm run dev
+- Jangan mengubah kode, database, environment, atau konfigurasi.
+- Jika ada proses lama yang memakai port 3000, hentikan proses tersebut dengan aman lalu jalankan dev server.
+- Tunggu sampai server benar-benar ready.
+- Tampilkan URL/port yang aktif.
+- Jika terjadi error, jangan memperbaiki kode dulu; tampilkan error lengkapnya.
 
 
 ```
