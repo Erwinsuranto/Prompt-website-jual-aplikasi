@@ -47,10 +47,72 @@
 
 
 ```
-# 
+# Prompt: UI Final Audit & Responsive Verification
 ```
 
+Audit dan pastikan UI project Digital Cell/toko-online benar-benar siap sebelum lanjut ke roadmap berikutnya.
 
+Fokus UI saja. Jangan mengubah database, Prisma, auth, payment, API, atau business logic.
+
+1. Audit seluruh halaman customer:
+   - /
+   - /products
+   - /categories
+   - /category/[slug]
+   - /product/[slug]
+   - /search
+   - /cart
+   - /checkout
+   - /orders
+   - /profile
+   - /favorite
+   - /login
+   - /register
+
+2. Test minimal viewport:
+   - 360px
+   - 375px
+   - 390px
+   - 414px
+   - desktop
+
+3. Pastikan:
+   - tidak ada horizontal overflow
+   - tidak ada tombol terpotong
+   - sticky bottom navigation aman
+   - tombol beli/tambah keranjang tidak keluar layar
+   - gambar tidak merusak layout
+   - typography proporsional
+   - spacing konsisten
+   - header responsive
+   - card produk responsive
+   - modal/dropdown tidak keluar viewport
+   - loading, empty dan error state tetap rapi
+   - halaman tidak blank/client-side exception
+
+4. Pertahankan desain Digital Cell yang sekarang.
+   Jangan redesign total dan jangan mengubah warna/identitas visual tanpa alasan.
+
+5. Jika menemukan masalah responsive/UI:
+   perbaiki langsung secara modular dan minimal.
+   Jangan menyentuh backend/database/payment.
+
+6. Setelah perbaikan jalankan:
+   - npm run typecheck
+   - npm run build
+   - development server
+   - smoke test route utama
+
+7. Pastikan git:
+   - git diff --check
+   - git status --short
+   - tidak ada secret/.env/artifact
+
+8. Jika semua PASS, commit dan push:
+   fix(ui): finalize responsive customer interface
+
+Jangan lanjut ke roadmap/payment/admin baru.
+Tujuan tahap ini hanya memastikan UI customer benar-benar stabil di mobile dan desktop.
 
 ```
 # Prompt berikutnya — Phase 37
