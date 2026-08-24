@@ -5,9 +5,443 @@
 
 
 ```
-# 
+# Prompt: Admin Categories — Full CRUD & Verification
 ```
+PROMPT: ADMIN CATEGORIES — FULL CRUD, STATUS, RELATION PRODUCT & VERIFICATION
 
+Project: Digital Cell / toko-online
+
+Konteks:
+Admin Products sudah selesai dan terverifikasi:
+- List products PASS
+- Tambah product PASS
+- Edit harga/stok PASS
+- Toggle aktif/nonaktif PASS
+- Hapus product PASS
+- Customer hanya melihat product aktif
+- PostgreSQL development sudah digunakan
+- Typecheck PASS
+- Build PASS
+- Smoke test PASS
+- Git working tree bersih
+- Jangan merusak fitur Products yang sudah selesai.
+
+Sekarang fokus hanya pada MODULE ADMIN CATEGORIES.
+
+Jangan mengubah payment, checkout, authentication, order, database schema secara besar, atau UI customer yang sudah stabil kecuali memang diperlukan oleh integrasi category.
+
+==================================================
+1. AUDIT TERLEBIH DAHULU
+==================================================
+
+Sebelum mengubah kode:
+
+- Audit struktur project.
+- Cari seluruh implementasi category:
+  - category service
+  - category repository
+  - Prisma model Category
+  - API/server actions category
+  - halaman admin categories
+  - form category
+  - customer category listing
+  - product-category relationship
+- Identifikasi route yang sudah tersedia.
+- Identifikasi apakah slug dibuat otomatis atau manual.
+- Identifikasi field Category yang benar-benar tersedia di Prisma schema.
+- Jangan membuat field database baru jika tidak diperlukan.
+- Jangan membuat migration baru hanya untuk menyelesaikan UI.
+- Gunakan struktur database yang sudah ada.
+
+Jika fitur category ternyata sudah sebagian besar tersedia, jangan rewrite.
+Perbaiki dan lengkapi implementasi existing.
+
+==================================================
+2. ADMIN CATEGORY LIST
+==================================================
+
+Pastikan halaman admin categories mempunyai:
+
+- daftar semua kategori
+- nama kategori
+- slug
+- jumlah produk bila data tersedia
+- status aktif/nonaktif
+- tombol edit
+- tombol aktif/nonaktif
+- tombol hapus
+- tombol tambah kategori
+- loading state
+- empty state
+- error state
+
+Pagination/search boleh digunakan jika struktur project sudah mendukung.
+
+Jangan membuat UI terlalu kompleks.
+
+Pastikan desktop dan mobile tetap usable.
+
+==================================================
+3. TAMBAH KATEGORI
+==================================================
+
+Buat/benahi form tambah kategori.
+
+Minimal:
+
+- Nama kategori
+- Slug jika memang field tersebut digunakan oleh schema
+- Status aktif/nonaktif jika memang didukung schema
+
+Validasi:
+
+- nama wajib
+- nama tidak boleh kosong
+- slug harus valid jika digunakan
+- cegah duplicate slug
+- cegah duplicate kategori yang memang tidak diperbolehkan
+
+Setelah submit:
+
+- data benar-benar masuk PostgreSQL development DB
+- tampilkan feedback sukses
+- list admin harus menampilkan kategori baru
+- refresh halaman tidak boleh menghilangkan data
+
+Jangan menggunakan mock/local-only state sebagai sumber utama.
+
+==================================================
+4. EDIT KATEGORI
+==================================================
+
+Pastikan admin dapat:
+
+- membuka kategori
+- mengubah nama
+- mengubah slug jika memang diperbolehkan
+- menyimpan perubahan
+- melihat hasil setelah refresh
+
+Perhatikan hubungan dengan product.
+
+Jika slug dipakai sebagai URL customer:
+
+- jangan menyebabkan route rusak
+- jangan membuat duplicate slug
+- jangan mengubah slug secara otomatis tanpa alasan
+
+Jika kategori mempunyai product:
+
+- edit kategori tidak boleh menghapus product
+- product tetap mempunyai relasi yang benar
+
+==================================================
+5. TOGGLE AKTIF / NONAKTIF
+==================================================
+
+Implementasikan toggle category.
+
+Ketika aktif:
+
+- kategori muncul di customer UI sesuai aturan existing.
+
+Ketika nonaktif:
+
+- kategori tidak boleh muncul sebagai kategori customer aktif.
+
+PENTING:
+
+Jangan menghapus product hanya karena kategori dinonaktifkan.
+
+Product yang terkait tetap aman di database.
+
+Pastikan status yang digunakan UI berasal dari database, bukan hanya React state.
+
+Setelah refresh:
+
+- status tetap benar.
+
+==================================================
+6. HAPUS KATEGORI
+==================================================
+
+Audit terlebih dahulu bagaimana relation Product -> Category bekerja.
+
+Jangan langsung menghapus kategori jika database relation dapat menyebabkan:
+
+- foreign key error
+- product ikut terhapus
+- orphan data
+- product menjadi rusak
+
+Jika kategori mempunyai product:
+
+gunakan behavior yang paling aman berdasarkan schema existing.
+
+Prioritas:
+
+1. Jangan menghapus product.
+2. Jangan merusak order/history.
+3. Jangan merusak product data.
+4. Jika kategori tidak boleh dihapus ketika masih mempunyai product, tampilkan pesan yang jelas.
+5. Jika schema memang mendukung pemindahan/unassign category, gunakan mekanisme tersebut.
+6. Jangan mengubah schema hanya untuk memaksakan delete.
+
+Setelah kategori berhasil dihapus:
+
+- hilang dari admin list
+- tidak muncul di customer
+- product tetap aman.
+
+==================================================
+7. CUSTOMER CATEGORY
+==================================================
+
+Verifikasi customer UI.
+
+Pastikan:
+
+- hanya kategori aktif yang ditampilkan
+- kategori nonaktif tidak muncul
+- kategori yang dihapus tidak muncul
+- kategori aktif tetap dapat dibuka
+- slug route tetap bekerja
+- product yang terkait kategori tampil benar
+
+Jangan mengubah desain customer UI yang sudah disetujui.
+
+Pertahankan UI Digital Cell yang sekarang.
+
+==================================================
+8. PRODUCT RELATION
+==================================================
+
+Karena Products sudah selesai, lakukan regression khusus relation.
+
+Test minimal:
+
+A. Buat kategori test.
+B. Pastikan kategori muncul.
+C. Hubungkan/gunakan kategori pada product jika fitur tersebut sudah tersedia.
+D. Buka product.
+E. Pastikan product masih muncul.
+F. Nonaktifkan kategori.
+G. Pastikan product tidak rusak.
+H. Aktifkan kembali kategori.
+I. Pastikan product kembali dapat diakses sesuai aturan.
+J. Refresh.
+K. Pastikan data tetap konsisten.
+
+Jangan mengubah harga, stok, status, atau data product secara tidak perlu.
+
+==================================================
+9. MOBILE RESPONSIVE ADMIN
+==================================================
+
+Verifikasi halaman admin Categories pada:
+
+- mobile sekitar 360px
+- mobile sekitar 375px
+- mobile sekitar 390px
+- mobile sekitar 414px
+- desktop
+
+Pastikan:
+
+- tabel tidak menyebabkan horizontal overflow yang buruk
+- tombol tidak keluar layar
+- form tidak melebar
+- modal tidak terpotong
+- action button tetap bisa ditekan
+- text tidak overlap
+- status badge tidak rusak
+- navigation tetap usable
+
+Gunakan pola responsive yang sudah digunakan project.
+
+Jangan mengubah global CSS jika tidak diperlukan.
+
+==================================================
+10. ERROR HANDLING
+==================================================
+
+Pastikan error category tidak menyebabkan:
+
+- client-side exception
+- blank screen
+- Next.js Application Error
+- server-side 500 yang tidak tertangani
+
+Handle minimal:
+
+- duplicate category
+- invalid slug
+- category tidak ditemukan
+- delete gagal karena relation
+- database error
+- unauthorized admin request
+
+Untuk user/admin tampilkan pesan yang jelas.
+
+Jangan expose stack trace atau secret ke browser.
+
+==================================================
+11. SECURITY
+==================================================
+
+Pastikan semua mutation category:
+
+- create
+- update
+- toggle
+- delete
+
+hanya dapat dilakukan oleh admin.
+
+Customer/public endpoint tidak boleh dapat melakukan mutation.
+
+Pastikan authorization dilakukan di server-side.
+
+Jangan hanya menyembunyikan tombol di UI.
+
+==================================================
+12. TEST
+==================================================
+
+Setelah implementasi jalankan:
+
+- npm run typecheck
+- npm run build
+
+Kemudian jalankan development server sesuai setup project.
+
+Lakukan smoke test:
+
+PUBLIC:
+- /categories
+- category detail
+- /products
+- product detail
+- search jika category digunakan oleh search
+
+ADMIN:
+- /admin/categories
+- tambah category
+- edit category
+- toggle category
+- delete category
+- /admin/products
+
+REGRESSION:
+- product existing tetap muncul
+- product aktif tetap tampil
+- product nonaktif tetap tidak tampil
+- category nonaktif tidak tampil ke customer
+- category aktif tampil kembali setelah diaktifkan.
+
+==================================================
+13. DATABASE VERIFICATION
+==================================================
+
+Jangan hanya mengandalkan UI.
+
+Untuk setiap operasi penting:
+
+CREATE:
+- cek data benar-benar masuk DB.
+
+UPDATE:
+- cek data berubah di DB.
+
+TOGGLE:
+- cek isActive/status berubah di DB.
+
+DELETE:
+- cek record benar-benar sesuai behavior yang ditentukan schema.
+
+Pastikan refresh browser tidak mengembalikan data lama.
+
+==================================================
+14. GIT
+==================================================
+
+Sebelum commit:
+
+git status --short
+git diff --check
+
+Pastikan:
+
+- tidak ada .env
+- tidak ada credential
+- tidak ada secret
+- tidak ada build artifact
+- tidak ada temporary test file
+- tidak ada screenshot/debug file
+- tidak ada perubahan unrelated
+
+Jika ada perubahan unrelated, jangan ikut commit.
+
+==================================================
+15. COMMIT
+==================================================
+
+Jika semua PASS dan memang ada perubahan kode:
+
+commit message:
+
+feat(admin): complete category management
+
+Kemudian:
+
+git push origin main
+
+JANGAN force push.
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+git status -sb
+
+Pastikan origin/main sinkron.
+
+==================================================
+16. HASIL AKHIR
+==================================================
+
+Berikan laporan ringkas:
+
+1. Audit category
+2. File yang diubah
+3. Fitur yang diperbaiki
+4. Database verification
+5. Admin CRUD result
+6. Customer category result
+7. Product relation result
+8. Mobile responsive result
+9. Typecheck result
+10. Build result
+11. Smoke test result
+12. Git commit
+13. Git push
+14. Blocker jika ada
+
+PENTING:
+
+- Jangan membuat ulang project.
+- Jangan menghapus fitur existing.
+- Jangan reset database.
+- Jangan membuat mock data sebagai pengganti DB.
+- Jangan mengubah payment.
+- Jangan mengubah checkout.
+- Jangan mengubah authentication.
+- Jangan mengubah UI customer yang sudah disetujui kecuali bug category memang membutuhkan perubahan.
+- Jangan membuat empty commit.
+- Jangan force push.
+- Jangan berhenti hanya karena implementasi selesai; lakukan verification sampai PASS.
+- Jika ditemukan bug, perbaiki dan ulangi test.
+- Jika blocker membutuhkan keputusan saya, berhenti sebelum melakukan perubahan berisiko dan laporkan blocker tersebut.
 
 
 ```
