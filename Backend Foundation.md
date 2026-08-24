@@ -29,9 +29,24 @@
 
 
 ```
-# 
+# Prompt: Buat Akun Test Customer
 ```
+Buat 1 akun customer untuk testing di environment development toko-online.
 
+Gunakan flow register yang sudah tersedia, jangan membuat akun langsung lewat database dan jangan mengubah kode.
+
+Data test:
+- Nomor WhatsApp: +6281234567890
+- Password: Test12345!
+- Role: customer
+
+Setelah akun berhasil dibuat:
+1. Pastikan login menggunakan akun tersebut berhasil.
+2. Pastikan session/JWT terbentuk dengan benar.
+3. Jangan mengubah role menjadi admin.
+4. Jangan membuat akun tambahan.
+5. Jangan commit atau push perubahan karena ini hanya data development.
+6. Tampilkan hasil akhir dan kredensial akun test yang berhasil dibuat.
 
 
 ```
