@@ -17,10 +17,62 @@
 
 
 ```
-# 
+# Prompt: Perbaiki Mobile Product Action Bar
 ```
 
+Perbaiki UI mobile halaman detail produk Digital Cell.
 
+Masalah:
+- Pada mobile, area harga + tombol "Tambah ke Keranjang" + "Beli Sekarang" terlalu besar/tinggi.
+- Bottom action bar menutupi bagian produk terkait dan konten halaman.
+- Harga dan tombol terlihat terlalu naik/menempati terlalu banyak viewport.
+- Screenshot menunjukkan action area mengambil ruang berlebihan.
+
+Tugas:
+1. Audit komponen/layout halaman product detail dan CSS responsive yang mengatur:
+   - harga
+   - quantity jika ada
+   - tombol Tambah ke Keranjang
+   - tombol Beli Sekarang
+   - sticky/fixed bottom action bar
+2. Khusus mobile viewport 360/375/390/414px:
+   - kecilkan tinggi action bar secara proporsional
+   - kurangi padding dan spacing yang berlebihan
+   - jangan membuat tombol terlalu tinggi
+   - harga tetap jelas tetapi tidak mengambil banyak ruang
+   - pastikan action bar tidak menutupi produk terkait
+3. Jika action bar menggunakan position: fixed/sticky:
+   - pastikan konten halaman mempunyai bottom padding yang cukup
+   - jangan sampai elemen fixed menimpa konten
+   - jangan membuat ruang kosong berlebihan
+4. Desktop jangan diubah kecuali ada CSS bersama yang memang diperlukan.
+5. Pertahankan desain Digital Cell yang sekarang: clean, white, midnight blue.
+6. Jangan mengubah:
+   - database
+   - API
+   - authentication
+   - cart logic
+   - payment
+   - admin
+7. Jangan redesign halaman. Fokus hanya pada ukuran, spacing, positioning, dan responsive behavior action bar.
+8. Verifikasi dengan viewport:
+   - 360x800
+   - 375x812
+   - 390x844
+   - 414x896
+   - desktop
+9. Pastikan:
+   - produk terkait tetap terlihat
+   - tidak ada horizontal overflow
+   - tidak ada konten tertutup action bar
+   - tombol tetap mudah ditekan
+   - harga dan tombol tetap terlihat jelas
+10. Jalankan typecheck, build, dan smoke test UI.
+11. Jalankan `git diff --check` dan `git status --short`.
+12. Jika semua PASS, commit dan push ke origin main tanpa force push.
+
+PENTING:
+Jangan mengubah desain keseluruhan. Hanya perbaiki mobile product-detail action bar yang terlalu besar dan menutupi konten.
 
 ```
 # Prompt: Perbaiki Reset Cart Saat Kembali Belanja
