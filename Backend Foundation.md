@@ -11,11 +11,58 @@
 
 
 ```
-# 
+# Prompt: Audit Admin Dashboard & Products
 ```
 
 
+Audit dan test Admin Dashboard + Products pada project toko-online.
 
+Fokus hanya pada fitur yang sudah ada. Jangan membuat fitur baru yang belum diperlukan dan jangan mengubah customer UI.
+
+1. Jalankan project dalam development mode.
+2. Login sebagai admin menggunakan authentication yang sudah tersedia.
+3. Test:
+   - /admin/dashboard
+   - /admin/products
+4. Dashboard:
+   - pastikan halaman bisa dibuka
+   - KPI/data tampil benar
+   - empty state aman jika data kosong
+   - tidak ada client-side exception
+5. Products:
+   - daftar produk tampil
+   - detail/data produk benar
+   - tambah produk
+   - edit produk
+   - ubah harga
+   - ubah stok
+   - aktif/nonaktif produk
+   - hapus produk
+   - setelah mutation, data tetap benar setelah refresh
+6. Pastikan perubahan produk benar-benar tersimpan ke database development.
+7. Pastikan customer tetap bisa melihat produk aktif dan tidak bisa melihat produk yang nonaktif.
+8. Test responsive admin minimal desktop dan mobile tanpa redesign.
+9. Jangan mengubah:
+   - payment/Midtrans
+   - database schema/migration
+   - authentication architecture
+   - cart
+   - customer UI
+10. Jika ditemukan bug, perbaiki hanya bug yang diperlukan.
+11. Jalankan:
+   - npm run typecheck
+   - npm run build
+   - smoke test admin
+   - git diff --check
+   - git status --short
+12. Jika semua PASS, commit dan push ke origin main tanpa force push.
+13. Jika ada blocker, jangan commit dan tampilkan penyebabnya.
+
+PENTING:
+Jangan membuat mock data baru jika database development sudah memiliki data.
+Jangan membuat empty commit.
+Jangan melakukan redesign.
+Fokus Dashboard + Products saja.
 ```
 # Prompt: Perbaiki Mobile Product Action Bar
 ```
