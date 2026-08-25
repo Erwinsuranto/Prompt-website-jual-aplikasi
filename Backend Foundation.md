@@ -112,7 +112,196 @@
 # 
 ```
 
+PERBAIKI BLOCKER CHECKOUT — TOMBOL CHECKOUT KEMBALI KE KERANJANG
 
+Kondisi saat ini:
+- Customer sudah login.
+- Keranjang berisi 1 item.
+- Halaman keranjang menampilkan:
+  "1 item"
+  "Rp 50.000"
+  tombol "Checkout".
+- Saat tombol Checkout ditekan, halaman tidak masuk ke halaman checkout dan tetap/kembali ke halaman keranjang.
+- Backend/order/payment sebelumnya sudah lolos audit dasar.
+- Jangan mengubah database, schema Prisma, atau flow yang sudah PASS tanpa bukti.
+- Jangan membuat mock checkout.
+
+Tugas:
+
+1. Reproduksi bug dari browser nyata/public IP menggunakan akun customer test.
+2. Mulai dari:
+   login
+   → produk
+   → tambah ke keranjang
+   → keranjang
+   → klik Checkout.
+
+3. Audit secara menyeluruh handler tombol Checkout:
+   - onClick;
+   - href;
+   - router.push;
+   - router.replace;
+   - form action;
+   - loading state;
+   - selected cart item state;
+   - checkout validation;
+   - middleware;
+   - auth/session guard;
+   - route checkout.
+
+4. Tentukan route checkout yang memang sudah digunakan project.
+   Jangan membuat route baru jika route checkout existing sebenarnya sudah ada.
+
+5. Cari penyebab mengapa tombol Checkout kembali ke `/cart`/keranjang.
+
+Kemungkinan yang wajib diperiksa:
+- route tujuan salah;
+- router.push mengarah ke `/cart`;
+- checkout route melakukan redirect kembali ke cart;
+- selected item hilang saat navigasi;
+- cart state kosong pada halaman checkout sehingga guard mengembalikan user ke cart;
+- session customer tidak terbaca di checkout;
+- API cart/checkout mengembalikan status yang menyebabkan redirect;
+- middleware salah menangani route checkout;
+- parameter checkout tidak dikirim;
+- hydration/client state menyebabkan checkout langsung dianggap invalid;
+- tombol berada di dalam form dan submit handler melakukan redirect yang salah;
+- link/button tertimpa handler lain.
+
+6. Audit route checkout dari source code dan ikuti seluruh redirect chain.
+
+Contoh alur yang diharapkan:
+
+/cart
+→ klik Checkout
+→ /checkout
+→ data cart/selected item dimuat
+→ customer memilih/konfirmasi data
+→ lanjut pembayaran
+→ create order
+→ payment
+→ order success/detail
+
+Jangan menganggap `/cart` sebagai halaman checkout.
+
+7. Jika checkout membutuhkan selected cart item:
+   - pastikan item yang dipilih tetap tersedia setelah navigasi;
+   - jangan hanya mengandalkan React state yang hilang ketika page berpindah;
+   - gunakan mekanisme persistence yang memang sudah digunakan project;
+   - validasi ulang terhadap database/API;
+   - jangan mempercayai harga dari client.
+
+8. Pastikan server menghitung ulang:
+   - product;
+   - price;
+   - quantity;
+   - subtotal;
+   - total.
+
+Jangan mengambil total final hanya dari nilai yang dikirim browser.
+
+9. Uji kondisi:
+   A. 1 item → Checkout
+   B. beberapa item → Checkout
+   C. refresh halaman checkout
+   D. back ke cart → Checkout lagi
+   E. buka `/checkout` langsung
+   F. customer belum login → harus diarahkan ke login sesuai flow existing
+   G. cart kosong → harus diarahkan ke cart dengan pesan yang benar
+   H. product menjadi inactive setelah masuk cart
+   I. quantity berubah sebelum checkout
+
+10. Jangan mengubah desain customer UI yang sudah PASS.
+
+11. Pastikan tombol Checkout hanya melakukan satu navigasi.
+   Jangan sampai:
+   - click handler;
+   - form submit;
+   - effect;
+   - middleware
+   semuanya melakukan redirect berbeda.
+
+12. Tambahkan diagnosis server/client yang aman bila diperlukan.
+   Jangan log:
+   - password;
+   - cookie;
+   - session token;
+   - secret;
+   - DATABASE_URL.
+
+13. Browser verification wajib:
+
+Customer:
+login
+→ home
+→ product
+→ add cart
+→ cart
+→ Checkout
+→ checkout page PASS
+→ refresh checkout PASS
+→ lanjut payment/order PASS
+
+Pastikan URL berubah ke route checkout yang benar dan tidak kembali ke `/cart`.
+
+14. Setelah perbaikan jalankan:
+
+npm run typecheck
+npm run build
+
+Kemudian production server yang sedang digunakan.
+
+Lakukan browser E2E ulang dari public IP.
+
+15. Periksa console browser:
+- 0 uncaught exception;
+- 0 hydration error;
+- tidak ada API 500;
+- tidak ada redirect loop.
+
+16. Periksa Git:
+
+git status --short
+git diff --check
+
+Jangan commit:
+- .env
+- secret
+- credential
+- cookie
+- build artifact
+- temporary file.
+
+Jika memang ada perubahan valid, commit dengan:
+
+fix(customer): fix checkout navigation flow
+
+Lalu:
+
+git push origin main
+
+Tanpa force push.
+
+17. Laporan akhir wajib menjelaskan:
+
+- Root cause checkout kembali ke cart
+- File yang diperbaiki
+- Route checkout yang sebenarnya
+- Checkout navigation: PASS/FAIL
+- Checkout refresh: PASS/FAIL
+- Empty cart: PASS/FAIL
+- Customer auth: PASS/FAIL
+- Order creation: PASS/FAIL
+- Payment flow: PASS/FAIL
+- Typecheck: PASS/FAIL
+- Build: PASS/FAIL
+- Browser console: PASS/FAIL
+- Git commit hash
+- Push status
+
+PENTING:
+Jangan hanya mengubah tombol agar terlihat pindah halaman.
+Telusuri sampai route checkout benar-benar dapat memuat cart/customer data dan dapat melanjutkan ke order/payment.
 
 ```
 # 
