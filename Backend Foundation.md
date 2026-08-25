@@ -121,11 +121,479 @@
 
 
 ```
-# 
+# Prompt berikutnya — Audit Admin Panel End-to-End
 ```
 
 
+PROMPT: AUDIT ADMIN PANEL END-TO-END
 
+Project: Digital Cell / toko-online
+
+Kondisi terakhir:
+- Admin Panel sudah dapat diakses oleh role ADMIN.
+- Authentication dan authorization sudah diverifikasi.
+- Admin dashboard sudah PASS.
+- Product/category CRUD sudah berjalan.
+- Category selector sudah menampilkan nama kategori, bukan CUID.
+- Dropdown kategori sudah responsive dan tidak overflow.
+- Customer UI sebelumnya sudah PASS.
+- Typecheck, build, production server dan smoke test terakhir PASS.
+- Jangan mengulang pekerjaan yang sudah PASS kecuali ditemukan regresi.
+
+TUGAS UTAMA:
+
+Sekarang lakukan audit menyeluruh terhadap SELURUH ADMIN PANEL yang sudah ada.
+
+Jangan membuat ulang Admin Panel.
+Jangan mengganti database.
+Jangan menghapus fitur existing.
+Jangan menggunakan mock data sebagai pengganti database.
+Gunakan database Prisma yang sedang dipakai aplikasi.
+
+1. AUDIT NAVIGASI ADMIN
+
+Periksa seluruh menu Admin Panel yang tersedia.
+
+Pastikan minimal area berikut dapat ditemukan jika memang sudah tersedia di project:
+
+- Dashboard
+- Produk
+- Kategori
+- Pesanan
+- Customer/User
+- Pembayaran
+- Banner/Promo
+- Pengaturan
+- Laporan
+- fitur admin lain yang memang sudah ada
+
+Pastikan:
+- menu desktop tampil benar;
+- drawer mobile tampil benar;
+- tidak ada menu admin yang hilang;
+- customer tidak dapat melihat menu admin;
+- setiap menu mengarah ke route yang benar;
+- tidak ada link menuju route yang belum ada.
+
+2. DASHBOARD ADMIN
+
+Audit dashboard:
+
+- statistik produk;
+- kategori;
+- pesanan;
+- revenue;
+- customer;
+- pesanan terbaru;
+- produk terlaris;
+- laporan/graph jika tersedia.
+
+Pastikan semua angka berasal dari database nyata.
+
+Jangan menggunakan angka hardcoded.
+
+Periksa:
+- loading state;
+- empty state;
+- error state;
+- responsive mobile;
+- desktop;
+- refresh halaman.
+
+3. PRODUK
+
+Audit CRUD produk secara penuh.
+
+Test:
+
+CREATE:
+- buat produk baru;
+- gunakan kategori existing;
+- masukkan harga jual;
+- masukkan harga coret jika tersedia;
+- masukkan stok;
+- aktif/nonaktif;
+- unggulan jika tersedia;
+- simpan.
+
+READ:
+- produk muncul di tabel/list;
+- nama benar;
+- harga benar;
+- kategori menampilkan nama;
+- stok benar;
+- status benar.
+
+UPDATE:
+- edit nama;
+- edit harga;
+- edit kategori;
+- edit stok;
+- toggle aktif/nonaktif;
+- simpan;
+- refresh;
+- pastikan perubahan tetap tersimpan.
+
+DELETE:
+- gunakan delete hanya pada data test jika memang diperlukan;
+- pastikan confirmation dialog;
+- pastikan tidak terjadi delete tanpa konfirmasi.
+
+Jangan menghapus data production nyata.
+
+4. KATEGORI
+
+Audit CRUD kategori.
+
+Pastikan:
+- nama kategori;
+- slug;
+- status;
+- jumlah produk;
+- create;
+- edit;
+- delete;
+- relasi dengan produk.
+
+Pastikan categoryId tetap menjadi ID internal.
+
+Tidak boleh ada CUID yang tampil kepada user/admin kecuali memang field teknis yang sengaja ditampilkan.
+
+5. PESANAN
+
+Audit Admin Orders.
+
+Pastikan admin dapat:
+
+- melihat daftar pesanan;
+- melihat detail pesanan;
+- melihat customer;
+- melihat produk;
+- melihat jumlah;
+- melihat subtotal;
+- melihat total;
+- melihat status order;
+- melihat status pembayaran;
+- melihat tanggal;
+- mencari order;
+- filter order;
+- membuka detail order.
+
+Periksa terutama perbedaan:
+
+Order Status
+dan
+Payment Status
+
+Keduanya harus tetap terpisah.
+
+Jangan membuat perubahan status order yang secara tidak sengaja mengubah payment status kecuali memang aturan bisnis mengharuskannya.
+
+6. PAYMENT
+
+Audit payment flow admin.
+
+Pastikan admin dapat melihat:
+
+- ID pesanan;
+- nominal;
+- metode pembayaran;
+- payment status;
+- bukti pembayaran jika ada;
+- waktu pembayaran.
+
+Jika terdapat verifikasi manual:
+
+- approve;
+- reject;
+- pending;
+
+harus memiliki guard dan validasi yang benar.
+
+Pastikan transaksi invalid tidak merusak database.
+
+7. CUSTOMER / USER
+
+Audit halaman user/customer jika sudah tersedia.
+
+Pastikan admin dapat melihat data yang memang diperlukan:
+
+- nama;
+- nomor WhatsApp;
+- role;
+- tanggal bergabung;
+- status akun.
+
+Jangan menampilkan:
+- password;
+- password hash;
+- secret;
+- token session;
+- credential sensitif.
+
+Pastikan role ADMIN dan CUSTOMER tetap benar.
+
+8. SETTINGS
+
+Audit Admin Settings.
+
+Periksa seluruh setting existing.
+
+Jangan menghapus setting yang sudah ada.
+
+Pastikan:
+- GET settings;
+- update settings;
+- validation;
+- persistence;
+- refresh;
+- database tetap benar.
+
+Jika ada payment settings:
+- QRIS;
+- bank;
+- e-wallet;
+- metode aktif/nonaktif;
+
+pastikan perubahan benar-benar tersimpan.
+
+9. LAPORAN
+
+Audit halaman laporan.
+
+Periksa:
+
+- filter 7 hari;
+- 30 hari;
+- 3 bulan;
+- semua;
+- custom date range;
+- grafik;
+- revenue;
+- jumlah order;
+- conversion;
+- produk terlaris.
+
+Pastikan filter tanggal tidak overflow pada:
+
+360px
+375px
+390px
+414px
+768px
+1280px
+1440px
+
+Pastikan input tanggal tetap berada di dalam container.
+
+10. RESPONSIVE ADMIN PANEL
+
+Verifikasi seluruh route admin pada:
+
+- 360px
+- 375px
+- 390px
+- 414px
+- 768px
+- 1280px
+- 1440px
+
+Cari:
+
+- horizontal overflow;
+- card keluar container;
+- dropdown keluar viewport;
+- tabel terlalu lebar;
+- tombol terpotong;
+- modal keluar layar;
+- drawer tidak bisa ditutup;
+- header overlap;
+- bottom navigation overlap;
+- text terpotong.
+
+Customer UI yang sudah PASS jangan disentuh.
+
+11. DATABASE INTEGRITY
+
+Gunakan database nyata.
+
+Verifikasi:
+
+- create tidak membuat duplicate yang tidak perlu;
+- update tidak membuat record baru;
+- delete tidak merusak foreign key;
+- order dan order item tetap konsisten;
+- product dan category relation benar;
+- payment dan order relation benar.
+
+Jangan melakukan:
+
+- DROP DATABASE;
+- reset database;
+- delete seluruh data;
+- regenerate data production.
+
+12. SECURITY
+
+Audit authorization.
+
+Pastikan:
+
+CUSTOMER:
+- tidak dapat membuka /admin/*
+- tidak dapat memanggil API admin
+- tidak dapat mengubah data produk
+- tidak dapat mengubah kategori
+- tidak dapat mengubah payment settings
+- tidak dapat mengubah order admin
+
+ADMIN:
+- dapat menggunakan area customer;
+- dapat mengakses Admin Panel;
+- dapat menjalankan operasi admin yang memang diizinkan.
+
+Authorization wajib dilakukan server-side.
+
+Jangan hanya menyembunyikan menu frontend.
+
+13. API
+
+Audit endpoint yang digunakan Admin Panel.
+
+Cari:
+
+- endpoint yang masih mock;
+- endpoint yang mengembalikan data hardcoded;
+- endpoint yang salah authorization;
+- endpoint yang memakai database berbeda;
+- endpoint yang tidak melakukan validation.
+
+Pastikan frontend dan backend menggunakan source of truth yang sama.
+
+14. ERROR HANDLING
+
+Pastikan setiap operasi memiliki:
+
+- loading;
+- success;
+- error;
+- empty state.
+
+Jangan menampilkan stack trace kepada user.
+
+Jangan mencetak password, token, cookie, hash, DATABASE_URL atau secret ke log.
+
+15. BROWSER E2E
+
+Gunakan browser/public server yang benar-benar sedang aktif.
+
+Test minimal:
+
+ADMIN:
+login
+→ dashboard
+→ produk
+→ create product
+→ edit product
+→ kategori
+→ orders
+→ payment
+→ settings
+→ laporan
+→ refresh setiap halaman.
+
+CUSTOMER:
+login
+→ customer dashboard/store
+→ products
+→ checkout/orders
+→ refresh
+→ coba /admin/dashboard
+→ harus ditolak.
+
+16. CONSOLE
+
+Pastikan browser console:
+
+- 0 uncaught exception;
+- 0 hydration error;
+- tidak ada API 500;
+- tidak ada route 404 yang tidak disengaja;
+- tidak ada failed request yang menyebabkan UI rusak.
+
+17. TEST AUTOMATION
+
+Jalankan test yang tersedia.
+
+Minimal:
+
+npm run typecheck
+npm run build
+npm run test
+
+Jika script test bawaan project gagal karena konfigurasi Node/environment, jangan mengubah test hanya agar PASS.
+
+Jelaskan akar masalahnya dan gunakan metode test yang kompatibel dengan konfigurasi project.
+
+18. GIT
+
+Sebelum commit:
+
+git status --short
+git diff --check
+
+Pastikan:
+
+- tidak ada .env;
+- tidak ada secret;
+- tidak ada credential;
+- tidak ada build artifact;
+- tidak ada file temporary.
+
+Jika tidak ada perubahan yang diperlukan, jangan membuat commit kosong.
+
+Jika ada perubahan:
+
+commit dengan message yang jelas, misalnya:
+
+feat(admin): complete admin panel e2e audit
+
+Kemudian:
+
+git push origin main
+
+TANPA force push.
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+git status -sb
+
+Pastikan working tree bersih dan branch sinkron dengan origin/main.
+
+HASIL AKHIR:
+
+Laporkan:
+
+1. route admin yang diverifikasi;
+2. fitur admin yang PASS;
+3. fitur yang diperbaiki;
+4. hasil database verification;
+5. hasil authorization;
+6. hasil responsive test;
+7. hasil browser E2E;
+8. typecheck;
+9. build;
+10. test;
+11. commit hash;
+12. push status;
+13. blocker jika masih ada.
+
+PENTING:
+Jangan berhenti hanya karena UI terlihat bagus.
+Verifikasi sampai level database + API + authorization + browser.
+Jangan merusak customer UI yang sebelumnya sudah PASS.
 ```
 # 
 ```
