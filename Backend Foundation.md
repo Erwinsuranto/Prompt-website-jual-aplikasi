@@ -147,7 +147,395 @@
 ```
 # 
 ```
+## FIX PUBLIC ACCESS SERVER + TEST LOGIN DIGITAL CELL
 
+Project:
+ /root/toko-online
+
+Kondisi saat ini:
+- Production server sudah berhasil dijalankan.
+- Port aplikasi: 3001
+- curl dari VPS ke localhost:3001 = HTTP 200.
+- Server process berjalan.
+- Login customer/admin sudah PASS melalui smoke test internal.
+- Tetapi dari perangkat luar/VPS public IP:
+  http://203.161.39.121:3001/
+  mendapatkan:
+  ERR_CONNECTION_REFUSED
+
+TUJUAN:
+Buat server Next.js production dapat diakses dari jaringan luar melalui:
+
+http://203.161.39.121:3001/
+
+Jangan mengubah authentication, database, UI, product, category, order, atau payment kecuali memang diperlukan oleh masalah ini.
+
+==================================================
+1. CEK LISTEN ADDRESS
+==================================================
+
+Masuk:
+
+cd /root/toko-online
+
+Periksa proses dan port:
+
+ss -lntp | grep ':3001'
+lsof -nP -iTCP:3001 -sTCP:LISTEN
+
+Tentukan apakah server listen pada:
+
+127.0.0.1:3001
+
+atau:
+
+0.0.0.0:3001
+
+Jika hanya:
+
+127.0.0.1:3001
+
+maka itu akar masalah public access.
+
+==================================================
+2. FIX SERVER BINDING
+==================================================
+
+Pastikan production Next.js listen pada:
+
+0.0.0.0:3001
+
+Gunakan konfigurasi/start command yang sesuai dengan project.
+
+Jangan mengubah source code secara besar-besaran.
+
+Jika package.json saat ini menggunakan:
+
+next start
+
+pastikan hostname dapat diarahkan ke:
+
+0.0.0.0
+
+Gunakan cara yang paling aman dan minimal.
+
+Contoh valid:
+
+next start -H 0.0.0.0 -p 3001
+
+atau konfigurasi equivalent yang memang cocok dengan project.
+
+Jangan mengaktifkan:
+
+output: "export"
+
+karena aplikasi membutuhkan server runtime/database.
+
+==================================================
+3. JANGAN MATIKAN SERVER YANG SUDAH VALID
+==================================================
+
+Sebelum melakukan perubahan, catat proses server saat ini.
+
+Setelah perubahan, restart production server dengan cara yang benar.
+
+Pastikan hanya ada satu production server yang menggunakan port 3001.
+
+Jangan menjalankan banyak instance yang berebut port.
+
+==================================================
+4. TEST DARI DALAM VPS
+==================================================
+
+Setelah server aktif:
+
+curl -i http://127.0.0.1:3001/
+curl -i http://0.0.0.0:3001/
+
+Kemudian:
+
+ss -lntp | grep ':3001'
+
+Expected:
+
+0.0.0.0:3001
+
+atau:
+
+[::]:3001
+
+dan HTTP harus mendapatkan response 200/redirect yang valid.
+
+==================================================
+5. TEST PUBLIC IP DARI VPS
+==================================================
+
+Cari public IP server:
+
+curl -4 ifconfig.me
+
+Pastikan sesuai dengan:
+
+203.161.39.121
+
+Kemudian test:
+
+curl -i --connect-timeout 10 http://203.161.39.121:3001/
+
+Jika ini gagal sementara localhost berhasil, lanjutkan diagnosis network/firewall.
+
+==================================================
+6. CEK FIREWALL VPS
+==================================================
+
+Periksa:
+
+ufw status
+iptables -L -n
+nft list ruleset
+
+Jangan menghapus firewall rules existing.
+
+Jika UFW aktif dan port 3001 belum diizinkan, buka hanya TCP port 3001:
+
+ufw allow 3001/tcp
+
+Kemudian verifikasi:
+
+ufw status
+
+Jangan membuka seluruh port secara sembarangan.
+
+==================================================
+7. CEK PROVIDER / SECURITY GROUP
+==================================================
+
+Jika firewall OS tidak memblokir tetapi:
+
+http://203.161.39.121:3001/
+
+tetap REFUSED/TIMEOUT dari internet, periksa apakah VPS provider memiliki firewall/security group/network ACL.
+
+Cari konfigurasi firewall jaringan yang membatasi inbound TCP 3001.
+
+Jika tersedia, pastikan:
+
+TCP
+Port: 3001
+Inbound: allowed
+
+Jangan membuka port database seperti:
+5432
+6379
+3306
+
+ke public internet.
+
+==================================================
+8. TEST DARI NETWORK EXTERNAL
+==================================================
+
+Setelah binding dan firewall diperbaiki, test:
+
+http://203.161.39.121:3001/
+
+Harus bisa dibuka dari perangkat lain, bukan hanya VPS.
+
+Verifikasi:
+
+GET /
+GET /login
+
+Expected:
+HTTP 200 atau redirect yang valid.
+
+==================================================
+9. TEST LOGIN SETELAH PUBLIC ACCESS
+==================================================
+
+Setelah website dapat dibuka dari browser external, baru test login.
+
+ADMIN:
+
+WhatsApp:
+6281234567890
+
+Password:
+Test1234!
+
+Test:
+
+/login
+→ Masuk
+→ redirect `/admin/dashboard`
+→ refresh
+→ tetap login
+
+CUSTOMER:
+
+Gunakan akun customer test existing.
+
+Test:
+
+/login
+→ Masuk
+→ `/orders` atau halaman customer
+→ refresh
+→ session tetap aktif
+→ logout
+→ kembali ke login
+
+==================================================
+10. TEST AUTHORIZATION
+==================================================
+
+Pastikan:
+
+Guest:
+ /admin/dashboard
+→ ditolak / redirect login
+
+Customer:
+ /admin/dashboard
+→ ditolak
+
+Admin:
+ /admin/dashboard
+→ allowed
+
+Jangan melemahkan middleware hanya agar halaman admin bisa dibuka.
+
+==================================================
+11. COOKIE / SESSION
+==================================================
+
+Karena sekarang akses menggunakan public IP HTTP:
+
+pastikan cookie/session tetap bekerja pada environment development/temporary ini.
+
+Periksa:
+
+- HttpOnly
+- SameSite
+- Secure
+- domain
+- path
+- session expiration
+
+Jangan menonaktifkan security cookie secara permanen hanya untuk membuat test berhasil.
+
+Jika production deployment memang nantinya menggunakan HTTPS, pertahankan konfigurasi production yang aman dan bedakan hanya konfigurasi development/testing bila memang diperlukan.
+
+==================================================
+12. JANGAN UBAH DATABASE
+==================================================
+
+Dilarang:
+
+- reset database
+- drop database
+- migrate destructive
+- delete products
+- delete categories
+- delete orders
+- membuat ulang akun admin
+- mengganti password admin
+
+Gunakan data existing.
+
+==================================================
+13. REGRESSION CHECK
+==================================================
+
+Setelah fix:
+
+npm run typecheck
+npm run build
+
+Kemudian jalankan production server.
+
+Test:
+
+/
+ /products
+ /categories
+ /login
+ /checkout
+ /orders
+ /profile
+ /admin/dashboard
+
+Pastikan tidak ada error baru.
+
+==================================================
+14. GIT SAFETY
+==================================================
+
+Sebelum commit:
+
+git status --short
+git diff --check
+
+Pastikan tidak ada:
+
+.env
+.env.local
+secret
+password
+token
+credential
+build artifact
+
+Jika perubahan hanya konfigurasi server/network, commit hanya file yang memang diperlukan.
+
+Gunakan commit:
+
+fix(server): expose production app publicly
+
+Kemudian:
+
+git push origin main
+
+TANPA force push.
+
+==================================================
+15. HASIL AKHIR WAJIB DILAPORKAN
+==================================================
+
+Tampilkan:
+
+SERVER
+- localhost:3001 = PASS/FAIL
+- listen address = ...
+- public IP:3001 = PASS/FAIL
+- external browser = PASS/FAIL
+
+LOGIN
+- customer login = PASS/FAIL
+- customer session = PASS/FAIL
+- admin login = PASS/FAIL
+- admin session = PASS/FAIL
+
+AUTHORIZATION
+- guest blocked = PASS/FAIL
+- customer blocked from admin = PASS/FAIL
+- admin allowed = PASS/FAIL
+
+BUILD
+- typecheck = PASS/FAIL
+- build = PASS/FAIL
+
+NETWORK
+- OS firewall = ...
+- external firewall/security group = ...
+
+PENTING:
+Jangan berhenti hanya karena `curl localhost:3001` berhasil.
+Masalah yang harus diselesaikan adalah akses dari perangkat luar ke:
+
+http://203.161.39.121:3001/
+
+Setelah public access PASS, baru verifikasi login dari browser external.
 
 
 ```
