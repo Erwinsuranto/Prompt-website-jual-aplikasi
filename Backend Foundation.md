@@ -9,7 +9,815 @@
 ```
 # 
 ```
+Lanjutkan project Digital Cell / toko-online dari kondisi TERAKHIR yang sudah berhasil diverifikasi.
 
+JANGAN membuat ulang project.
+JANGAN menghapus fitur existing.
+JANGAN mengubah desain customer UI yang sudah dinyatakan stabil.
+JANGAN menyentuh payment production flow yang sudah PASS kecuali ada bug nyata yang ditemukan.
+Fokus pekerjaan sekarang adalah ADMIN PANEL dan verifikasi seluruh UI/admin flow.
+
+==================================================
+KONDISI PROJECT TERAKHIR
+==================================================
+
+Project:
+Digital Cell / toko-online
+
+Kondisi yang sudah berhasil:
+- Customer UI responsive mobile 360/375/390/414px dan desktop sudah stabil.
+- Homepage customer sudah stabil.
+- Product detail sudah stabil.
+- Checkout sudah stabil secara UI.
+- Payment development flow sudah selesai dan terverifikasi.
+- Payment settings sudah tersedia.
+- Category management sudah selesai.
+- Product CRUD sudah tersedia.
+- Order management sudah tersedia.
+- Admin dashboard sudah memiliki statistik dasar.
+- Prisma/database sudah terintegrasi.
+- Data sudah persisten setelah refresh/restart.
+- Typecheck PASS.
+- Build PASS.
+- Smoke test PASS.
+- Git working tree sebelumnya bersih.
+- Commit/push sebelumnya sudah dilakukan tanpa force push.
+
+Jangan menganggap fitur hanya selesai karena backend PASS.
+Sekarang kita harus memastikan ADMIN UI benar-benar usable di browser.
+
+==================================================
+TUJUAN UTAMA
+==================================================
+
+Bangun/verifikasi Admin Panel Digital Cell sebagai panel operasional yang benar-benar siap digunakan admin.
+
+Admin harus dapat mengelola:
+
+1. Dashboard
+2. Products
+3. Categories
+4. Orders
+5. Payment Settings
+6. Users/customer jika memang sudah tersedia
+7. Pengaturan lain yang memang sudah ada di project
+
+Semua harus menggunakan data database nyata.
+
+Jangan menggunakan mock data untuk menggantikan database.
+
+==================================================
+TAHAP 1 — AUDIT ADMIN PANEL EXISTING
+==================================================
+
+Sebelum mengubah kode:
+
+1. Audit seluruh route admin.
+2. Cari seluruh file:
+   - src/app/admin/**
+   - src/components/admin/**
+   - src/services/**
+   - src/lib/**
+   - API route/server action terkait admin
+   - Prisma schema dan migration terkait admin.
+3. Identifikasi halaman admin yang sudah ada.
+4. Identifikasi component yang sudah ada.
+5. Identifikasi service yang sudah ada.
+6. Identifikasi API/server action yang sudah digunakan.
+7. Jangan membuat duplicate service atau duplicate API.
+8. Reuse architecture existing jika sudah benar.
+
+Buat keputusan berdasarkan kode yang benar-benar ada, bukan asumsi.
+
+==================================================
+TAHAP 2 — ADMIN LAYOUT
+==================================================
+
+Pastikan admin memiliki layout yang konsisten.
+
+Desktop:
+- sidebar admin
+- header/topbar
+- content area
+- navigation jelas
+- active menu jelas
+- tidak ada horizontal overflow
+- spacing konsisten
+- responsive pada desktop kecil maupun besar.
+
+Mobile:
+- sidebar berubah menjadi drawer/menu.
+- content tidak terpotong.
+- table tidak menyebabkan seluruh halaman horizontal overflow.
+- tombol tetap mudah disentuh.
+- modal/dialog tidak keluar viewport.
+- form tidak terlalu sempit.
+- header tidak bertabrakan.
+- navigasi admin tetap usable.
+
+Jangan mengubah customer bottom navigation.
+
+Admin layout harus terpisah secara jelas dari customer layout.
+
+==================================================
+TAHAP 3 — ADMIN DASHBOARD
+==================================================
+
+Buat/verifikasi halaman:
+
+/admin
+
+Dashboard harus menggunakan data database nyata.
+
+Minimal tampilkan:
+
+A. Statistik utama:
+- Total penjualan
+- Total order
+- Order pending
+- Order selesai
+- Total customer
+- Total produk aktif
+
+B. Statistik operasional:
+- Produk stok rendah
+- Produk habis
+- Order terbaru
+- Produk terlaris
+
+C. Ringkasan penjualan:
+- total transaksi
+- total revenue
+- jika data tanggal tersedia, tampilkan ringkasan periode yang masuk akal.
+
+Jangan membuat chart palsu.
+
+Jika database masih kosong:
+- tampilkan empty state yang jelas.
+- jangan membuat angka dummy hanya supaya dashboard terlihat penuh.
+
+Contoh:
+"Belum ada transaksi"
+"Belum ada data penjualan"
+"Belum ada produk stok rendah"
+
+==================================================
+TAHAP 4 — RECENT ORDERS
+==================================================
+
+Pada Dashboard tampilkan order terbaru.
+
+Kolom minimal:
+- Order ID
+- Customer
+- Total
+- Payment Status
+- Order Status
+- Tanggal
+- Action
+
+Status Payment dan Order HARUS tetap terpisah.
+
+Jangan menggabungkan:
+
+Payment Status
+dan
+Order Status
+
+Contoh:
+
+Payment:
+- PENDING
+- PAID
+- FAILED
+- EXPIRED
+
+Order:
+- PENDING
+- PROCESSING
+- COMPLETED
+- CANCELLED
+
+Sesuaikan enum/schema yang benar-benar ada di Prisma.
+
+Jangan membuat enum baru jika enum existing sudah tersedia.
+
+==================================================
+TAHAP 5 — ADMIN PRODUCTS
+==================================================
+
+Pastikan:
+
+/admin/products
+
+benar-benar berfungsi.
+
+Fitur:
+
+1. List produk
+2. Pagination
+3. Search
+4. Filter kategori
+5. Filter aktif/nonaktif
+6. Tambah produk
+7. Edit produk
+8. Edit harga
+9. Edit stok
+10. Toggle aktif/nonaktif
+11. Hapus produk
+12. Detail produk jika memang sudah ada
+
+List harus berasal dari database.
+
+Pagination harus benar-benar server/database pagination jika architecture memungkinkan.
+
+Jangan mengambil semua produk lalu melakukan pagination palsu di browser jika jumlah data berpotensi besar.
+
+Pastikan field:
+- name
+- slug
+- description
+- category
+- price
+- stock
+- image
+- active/isActive
+- createdAt
+sesuai schema existing.
+
+Jangan memaksakan field yang tidak ada.
+
+Bug yang sebelumnya sudah diperbaiki:
+produk tanpa harga tidak boleh menyebabkan error ketika diedit.
+
+Pastikan bug tersebut tidak muncul kembali.
+
+Validasi harga dan stok harus jelas.
+
+Contoh:
+- harga tidak boleh negatif.
+- stok tidak boleh negatif.
+- required field harus tervalidasi.
+- slug harus unik jika schema mensyaratkan unique.
+
+==================================================
+TAHAP 6 — ADMIN CATEGORIES
+==================================================
+
+Pastikan:
+
+/admin/categories
+
+berfungsi penuh.
+
+Fitur:
+
+- list kategori
+- pagination jika diperlukan
+- tambah kategori
+- edit nama
+- edit slug jika diperbolehkan
+- toggle aktif/nonaktif
+- hapus kategori
+- jumlah produk per kategori jika data tersedia
+- search jika sudah ada pola search admin.
+
+ATURAN PENTING:
+
+Jika kategori masih memiliki produk:
+- jangan hapus secara diam-diam.
+- tampilkan pesan yang jelas.
+- gunakan behavior database/service yang sudah ada.
+
+Slug harus unique.
+
+Jika duplicate slug:
+- tampilkan error yang jelas kepada admin.
+- jangan tampilkan generic error jika backend sudah dapat mengembalikan alasan yang spesifik.
+
+Kategori nonaktif:
+- tidak tampil di customer category navigation/list jika memang behavior existing demikian.
+- produk tidak boleh rusak hanya karena kategori dinonaktifkan.
+
+==================================================
+TAHAP 7 — ADMIN ORDERS
+==================================================
+
+Pastikan:
+
+/admin/orders
+
+adalah halaman operasional yang lengkap.
+
+Minimal:
+
+- list order
+- pagination
+- search Order ID/customer
+- filter Order Status
+- filter Payment Status
+- filter tanggal jika struktur existing mendukung
+- detail order
+- customer information
+- daftar item
+- quantity
+- harga
+- subtotal
+- total
+- payment method
+- payment status
+- order status
+- createdAt
+- update status jika memang diperbolehkan.
+
+PENTING:
+
+Payment Status dan Order Status harus independen.
+
+Jangan mengubah payment status hanya karena order status berubah.
+
+Jangan mengubah database secara langsung dari UI.
+
+Semua perubahan harus melewati service/server action/API yang sudah digunakan project.
+
+==================================================
+TAHAP 8 — ORDER DETAIL
+==================================================
+
+Pada detail order tampilkan:
+
+ORDER INFORMATION
+- Order ID
+- tanggal
+- status order
+
+CUSTOMER
+- nama
+- WhatsApp/nomor telepon jika tersedia
+- informasi lain sesuai schema.
+
+PRODUCTS
+- nama produk
+- quantity
+- harga satuan
+- subtotal
+
+PAYMENT
+- payment method
+- payment status
+- payment reference jika memang tersedia
+- total payment.
+
+Jika order memiliki status:
+PENDING-PAYMENT
+PROCESSING
+PAID
+FAILED
+atau status lain,
+ikuti enum/logic existing.
+
+Jangan mengarang status baru.
+
+==================================================
+TAHAP 9 — PAYMENT SETTINGS
+==================================================
+
+Pastikan:
+
+/admin/settings/payment
+
+atau route existing yang digunakan project tetap berfungsi.
+
+Verifikasi:
+
+- QRIS
+- Bank
+- E-Wallet
+- enable/disable
+- konfigurasi sesuai schema/service existing.
+
+Pastikan:
+
+Guest tidak dapat mengubah settings.
+Customer tidak dapat mengakses admin settings.
+Admin dapat mengakses.
+
+Endpoint public hanya mengembalikan data yang memang aman untuk customer.
+
+Jangan pernah mengembalikan:
+- secret
+- credential
+- private configuration
+- internal admin data.
+
+==================================================
+TAHAP 10 — ADMIN AUTHORIZATION
+==================================================
+
+Ini WAJIB diverifikasi.
+
+Test minimal:
+
+1. Guest membuka /admin
+   -> harus ditolak/redirect login sesuai behavior existing.
+
+2. Customer membuka /admin
+   -> harus ditolak.
+
+3. Customer mencoba API admin
+   -> HTTP 401/403 sesuai architecture existing.
+
+4. Admin membuka /admin
+   -> berhasil.
+
+5. Admin API
+   -> berhasil.
+
+6. Admin logout
+   -> session/access harus benar-benar hilang.
+
+Jangan hanya menyembunyikan menu admin dari customer.
+
+Authorization harus terjadi di server/API/service.
+
+Jangan mengandalkan frontend check saja.
+
+==================================================
+TAHAP 11 — ERROR HANDLING
+==================================================
+
+Jangan biarkan error seperti:
+
+"Application error: a client-side exception has occurred"
+
+muncul kepada user tanpa informasi.
+
+Untuk setiap operasi admin:
+
+- loading state
+- success state
+- validation error
+- server error
+- empty state
+- confirmation dialog untuk operasi destructive.
+
+Contoh delete:
+
+"Apakah Anda yakin ingin menghapus produk ini?"
+
+Jika gagal:
+
+"Produk gagal dihapus"
++ alasan jika aman ditampilkan.
+
+Jangan menampilkan stack trace ke user.
+
+Error detail hanya untuk server log/debug.
+
+==================================================
+TAHAP 12 — LOADING & UX
+==================================================
+
+Admin UI harus memiliki:
+
+- skeleton/loading state jika fetch membutuhkan waktu.
+- disabled state saat submit.
+- tombol tidak bisa ditekan berkali-kali saat request berjalan.
+- toast/alert success.
+- toast/alert error.
+- modal confirmation untuk delete.
+- form tetap mempertahankan input ketika validasi gagal jika memungkinkan.
+
+Jangan membuat UI terasa seperti halaman raw CRUD.
+
+Harus tetap konsisten dengan desain Digital Cell existing.
+
+==================================================
+TAHAP 13 — RESPONSIVE ADMIN
+==================================================
+
+WAJIB test minimal viewport:
+
+360px
+375px
+390px
+414px
+768px
+1024px
+1280px
+1440px
+
+Periksa:
+
+- tidak ada horizontal overflow.
+- table admin responsive.
+- card dashboard tidak melebar keluar viewport.
+- modal responsive.
+- form responsive.
+- sidebar mobile tidak mengganggu content.
+- tombol tidak tertutup.
+- header tidak overflow.
+- text panjang tidak merusak layout.
+
+Gunakan pola responsive yang sudah berhasil dipakai pada customer UI.
+
+Jangan merusak responsive customer UI yang sudah PASS.
+
+==================================================
+TAHAP 14 — DATABASE VERIFICATION
+==================================================
+
+Semua CRUD harus diverifikasi dengan database nyata.
+
+Untuk Product:
+- create
+- refresh
+- edit
+- refresh
+- toggle
+- refresh
+- delete
+- refresh
+
+Untuk Category:
+- create
+- refresh
+- edit
+- toggle
+- refresh
+- delete jika tidak memiliki dependency.
+
+Untuk Order:
+- create order dari customer flow.
+- lihat order dari admin.
+- buka detail.
+- update status jika tersedia.
+- refresh.
+- pastikan status tetap tersimpan.
+
+Untuk Payment Settings:
+- ubah setting.
+- refresh.
+- restart dev server jika aman.
+- pastikan data tetap ada.
+
+Jangan hanya mengecek state React.
+
+==================================================
+TAHAP 15 — CUSTOMER/ADMIN ISOLATION
+==================================================
+
+Pastikan perubahan admin tidak merusak customer.
+
+Customer tetap harus:
+
+- melihat produk aktif.
+- tidak melihat produk nonaktif.
+- melihat kategori aktif.
+- tidak melihat kategori nonaktif.
+- dapat membuka product detail.
+- dapat checkout.
+- dapat membuat order sesuai flow existing.
+- payment flow tetap bekerja.
+
+Admin dapat melihat data sesuai kebutuhan operasional.
+
+Admin harus dapat melihat produk nonaktif.
+
+Admin harus dapat melihat order sesuai status.
+
+==================================================
+TAHAP 16 — SECURITY AUDIT
+==================================================
+
+Cari kemungkinan:
+
+- secret di frontend.
+- DATABASE_URL di client.
+- admin credential di source code.
+- API admin tanpa authorization.
+- IDOR pada order/product/category.
+- endpoint admin yang bisa dipanggil customer.
+- data sensitif dikirim ke public API.
+- unsafe direct database mutation.
+- credential di git.
+- .env masuk commit.
+
+Jangan menambahkan secret baru.
+
+Jangan commit:
+
+.env
+.env.local
+credentials
+token
+password
+database URL
+private keys
+temporary debug files.
+
+==================================================
+TAHAP 17 — TEST
+==================================================
+
+Setelah implementasi:
+
+1. npm run typecheck
+2. npm run build
+3. Jalankan dev/production server sesuai architecture existing.
+4. Smoke test admin routes.
+5. Smoke test customer routes.
+6. API regression test.
+7. Database persistence test.
+8. Authorization test.
+
+Minimal route verification:
+
+/
+ /products
+ /product/[slug]
+ /categories
+ /checkout
+ /orders
+ /profile
+ /admin
+ /admin/products
+ /admin/categories
+ /admin/orders
+ /admin/settings
+ /admin/settings/payment
+
+Sesuaikan route jika struktur actual project berbeda.
+
+Jangan menganggap route ada hanya berdasarkan prompt.
+Periksa route actual terlebih dahulu.
+
+==================================================
+TAHAP 18 — JANGAN MENGUBAH TEST SECARA SEMBARANGAN
+==================================================
+
+Jangan menghapus test hanya karena gagal.
+
+Jangan menurunkan assertion hanya agar PASS.
+
+Jangan skip test tanpa alasan teknis yang jelas.
+
+Jika test runner memiliki masalah environment seperti Node version atau loader:
+- identifikasi masalah sebenarnya.
+- jangan mengubah application behavior hanya untuk memaksa test PASS.
+
+Jika test memang valid dan menemukan bug:
+- perbaiki bug.
+- jalankan ulang test.
+
+==================================================
+TAHAP 19 — GIT
+==================================================
+
+Sebelum commit:
+
+git status --short
+
+git diff --check
+
+Periksa:
+
+- tidak ada secret.
+- tidak ada .env.
+- tidak ada temporary file.
+- tidak ada debug file.
+- tidak ada build artifact yang tidak seharusnya.
+- tidak ada perubahan customer UI yang tidak diperlukan.
+
+Jika semuanya bersih:
+
+git add <file yang memang berubah>
+
+git commit -m "feat(admin): complete admin dashboard and operations"
+
+git push origin main
+
+JANGAN force push.
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+
+Pastikan branch sinkron dengan:
+
+origin/main
+
+==================================================
+TAHAP 20 — LAPORAN AKHIR
+==================================================
+
+Setelah selesai, jangan hanya mengatakan "done".
+
+Berikan laporan:
+
+1. Admin Dashboard
+   PASS/FAIL
+
+2. Products
+   PASS/FAIL
+
+3. Categories
+   PASS/FAIL
+
+4. Orders
+   PASS/FAIL
+
+5. Payment Settings
+   PASS/FAIL
+
+6. Admin Authorization
+   PASS/FAIL
+
+7. Customer regression
+   PASS/FAIL
+
+8. Responsive
+   PASS/FAIL
+
+9. Typecheck
+   PASS/FAIL
+
+10. Build
+    PASS/FAIL
+
+11. Smoke test
+    PASS/FAIL
+
+12. Database persistence
+    PASS/FAIL
+
+13. Git
+    commit hash
+    push status
+    working tree status
+
+Jika ada blocker, jelaskan blocker sebenarnya.
+
+Jangan menyebut PASS jika belum diverifikasi.
+
+==================================================
+ATURAN PALING PENTING
+==================================================
+
+- Jangan rewrite project.
+- Jangan reset database.
+- Jangan drop database.
+- Jangan hapus migration.
+- Jangan mengganti Prisma schema tanpa alasan kuat.
+- Jangan mengganti database.
+- Jangan menggunakan mock data untuk production behavior.
+- Jangan merusak customer UI.
+- Jangan mengubah payment flow yang sudah PASS tanpa bug nyata.
+- Jangan membuat duplicate service/API.
+- Jangan membuat API hanya untuk formalitas.
+- Jangan mengandalkan frontend authorization.
+- Jangan commit secret.
+- Jangan force push.
+- Jangan berhenti hanya karena build PASS.
+- Verifikasi UI dan behavior.
+- Jika menemukan bug, perbaiki sampai PASS jika aman.
+- Semua perubahan harus modular dan maintainable.
+
+==================================================
+URUTAN EKSEKUSI
+==================================================
+
+Kerjakan dengan urutan:
+
+1. Audit project.
+2. Audit existing admin routes/components/services.
+3. Audit database/schema.
+4. Verifikasi admin authentication/authorization.
+5. Selesaikan Admin Layout.
+6. Selesaikan Dashboard.
+7. Selesaikan Products.
+8. Selesaikan Categories.
+9. Selesaikan Orders.
+10. Verifikasi Payment Settings.
+11. Responsive test.
+12. Customer regression.
+13. Typecheck.
+14. Build.
+15. Smoke test.
+16. Database persistence.
+17. Security check.
+18. git diff --check.
+19. git status.
+20. Commit.
+21. Push origin/main.
+22. Verifikasi setelah push.
+23. Berikan laporan lengkap.
+
+JANGAN lanjut ke fitur baru sebelum tahap sebelumnya benar-benar PASS.
+
+Fokus sekarang:
+ADMIN PANEL DIGITAL CELL yang benar-benar siap digunakan, bukan sekadar halaman yang terlihat bagus.
 
 
 ```
