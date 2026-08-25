@@ -14,10 +14,745 @@
 
 ```
 
-# 
+# Prompt: Payment Flow End-to-End — DEV/Sandbox
 ```
 
+## Prompt: Payment Flow End-to-End — DEV/Sandbox
 
+Project: Digital Cell / toko-online
+
+LANJUTKAN DARI KONDISI SAAT INI.
+
+STATUS:
+- Customer UI sudah stabil.
+- Mobile responsive sudah diperbaiki.
+- Product management PASS.
+- Category management PASS.
+- Admin Orders PASS.
+- Admin Payment Settings sudah PASS.
+- Commit terakhir payment settings: 9767f6c.
+- Build/typecheck sebelumnya PASS.
+- Payment Settings sudah mendukung metode pembayaran DEV.
+- Sekarang fokus hanya pada PAYMENT FLOW END-TO-END.
+
+==================================================
+ATURAN UTAMA
+==================================================
+
+MODE WAJIB:
+DEV / SANDBOX ONLY.
+
+JANGAN:
+- menggunakan payment production
+- menggunakan uang nyata
+- menggunakan production Midtrans key
+- membuat transaksi production
+- reset database
+- menghapus migration
+- menghapus fitur existing
+- force push
+- mengganti database
+- mengganti desain UI yang sudah PASS tanpa alasan
+
+Jika menemukan konfigurasi production, jangan aktifkan.
+Gunakan environment/configuration DEV yang sudah tersedia.
+
+==================================================
+1. AUDIT PAYMENT FLOW EXISTING
+==================================================
+
+Sebelum coding, audit:
+
+- checkout page
+- cart state
+- checkout state
+- order-service
+- payment-service
+- order API
+- payment API
+- Prisma schema
+- Order
+- OrderItem
+- Payment
+- PaymentMethod
+- payment status
+- order status
+- admin orders
+- customer orders
+- payment settings
+
+Cari seluruh flow:
+
+product
+→ cart
+→ checkout
+→ customer information
+→ payment method
+→ create order
+→ create payment
+→ payment status
+→ order status
+→ customer order detail
+
+Jangan membuat flow kedua jika flow existing masih dapat diperbaiki.
+
+Gunakan architecture/service existing.
+
+==================================================
+2. ORDER DAN PAYMENT HARUS TERPISAH
+==================================================
+
+Pastikan:
+
+Order status != Payment status.
+
+Contoh:
+
+Order:
+PENDING
+PROCESSING
+COMPLETED
+CANCELLED
+FAILED
+
+Payment:
+PENDING
+WAITING_PAYMENT
+PAID
+FAILED
+EXPIRED
+
+Jika project memiliki enum berbeda, gunakan enum existing.
+
+Jangan mengubah schema tanpa audit.
+
+Payment gagal tidak boleh otomatis menghapus order.
+
+Payment pending tidak boleh dianggap paid.
+
+Order completed hanya boleh terjadi ketika aturan bisnis existing mengizinkan.
+
+==================================================
+3. CREATE ORDER
+==================================================
+
+Saat customer klik:
+
+"Lanjutkan Pembayaran"
+
+pastikan:
+
+1. Validasi cart.
+2. Validasi product masih aktif.
+3. Validasi harga dari server/database.
+4. Jangan percaya harga dari client.
+5. Validasi stock.
+6. Validasi customer information.
+7. Validasi payment method aktif.
+8. Hitung ulang subtotal di server.
+9. Hitung total di server.
+10. Create Order.
+11. Create OrderItem.
+12. Create Payment.
+13. Simpan payment method yang dipilih.
+14. Return order/payment information.
+
+Semua mutation harus atomic jika memungkinkan.
+
+Gunakan transaction database.
+
+Jika salah satu langkah gagal:
+- jangan meninggalkan order setengah jadi
+- jangan meninggalkan OrderItem orphan
+- jangan meninggalkan Payment orphan
+
+==================================================
+4. HARGA
+==================================================
+
+PENTING:
+
+Harga final harus berasal dari database/server.
+
+Jangan:
+
+clientTotal
+clientPrice
+clientSubtotal
+
+dijadikan sumber kebenaran.
+
+Server harus:
+
+ambil product
+→ ambil harga aktual
+→ hitung quantity
+→ hitung subtotal
+→ hitung total
+
+Jika harga product berubah setelah cart dibuat:
+gunakan harga server terbaru sesuai aturan existing.
+
+==================================================
+5. STOCK
+==================================================
+
+Validasi stock di server.
+
+Jika stock tidak cukup:
+
+return error 400 dengan pesan jelas.
+
+Jangan mengurangi stock jika order/payment belum mencapai state yang memang mengharuskan pengurangan stock.
+
+Ikuti aturan stock existing.
+
+Jika project sebelumnya sudah menentukan:
+
+PENDING-FAILED
+atau
+PAYMENT-PROCESSING
+atau state lain,
+
+ikuti implementation existing.
+
+Jangan membuat aturan baru tanpa audit.
+
+==================================================
+6. PAYMENT METHOD
+==================================================
+
+Customer hanya boleh memilih payment method:
+
+active = true
+
+Server juga wajib memvalidasi ulang.
+
+Jangan percaya:
+
+paymentMethodId dari client
+
+tanpa pengecekan database.
+
+Jika payment method:
+
+- tidak ditemukan → 404
+- inactive → 400
+- tidak valid → 400
+
+Payment method yang dinonaktifkan dari Admin tidak boleh digunakan customer.
+
+==================================================
+7. DEV PAYMENT CREATION
+==================================================
+
+Karena masih DEV/Sandbox:
+
+Setelah order dibuat, buat payment record.
+
+Contoh:
+
+Order:
+PENDING
+
+Payment:
+WAITING_PAYMENT
+
+Payment harus mempunyai identifier/reference yang unik.
+
+Contoh format:
+
+PAY-<unique-id>
+
+Gunakan generator existing jika sudah ada.
+
+Jangan menggunakan ID random client sebagai payment reference.
+
+==================================================
+8. PAYMENT DETAIL PAGE
+==================================================
+
+Setelah order dibuat:
+
+customer diarahkan ke halaman payment/detail yang sesuai.
+
+Tampilkan:
+
+- Order ID
+- Nama produk
+- Quantity
+- Total pembayaran
+- Payment method
+- Payment status
+- Instruksi pembayaran
+
+QRIS:
+- QR image
+- nominal
+- instruksi
+
+Bank:
+- bank
+- account number
+- account name
+- nominal
+- tombol copy
+
+E-wallet:
+- provider
+- account number
+- account name
+- nominal
+- tombol copy
+
+Gunakan data database.
+
+Jangan hardcode payment method.
+
+==================================================
+9. DEV PAYMENT ACTION
+==================================================
+
+Buat mekanisme DEV/Sandbox untuk menguji pembayaran tanpa uang nyata.
+
+Contoh:
+
+"Simulasikan Pembayaran Berhasil"
+
+atau mekanisme DEV equivalent yang sesuai architecture.
+
+ATURAN:
+
+- hanya tersedia ketika DEV
+- tidak tersedia di production
+- tidak menggunakan Midtrans production
+- tidak membutuhkan payment credential nyata
+- hanya mengubah state melalui backend
+- wajib melakukan authorization
+
+Flow:
+
+WAITING_PAYMENT
+→ DEV PAYMENT SUCCESS
+→ PAID
+
+Setelah payment menjadi PAID:
+
+jalankan business logic order sesuai aturan existing.
+
+Jangan langsung membuat order COMPLETED jika architecture membutuhkan PROCESSING terlebih dahulu.
+
+==================================================
+10. PAYMENT FAILED
+==================================================
+
+Sediakan jalur DEV untuk:
+
+WAITING_PAYMENT
+→ FAILED
+
+Pastikan:
+
+- payment status FAILED
+- order tidak dianggap paid
+- customer dapat melihat status
+- tidak ada exception
+- tidak menghapus order secara otomatis
+
+Jika retry payment memang didukung architecture existing:
+
+order yang sama dapat membuat payment attempt baru tanpa menggandakan OrderItem.
+
+Jika retry belum didukung:
+jangan implementasi kompleks secara paksa.
+
+==================================================
+11. PAYMENT EXPIRED
+==================================================
+
+Audit apakah project sudah memiliki expiry.
+
+Jika sudah:
+gunakan implementation existing.
+
+Jika belum:
+jangan membuat background worker kompleks hanya untuk tahap ini.
+
+Pastikan status EXPIRED dapat direpresentasikan dengan benar jika dibutuhkan oleh flow.
+
+==================================================
+12. CUSTOMER ORDER PAGE
+==================================================
+
+Setelah order dibuat, customer harus dapat melihat:
+
+- order ID
+- produk
+- total
+- order status
+- payment status
+- payment method
+- tanggal
+- detail pembayaran jika masih pending
+
+Pastikan refresh browser tidak kehilangan data.
+
+Data harus berasal dari database/API, bukan state memory saja.
+
+==================================================
+13. ADMIN ORDER PAGE
+==================================================
+
+Admin Orders harus menampilkan:
+
+- Order ID
+- customer
+- total
+- order status
+- payment status
+- payment method
+- createdAt
+
+Pastikan payment status dan order status terlihat terpisah.
+
+Jangan merusak Admin Orders yang sudah PASS.
+
+==================================================
+14. AUTHORIZATION
+==================================================
+
+Guest:
+
+- tidak boleh melihat order customer
+- tidak boleh mengubah payment
+- tidak boleh mengakses admin payment action
+
+Customer:
+
+- hanya boleh melihat order miliknya
+- tidak boleh melihat order customer lain
+- tidak boleh mengubah payment milik customer lain
+- tidak boleh melakukan admin action
+
+Admin:
+
+- boleh melihat order sesuai permission existing
+- boleh melakukan admin action yang memang sudah tersedia
+
+Jangan menggunakan ID dari client sebagai satu-satunya authorization check.
+
+==================================================
+15. DUPLICATE ORDER PROTECTION
+==================================================
+
+PENTING karena sebelumnya ada masalah checkout/cart:
+
+Jika customer:
+
+checkout
+→ kembali ke homepage
+→ membeli produk lain
+
+jangan membuat order lama ikut masuk kembali ke cart.
+
+Pastikan:
+
+- cart state konsisten
+- checkout state tidak menggandakan item
+- order hanya dibuat saat submit checkout
+- refresh checkout tidak membuat order baru
+- double click tombol pembayaran tidak membuat dua order
+- retry request tidak membuat duplicate order jika architecture mendukung idempotency
+
+Gunakan protection yang sesuai dengan architecture existing.
+
+Jangan membuat solusi frontend-only untuk duplicate order.
+
+==================================================
+16. ERROR HANDLING
+==================================================
+
+Pastikan tidak ada:
+
+Application error
+Client-side exception
+HTTP 500 untuk validation
+blank page
+unhandled promise rejection
+
+Mapping:
+
+400:
+validation/business error
+
+401:
+unauthorized
+
+403:
+forbidden
+
+404:
+resource tidak ditemukan
+
+409:
+duplicate/conflict jika sesuai
+
+500:
+unexpected server error
+
+Error message harus aman dan jelas.
+
+Jangan expose stack trace ke customer.
+
+==================================================
+17. DATABASE VERIFICATION
+==================================================
+
+Setelah melakukan test:
+
+cek database DEV.
+
+Verifikasi:
+
+Order ada.
+
+OrderItem ada.
+
+Payment ada.
+
+Relationship benar.
+
+Tidak ada duplicate OrderItem.
+
+Tidak ada orphan Payment.
+
+Status sesuai.
+
+Refresh halaman:
+data tetap ada.
+
+Restart development server:
+data tetap ada.
+
+Jangan reset database.
+
+==================================================
+18. TEST SCENARIO
+==================================================
+
+WAJIB lakukan test berikut.
+
+TEST 1:
+Guest buka checkout
+→ diarahkan/login sesuai auth existing.
+
+TEST 2:
+Customer checkout dengan product aktif
+→ Order created
+→ OrderItem created
+→ Payment created.
+
+TEST 3:
+Customer memilih payment method aktif
+→ berhasil.
+
+TEST 4:
+Customer memilih payment method inactive
+→ ditolak.
+
+TEST 5:
+Product stock tidak cukup
+→ order tidak dibuat.
+
+TEST 6:
+Product tidak aktif
+→ order ditolak.
+
+TEST 7:
+Harga client dimanipulasi
+→ server tetap menggunakan harga database.
+
+TEST 8:
+Double click submit
+→ tidak membuat duplicate order.
+
+TEST 9:
+Payment DEV success
+→ Payment PAID.
+
+TEST 10:
+Payment DEV failed
+→ Payment FAILED.
+
+TEST 11:
+Refresh payment page
+→ status tetap benar.
+
+TEST 12:
+Customer membuka order
+→ hanya order miliknya.
+
+TEST 13:
+Customer mencoba order milik user lain
+→ 403/404 sesuai security architecture.
+
+TEST 14:
+Admin melihat order
+→ order terlihat.
+
+TEST 15:
+Admin melihat payment status
+→ payment status terpisah dari order status.
+
+TEST 16:
+Nonaktifkan payment method dari Admin
+→ payment method hilang dari checkout.
+
+TEST 17:
+Aktifkan kembali
+→ muncul kembali di checkout.
+
+==================================================
+19. RESPONSIVE TEST
+==================================================
+
+Verifikasi:
+
+360px
+375px
+390px
+414px
+768px
+1280px
+1440px
+
+Khusus:
+
+checkout
+payment detail
+customer orders
+admin orders
+
+Tidak boleh:
+
+- horizontal overflow
+- button keluar viewport
+- modal terpotong
+- payment card terlalu besar
+- bottom navigation menutupi content
+- sticky action menutupi payment detail
+
+Jangan mengubah desain yang sudah disetujui kecuali memang diperlukan.
+
+==================================================
+20. REGRESSION
+==================================================
+
+Pastikan semua route existing tetap bekerja:
+
+/
+ /products
+ /categories
+ /product/[slug]
+ /checkout
+ /orders
+ /profile
+ /admin
+ /admin/products
+ /admin/categories
+ /admin/orders
+ /admin/settings
+ /admin/settings/payment
+
+Gunakan route actual project jika berbeda.
+
+Jalankan smoke test.
+
+==================================================
+21. TEST COMMAND
+==================================================
+
+Jalankan:
+
+npm run typecheck
+
+npm run build
+
+Jalankan test suite yang kompatibel dengan Node environment project.
+
+Jika npm run test:* existing gagal karena masalah command/tooling Node, jangan menganggap fitur gagal.
+
+Cari test command yang memang digunakan project sebelumnya dan jalankan test tersebut.
+
+Jangan mengganti test framework hanya untuk membuat PASS.
+
+==================================================
+22. GIT SAFETY
+==================================================
+
+Sebelum commit:
+
+git status --short
+
+git diff --check
+
+Pastikan tidak ada:
+
+.env
+.env.local
+secret
+API key
+production credential
+temporary file
+debug file
+build artifact
+
+Commit:
+
+git add <file yang berubah>
+
+git commit -m "feat(payment): complete dev payment flow"
+
+git push origin main
+
+JANGAN force push.
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+git status -sb
+
+Pastikan origin/main sinkron.
+
+==================================================
+23. OUTPUT AKHIR
+==================================================
+
+Tampilkan:
+
+1. Audit payment flow
+2. File yang diubah
+3. API/route yang diubah
+4. Database/model yang digunakan
+5. Order creation result
+6. Payment creation result
+7. DEV success flow
+8. DEV failed flow
+9. Duplicate protection
+10. Authorization result
+11. Responsive result
+12. Typecheck result
+13. Build result
+14. Smoke test result
+15. Database verification result
+16. Commit hash
+17. Push status
+18. Blocker jika ada
+
+JANGAN lanjut ke production payment setelah tahap ini.
+
+STOP setelah seluruh DEV payment flow selesai dan terverifikasi.
 
 ```
 # Prompt: Admin Payment Settings — DEV/Sandbox
