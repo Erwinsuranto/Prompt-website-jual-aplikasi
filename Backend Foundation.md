@@ -169,10 +169,193 @@
 
 
 ```
-# 
+# Prompt berikutnya — UI Admin Responsive Audit
 ```
 
+Prompt: Admin Panel UI Responsive Audit & Polish
 
+Project: Digital Cell / toko-online
+
+Sekarang fokus HANYA pada UI/UX Admin Panel.
+Jangan menambah fitur backend baru dan jangan mengubah customer/store UI yang sudah dinyatakan stabil.
+
+Tujuan:
+Memastikan seluruh Admin Panel benar-benar usable, rapi, responsive, dan tidak overflow pada desktop maupun mobile.
+
+WAJIB lakukan audit terlebih dahulu sebelum mengubah kode.
+
+Route yang harus diverifikasi:
+- /admin
+- /admin/products
+- /admin/categories
+- /admin/orders
+- /admin/settings
+- /admin/settings/payment
+
+Viewport minimum yang harus diperhatikan:
+- 360px
+- 375px
+- 390px
+- 414px
+- desktop 1280px
+
+PERBAIKI jika ditemukan:
+
+1. ADMIN LAYOUT
+- Sidebar desktop tetap rapi.
+- Pada mobile gunakan drawer/menu yang benar.
+- Jangan membuat halaman horizontal overflow.
+- Konten utama tidak tertutup sidebar/header.
+- Header admin tetap usable pada layar kecil.
+- Padding dan gap responsif.
+- Jangan menggunakan fixed width yang menyebabkan overflow.
+
+2. DASHBOARD
+- Card statistik tersusun responsif.
+- Desktop boleh menggunakan grid beberapa kolom.
+- Mobile berubah menjadi 1 kolom atau layout yang sesuai.
+- Angka statistik tidak terpotong.
+- Chart/table tidak keluar viewport.
+- Empty/loading/error state tetap rapi.
+
+3. PRODUCTS
+- Tabel desktop tetap nyaman.
+- Mobile jangan memaksa tabel terlalu lebar.
+- Gunakan responsive card/list atau horizontal scroll yang benar bila memang diperlukan.
+- Tombol Tambah Produk mudah ditemukan.
+- Tombol edit, toggle aktif/nonaktif, dan hapus tidak bertabrakan.
+- Form tambah/edit produk responsive.
+- Modal tidak keluar viewport.
+- Input harga, stok, kategori, status dan field lainnya tidak overflow.
+- Preview gambar tetap proporsional.
+
+4. CATEGORIES
+- List/grid kategori responsive.
+- Tombol tambah/edit/delete/toggle tidak bertabrakan.
+- Modal/form responsive.
+- Status aktif/nonaktif terlihat jelas.
+- Jangan mengubah logic CRUD yang sudah PASS.
+
+5. ORDERS
+- Order list nyaman dibaca pada mobile.
+- Status order menggunakan badge yang jelas.
+- Detail order tidak overflow.
+- Tombol aksi tetap mudah ditekan.
+- Jangan membuat tabel desktop rusak hanya demi mobile.
+- Jika data banyak, pagination/filter tetap usable.
+
+6. PAYMENT SETTINGS
+- Form QRIS/payment method responsive.
+- Card metode pembayaran tidak keluar viewport.
+- Input dan tombol tidak terlalu kecil.
+- Upload QR/image preview tetap proporsional.
+- Toggle aktif/nonaktif mudah digunakan.
+- Jangan mengubah logic payment yang sudah PASS.
+
+7. RESPONSIVE RULES
+Gunakan pola responsive yang konsisten:
+- width: 100% / max-width yang aman
+- min-width: 0 pada flex/grid child jika diperlukan
+- flex-wrap pada toolbar
+- overflow-x-auto hanya pada elemen yang memang membutuhkan scrolling
+- hindari fixed pixel width besar
+- modal menggunakan max-width dan width yang aman
+- tombol tidak boleh keluar layar
+- teks panjang harus wrap/break dengan benar
+
+8. MOBILE TOUCH UX
+- Semua tombol/action memiliki area klik yang nyaman.
+- Jangan membuat tombol terlalu rapat.
+- Form input nyaman digunakan dengan keyboard mobile.
+- Dialog/modal tetap dapat discroll.
+- Tidak ada fixed footer/header yang menutupi content.
+
+9. VISUAL CONSISTENCY
+Pertahankan style Digital Cell:
+- clean
+- white base
+- midnight/dark blue
+- border radius konsisten
+- shadow tidak berlebihan
+- typography konsisten
+- spacing konsisten
+- icon tidak terlalu besar
+
+Jangan melakukan redesign total.
+Polish UI existing saja.
+
+10. CUSTOMER UI
+JANGAN mengubah:
+- homepage customer
+- product detail customer
+- checkout customer
+- bottom navigation customer
+- customer responsive layout
+
+Kecuali ada dependency langsung dari shared component yang benar-benar menyebabkan Admin UI rusak.
+Jika shared component dipakai customer, pastikan perubahan tidak merusak customer UI.
+
+11. VERIFIKASI
+Setelah perubahan:
+- npm run typecheck
+- npm run build
+- jalankan dev/production server sesuai arsitektur project
+- lakukan smoke test route Admin
+- verifikasi viewport 360/375/390/414 dan desktop
+- cek tidak ada horizontal overflow
+- cek console/browser runtime error
+- cek semua route Admin dapat dibuka
+- cek modal/drawer/form dapat dibuka dan ditutup
+
+12. REGRESSION
+Jangan merusak:
+- authentication
+- product CRUD
+- category CRUD
+- order management
+- payment settings
+- database
+- API
+- customer UI
+
+13. GIT
+Sebelum commit:
+git status --short
+git diff --check
+
+Pastikan:
+- tidak ada .env
+- tidak ada secret
+- tidak ada credential
+- tidak ada build artifact
+- tidak ada temporary file
+
+Jika semua PASS:
+- commit dengan message:
+  feat(admin): polish responsive admin ui
+- push:
+  git push origin main
+- setelah push:
+  git status --short
+  git log -1 --oneline
+
+Jangan force push.
+
+HASIL AKHIR:
+Laporkan:
+1. File yang diubah
+2. UI yang diperbaiki
+3. Viewport yang diverifikasi
+4. Typecheck result
+5. Build result
+6. Smoke test result
+7. Commit hash
+8. Push status
+9. Apakah masih ada blocker
+
+PENTING:
+Jangan berhenti hanya karena build PASS.
+Tujuan utama tahap ini adalah memastikan UI Admin benar-benar terlihat dan usable di mobile dan desktop.
 
 ```
 
