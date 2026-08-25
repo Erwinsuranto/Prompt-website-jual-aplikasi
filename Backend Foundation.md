@@ -139,9 +139,107 @@
 
 
 ```
-# 
+# Audit & Perbaiki Integrasi Backend Prisma
 ```
 
+## Audit & Perbaiki Integrasi Backend Prisma
+
+Project: **Digital Cell / toko-online**
+
+Lakukan audit menyeluruh terhadap project yang sedang aktif. Jangan membuat ulang project dan jangan menghapus fitur yang sudah ada.
+
+Temuan awal:
+
+* Next.js 14.2.33
+* TypeScript
+* Prisma 5.22
+* Database migration sudah ada di `app/prisma/migrations/`
+* `npm run typecheck` berhasil
+* `npm run build` berhasil
+* `npm run start` gagal karena `next.config` menggunakan `output: "export"`
+* Pencarian `PrismaClient` di `src` tidak menemukan penggunaan Prisma.
+* Project memiliki service seperti `auth-service`, `banner-service`, `category-service`, `order-service`, `payment-service`, `product-service`, `user-service`, dll.
+
+Tugas:
+
+1. Audit seluruh struktur project terlebih dahulu.
+2. Tentukan apakah project memang membutuhkan Next.js server runtime untuk Prisma/database.
+3. Jika Prisma belum terintegrasi, implementasikan integrasi Prisma dengan benar.
+4. Jika `output: "export"` tidak sesuai dengan arsitektur aplikasi, perbaiki `next.config` agar aplikasi dapat berjalan menggunakan `npm run start`.
+5. Buat/revisi Prisma client singleton yang aman untuk development dan production.
+6. Hubungkan service yang memang membutuhkan database ke Prisma tanpa merusak UI/store yang sudah ada.
+7. Periksa authentication, user, product, category, banner, order, order item, payment, notification dan data settings agar siap menggunakan database sesuai schema Prisma yang sudah ada.
+8. Jangan membuat API route hanya untuk formalitas. Buat endpoint/server logic yang memang diperlukan oleh frontend.
+9. Jangan menyimpan `DATABASE_URL`, secret, atau `.env.local` ke Git.
+10. Jangan mengubah desain UI kecuali diperlukan untuk memperbaiki integrasi.
+11. Jangan menghapus migration yang sudah dibuat.
+12. Pastikan semua perubahan modular dan mudah dikembangkan.
+13. Jalankan:
+
+* `npm run typecheck`
+* `npm run build`
+* `npm run start` atau validasi production server dengan cara yang sesuai arsitektur.
+
+14. Jika ditemukan error, perbaiki sampai ketiga tahap tersebut valid.
+
+15. Setelah selesai, tampilkan ringkasan file yang diubah dan alasan setiap perubahan.
+
+16. Setelah seluruh verifikasi PASS, lakukan commit dan push ke `origin main`.
+
+17. Sebelum commit, jalankan `git status --short` dan `git diff --check`.
+
+18. Pastikan tidak ada `.env`, secret, credential, build artifact, atau file temporary yang ikut di-commit.
+
+19. Gunakan commit message yang jelas, misalnya `feat(backend): integrate Prisma database services`.
+
+20. Jalankan `git push origin main` tanpa force push.
+
+21. Setelah push, verifikasi `git status --short`, `git log -1 --oneline`, dan sinkronisasi dengan `origin/main`.
+
+22. Perbaiki akses dan navigasi Admin Panel yang saat ini belum terlihat dari UI meskipun route `/admin/dashboard` sudah pernah terverifikasi HTTP 200.
+
+23. Audit terlebih dahulu implementasi authentication/session dan role authorization. Pastikan akun dengan role `ADMIN` benar-benar dikenali sebagai admin dari session yang sedang aktif, bukan hanya berdasarkan tampilan profil.
+
+24. Untuk akun `ADMIN`, tambahkan akses navigasi yang jelas menuju **Admin Panel** tanpa mengubah navigasi customer yang sudah ada. Admin tetap boleh menggunakan seluruh fitur customer, tetapi harus mendapatkan tambahan menu/entry `Admin Panel`.
+
+25. Menu `Admin Panel` hanya boleh tampil untuk user dengan role `ADMIN`. Customer biasa tidak boleh melihat menu tersebut.
+
+26. Saat admin memilih `Admin Panel`, arahkan ke `/admin/dashboard`. Jangan membuat dashboard baru jika dashboard admin yang sudah ada masih dapat digunakan; hubungkan navigasi ke implementasi existing.
+
+27. Audit seluruh route `/admin/*` dan middleware/guard-nya. Semua route admin harus menolak customer/non-admin dengan mekanisme authorization yang benar. Jangan hanya menyembunyikan menu di frontend.
+
+28. Pastikan login admin dari UI menghasilkan session/cookie yang valid, kemudian `/admin/dashboard` dapat dibuka langsung, direfresh, dan tetap terautentikasi sebagai ADMIN.
+
+29. Pastikan login customer tetap bekerja dan customer tidak dapat mengakses `/admin/dashboard` maupun endpoint admin hanya dengan mengetik URL secara manual.
+
+30. Audit perbedaan nomor WhatsApp akun test yang pernah muncul (`6281234567890` dan `62812345678900`). Jangan membuat akun duplikat atau mengubah data production sembarangan. Identifikasi akun ADMIN yang benar dari database/source of truth dan gunakan akun tersebut untuk verifikasi.
+
+31. Jangan mengubah halaman profil customer/admin menjadi Admin Panel. Profil tetap halaman akun. Admin Panel harus menjadi area administrasi terpisah dengan route dan layout yang jelas.
+
+32. Verifikasi minimal end-to-end:
+
+* customer login → session PASS → `/orders` PASS;
+* customer → `/admin/dashboard` ditolak/redirect PASS;
+* admin login → session role `ADMIN` PASS;
+* admin → `/admin/dashboard` HTTP 200 PASS;
+* admin refresh dashboard minimal 5 kali PASS;
+* admin menu menampilkan `Admin Panel` PASS;
+* customer menu tidak menampilkan `Admin Panel` PASS;
+* seluruh route admin utama yang sudah ada tetap PASS.
+
+33. Jangan mengubah desain/UI customer yang sudah dinyatakan PASS, kecuali perubahan kecil yang diperlukan untuk menambahkan entry `Admin Panel` secara responsif.
+
+PENTING:
+
+* Jangan hanya menghilangkan `output: "export"` tanpa memastikan seluruh aplikasi tetap berfungsi.
+* Jangan mengganti database.
+* Jangan menggunakan mock data sebagai pengganti database production.
+* Jangan menghapus fitur existing.
+* Gunakan schema Prisma yang sudah tersedia sebagai sumber data utama.
+* Jika ada bagian yang ternyata memang sengaja static, pertahankan bagian tersebut dan integrasikan backend hanya pada fitur yang membutuhkan database.
+* Karena VPS berisiko mati, jangan berhenti setelah implementasi. Jika typecheck, build, dan production server verification sudah PASS, langsung commit dan push ke GitHub.
+* Jangan force push.
+* Jika ada error yang belum terselesaikan, jangan commit perubahan yang rusak; perbaiki terlebih dahulu jika aman, atau berhenti dan laporkan blocker.
 
 
 ```
