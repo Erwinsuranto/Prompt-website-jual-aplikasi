@@ -117,7 +117,404 @@
 ```
 # 
 ```
+LANJUT — DEEP BUSINESS-FLOW AUDIT ADMIN PANEL
 
+Kondisi terakhir:
+- Admin Panel navigation PASS.
+- Authorization ADMIN vs CUSTOMER PASS.
+- Browser E2E PASS.
+- 7 viewport × 10 route admin = 0 horizontal overflow.
+- Console: 0 uncaught exception, 0 hydration error, 0 API 500.
+- Typecheck PASS.
+- Build PASS.
+- Test suite: 98 tests, 0 fail.
+- Git clean.
+- HEAD = origin/main.
+- Commit terakhir: a3d1c4e.
+- Category label sudah human-readable dan tidak lagi menampilkan CUID.
+- Dropdown/filter responsive sudah PASS.
+
+JANGAN mengulang audit responsive/navigation yang sudah PASS.
+JANGAN mengubah customer UI yang sudah PASS.
+JANGAN reset/drop database.
+JANGAN membuat mock database.
+JANGAN force push.
+
+Sekarang lakukan DEEP BUSINESS-FLOW AUDIT menggunakan database nyata.
+
+1. PRODUCT CRUD
+
+Gunakan satu produk TEST yang aman.
+
+Verifikasi:
+- CREATE product
+- category selection
+- price
+- original price
+- stock
+- active
+- featured
+- save
+- READ setelah refresh
+- UPDATE
+- category change
+- stock change
+- price change
+- active toggle
+- featured toggle
+- DELETE hanya jika benar-benar data test
+
+Pastikan:
+- categoryId tersimpan benar;
+- UI tetap menampilkan category.name;
+- tidak ada duplicate product akibat retry;
+- update benar-benar UPDATE record existing;
+- refresh tidak mengembalikan data lama;
+- customer melihat perubahan produk yang memang aktif.
+
+2. CATEGORY CRUD
+
+Gunakan database nyata.
+
+Test:
+- create category test;
+- tampil di admin;
+- pilih category tersebut pada product;
+- edit nama category;
+- refresh;
+- product tetap memiliki relation category yang benar;
+- delete category hanya jika aman.
+
+Periksa foreign-key behavior.
+
+Jangan menghapus kategori production yang masih digunakan produk.
+
+3. ORDER FLOW
+
+Buat atau gunakan satu order TEST yang aman.
+
+Verifikasi rantai:
+
+PRODUCT
+→ CHECKOUT
+→ ORDER
+→ ORDER ITEM
+→ PAYMENT
+→ ADMIN ORDERS
+
+Pastikan:
+- satu checkout menghasilkan order yang benar;
+- quantity benar;
+- subtotal benar;
+- total benar;
+- order item mengarah ke product yang benar;
+- customer benar;
+- tidak ada duplicate order akibat refresh/retry.
+
+4. ORDER STATUS vs PAYMENT STATUS
+
+Audit secara khusus.
+
+Pastikan:
+- Order Status adalah field/state tersendiri.
+- Payment Status adalah field/state tersendiri.
+- Mengubah payment status tidak sembarangan mengubah order status.
+- Mengubah order status tidak sembarangan mengubah payment status.
+
+Verifikasi state transition yang memang diizinkan project.
+
+Jika ada:
+PENDING
+PROCESSING
+PAID
+FAILED
+CANCELLED
+COMPLETED
+
+ikuti enum/schema existing, jangan membuat enum baru tanpa kebutuhan.
+
+5. PAYMENT
+
+Audit seluruh payment flow yang memang sudah ada.
+
+Verifikasi:
+- payment method;
+- payment amount;
+- payment status;
+- order relation;
+- payment reference;
+- payment timestamp;
+- manual verification jika tersedia.
+
+Test invalid payment input.
+
+Pastikan transaksi invalid:
+- ditolak;
+- tidak merusak order;
+- tidak membuat payment duplicate;
+- tidak mengubah status secara ilegal.
+
+6. CUSTOMER / USER
+
+Audit data user dari database.
+
+Pastikan:
+- CUSTOMER tetap CUSTOMER;
+- ADMIN tetap ADMIN;
+- nomor WhatsApp canonical konsisten;
+- tidak ada duplicate account akibat format nomor berbeda.
+
+Periksa khusus nomor yang pernah muncul:
+6281234567890
+dan
+62812345678900
+
+Jangan menghapus atau mengubah akun secara sembarangan.
+
+Cari source of truth sebenarnya dan dokumentasikan hasilnya.
+
+Password/hash/token tidak boleh ditampilkan.
+
+7. AUTHORIZATION API
+
+Jangan hanya test browser.
+
+Panggil endpoint admin secara langsung dengan:
+- customer session;
+- admin session;
+- guest/no session.
+
+Pastikan:
+
+guest → 401/redirect sesuai desain
+customer → 403 atau redirect sesuai desain
+admin → 200
+
+Test minimal endpoint:
+- products admin;
+- categories admin;
+- orders admin;
+- users/admin;
+- settings;
+- payment;
+- reports.
+
+Pastikan authorization server-side.
+
+8. REPORTS
+
+Gunakan data order nyata/test yang tersedia.
+
+Verifikasi:
+- revenue;
+- order count;
+- average order value;
+- conversion jika memang tersedia;
+- daily;
+- weekly;
+- monthly;
+- custom range.
+
+Bandingkan angka laporan dengan query/database secara langsung.
+
+Jika ada perbedaan angka:
+cari akar masalahnya, jangan hanya memperbaiki tampilan.
+
+9. DASHBOARD CONSISTENCY
+
+Bandingkan:
+
+Dashboard
+vs
+Orders
+vs
+Reports
+vs
+Database
+
+Pastikan angka yang sama memang berasal dari source yang konsisten.
+
+Contoh:
+jumlah order dashboard harus konsisten dengan jumlah order pada periode yang sama di report.
+
+10. TRANSACTION SAFETY
+
+Audit operasi penting yang menyentuh beberapa tabel.
+
+Pastikan operasi seperti:
+- create order;
+- update payment;
+- update order;
+- delete product/category jika ada relation;
+
+menggunakan transaction/atomic operation jika memang diperlukan oleh schema.
+
+Cari kemungkinan partial write.
+
+Contoh:
+jika Order berhasil dibuat tetapi OrderItem gagal, sistem tidak boleh meninggalkan data setengah jadi.
+
+11. RETRY / DOUBLE SUBMIT
+
+Simulasikan:
+- klik submit dua kali;
+- refresh setelah submit;
+- request retry;
+- back lalu submit kembali.
+
+Pastikan tidak menghasilkan:
+- duplicate order;
+- duplicate payment;
+- duplicate product;
+- duplicate category.
+
+Jika business flow memang membutuhkan idempotency, implementasikan secara minimal menggunakan struktur existing.
+
+12. DATA INTEGRITY
+
+Jalankan pemeriksaan database:
+
+- orphan order items;
+- orphan payments;
+- products tanpa category jika category diwajibkan;
+- duplicate canonical phone;
+- invalid status combination;
+- negative price;
+- negative stock;
+- invalid totals;
+- missing required relation.
+
+Jangan memperbaiki data production secara massal tanpa bukti.
+
+13. VALIDATION
+
+Audit backend validation.
+
+Jangan mengandalkan validation frontend.
+
+Test:
+- empty name;
+- invalid price;
+- negative price;
+- invalid stock;
+- invalid categoryId;
+- malformed order;
+- invalid payment amount;
+- unauthorized role.
+
+Backend harus menolak input invalid.
+
+14. ERROR HANDLING
+
+Pastikan error API:
+- tidak membocorkan stack trace;
+- tidak membocorkan DATABASE_URL;
+- tidak membocorkan password/hash;
+- tidak membocorkan cookie;
+- tidak membocorkan secret.
+
+Browser hanya menerima error yang aman dan dapat ditangani UI.
+
+15. CUSTOMER REGRESSION
+
+Setelah semua audit admin selesai, WAJIB verifikasi ulang:
+
+Customer:
+login
+→ home
+→ category
+→ product
+→ checkout
+→ order
+→ refresh
+→ logout
+
+Pastikan customer tetap PASS.
+
+Jangan mengorbankan customer flow untuk memperbaiki admin.
+
+16. FINAL TEST
+
+Jalankan:
+
+npm run typecheck
+npm run build
+npm run test
+
+Kemudian production server yang sesuai dengan arsitektur project.
+
+Lakukan smoke/E2E terhadap:
+- customer;
+- admin;
+- product;
+- category;
+- order;
+- payment;
+- reports.
+
+17. GIT
+
+Jika ada perubahan:
+
+git status --short
+git diff --check
+
+Pastikan tidak ada:
+.env
+.env.local
+secret
+credential
+password
+hash
+cookie
+build artifact
+temporary file
+
+Commit hanya jika benar-benar ada perubahan.
+
+Gunakan message:
+
+feat(admin): verify business flows end-to-end
+
+Kemudian:
+
+git push origin main
+
+TANPA force push.
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+git status -sb
+
+Pastikan:
+working tree clean
+HEAD = origin/main
+
+HASIL AKHIR WAJIB:
+
+- Product CRUD: PASS/FAIL
+- Category CRUD: PASS/FAIL
+- Order flow: PASS/FAIL
+- Payment: PASS/FAIL
+- Order/Payment status separation: PASS/FAIL
+- Customer/User: PASS/FAIL
+- Admin API authorization: PASS/FAIL
+- Reports/database consistency: PASS/FAIL
+- Transaction safety: PASS/FAIL
+- Duplicate-submit protection: PASS/FAIL
+- Validation: PASS/FAIL
+- Customer regression: PASS/FAIL
+- Typecheck: PASS/FAIL
+- Build: PASS/FAIL
+- Test: jumlah tests/pass/fail
+- Git commit
+- Push status
+- Blocker jika ada
+
+Jangan berhenti hanya karena test otomatis PASS.
+Gunakan database nyata dan verifikasi business flow sampai ke akar.
 
 
 ```
