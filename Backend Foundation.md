@@ -157,11 +157,476 @@
 
 
 ```
-# 
+# Prompt: Audit & Perbaiki Authentication/Login Digital Cell
 ```
 
 
+## AUDIT & PERBAIKI AUTHENTICATION/LOGIN DIGITAL CELL
 
+Project: Digital Cell / toko-online
+
+Kondisi saat ini:
+- UI login sudah tampil dengan benar.
+- Customer maupun admin sama-sama belum berhasil login.
+- Jangan menyimpulkan masalah hanya karena role admin.
+- Fokus sekarang adalah membuat authentication benar-benar bekerja end-to-end menggunakan database yang sudah ada.
+- Jangan membuat ulang project.
+- Jangan menghapus fitur existing.
+- Jangan mengubah desain UI kecuali memang diperlukan untuk memperbaiki bug login.
+
+TARGET UTAMA:
+Customer dan admin harus bisa login menggunakan akun yang memang tersimpan di database.
+
+==================================================
+1. AUDIT FRONTEND LOGIN
+==================================================
+
+Cari komponen/page login yang digunakan customer.
+
+Periksa secara nyata:
+- field nomor WhatsApp
+- field password
+- submit handler
+- endpoint API yang dipanggil
+- HTTP method
+- payload JSON/form-data
+- response yang diharapkan
+- handling error
+- redirect setelah login
+- penyimpanan session/token
+- cookie yang digunakan
+
+Jangan hanya membaca nama file.
+Ikuti alurnya dari tombol "Masuk" sampai request benar-benar dikirim.
+
+Pastikan nomor WhatsApp dinormalisasi konsisten.
+
+Contoh format:
++6281234567890
+6281234567890
+081234567890
+
+Tentukan satu format canonical yang digunakan backend/database, tetapi jangan merusak data existing.
+
+==================================================
+2. AUDIT BACKEND AUTH
+==================================================
+
+Cari seluruh implementasi:
+- login
+- authenticate
+- session
+- JWT/token jika digunakan
+- cookie
+- password verification
+- role authorization
+- customer auth
+- admin auth
+
+Identifikasi endpoint login yang benar-benar dipakai frontend.
+
+Periksa:
+- apakah endpoint benar-benar tersedia
+- apakah method cocok
+- apakah payload cocok
+- apakah backend membaca field yang benar
+- apakah user dicari berdasarkan nomor WhatsApp yang benar
+- apakah password diverifikasi terhadap hash yang benar
+- apakah user aktif
+- apakah role dibaca dari database
+- apakah session/token berhasil dibuat
+- apakah cookie/session berhasil dikirim ke browser
+
+Jangan membuat endpoint duplikat jika endpoint existing sebenarnya sudah benar.
+
+==================================================
+3. AUDIT PRISMA + POSTGRESQL
+==================================================
+
+Periksa schema Prisma yang sudah ada.
+
+Cari model yang berhubungan dengan:
+- User
+- Account
+- Session
+- Role
+- password
+- WhatsApp/phone
+- customer
+- admin
+
+Pastikan backend benar-benar menggunakan Prisma Client yang terhubung ke PostgreSQL.
+
+Jangan menggunakan mock user sebagai pengganti database.
+
+Pastikan:
+- DATABASE_URL benar digunakan
+- Prisma Client berhasil connect
+- query user tidak gagal
+- field database sesuai schema
+- field nomor WhatsApp sesuai schema
+- password hash tersimpan dengan benar
+
+Jangan menghapus migration existing.
+
+Jangan mengganti database.
+
+==================================================
+4. AUDIT PASSWORD HASH
+==================================================
+
+Ini bagian penting.
+
+Cari fungsi hashing dan verification password yang digunakan project.
+
+Tentukan apakah project menggunakan:
+- bcrypt
+- bcryptjs
+- argon2
+- library lain
+
+Pastikan algoritma saat membuat password sama dengan algoritma saat login.
+
+Jangan membandingkan password plaintext dengan password hash.
+
+Jangan mengubah password user production secara sembarangan.
+
+==================================================
+5. CEK AKUN TEST DI DATABASE
+==================================================
+
+Periksa database PostgreSQL secara langsung.
+
+Cari akun test customer dan akun test admin yang memang sudah dibuat oleh project.
+
+Jangan hanya melihat seed file.
+
+Tampilkan secara aman:
+- nomor WhatsApp yang ditemukan
+- role
+- status aktif/nonaktif
+- apakah password hash tersedia
+- apakah password hash valid untuk password test yang memang ditetapkan project
+
+JANGAN menampilkan password hash lengkap jika tidak diperlukan.
+
+Jika akun test belum ada:
+- jangan membuat akun duplikat
+- gunakan upsert berdasarkan unique field
+- buat akun test customer dan admin hanya untuk development/testing
+- gunakan password test yang jelas dan konsisten
+- jangan menyentuh akun production
+
+Penting:
+Jangan mengganti kredensial hanya karena login gagal.
+Cari dulu penyebab sebenarnya.
+
+==================================================
+6. TEST LOGIN CUSTOMER
+==================================================
+
+Setelah backend diperbaiki, lakukan pengujian login customer secara nyata.
+
+Urutan:
+
+1. database user ditemukan
+2. password verification PASS
+3. login endpoint PASS
+4. session/token dibuat
+5. cookie/session diterima client
+6. redirect customer PASS
+7. halaman customer dapat dibuka
+8. refresh browser tetap authenticated
+9. logout menghapus session
+
+Jangan berhenti hanya karena API mengembalikan HTTP 200.
+
+==================================================
+7. TEST LOGIN ADMIN
+==================================================
+
+Lakukan pengujian terpisah untuk admin.
+
+Pastikan:
+- akun admin ditemukan
+- password verification PASS
+- session admin dibuat
+- role ADMIN terbaca
+- `/admin` dapat dibuka
+- route admin menolak customer biasa
+- guest diarahkan ke login
+- customer tidak dapat mengakses halaman admin
+
+Jangan membuat customer otomatis menjadi admin hanya untuk membuat test pass.
+
+==================================================
+8. TEST AUTHORIZATION
+==================================================
+
+Verifikasi minimal:
+
+CASE A:
+Guest → `/admin`
+HASIL:
+redirect/login atau 401/403 sesuai arsitektur.
+
+CASE B:
+Customer → `/admin`
+HASIL:
+403/redirect dan TIDAK boleh masuk admin.
+
+CASE C:
+Admin → `/admin`
+HASIL:
+200 dan dashboard tampil.
+
+CASE D:
+Customer login → halaman customer
+HASIL:
+berhasil.
+
+CASE E:
+Admin login → halaman customer
+HASIL:
+tetap valid sesuai desain aplikasi.
+
+==================================================
+9. AUDIT COOKIE / SESSION
+==================================================
+
+Jika login API berhasil tetapi browser tetap dianggap guest, fokus pada cookie/session.
+
+Periksa:
+- Set-Cookie
+- HttpOnly
+- SameSite
+- Secure
+- Path
+- domain
+- expiration
+- credentials/include pada fetch
+- middleware
+- proxy/reverse proxy jika ada
+
+Pastikan konfigurasi development HTTP tidak memaksa Secure cookie jika menyebabkan cookie tidak tersimpan.
+
+Jangan menurunkan security secara permanen untuk production.
+
+==================================================
+10. AUDIT MIDDLEWARE
+==================================================
+
+Periksa middleware/route guard.
+
+Pastikan middleware tidak:
+- menghapus session valid
+- salah membaca cookie
+- salah membaca role
+- menganggap semua user sebagai guest
+- redirect loop
+- memblokir API login
+- memblokir API customer
+- memblokir API admin setelah login
+
+Jika ada middleware yang salah, perbaiki akar masalahnya.
+
+==================================================
+11. ERROR HANDLING
+==================================================
+
+Jangan tampilkan hanya:
+
+"Terjadi kesalahan."
+
+Saat development, tambahkan logging server yang cukup untuk mengetahui:
+
+- endpoint
+- user lookup berhasil/tidak
+- password verification berhasil/tidak
+- session creation berhasil/tidak
+- database error
+- authorization error
+
+Jangan log:
+- password plaintext
+- secret
+- token sensitif
+- cookie sensitif
+- DATABASE_URL lengkap
+
+Frontend tetap boleh menampilkan pesan error yang aman untuk user.
+
+==================================================
+12. JANGAN MERUSAK UI
+==================================================
+
+UI login yang sekarang sudah ada harus dipertahankan.
+
+Jangan mengubah:
+- layout
+- warna
+- typography
+- card
+- button
+- icon
+- responsive design
+
+kecuali ada bug yang langsung berkaitan dengan authentication.
+
+==================================================
+13. REGRESSION TEST
+==================================================
+
+Setelah perbaikan jalankan:
+
+npm run typecheck
+
+npm run build
+
+Jalankan production/dev server sesuai arsitektur project.
+
+Kemudian lakukan smoke test:
+
+- `/`
+- `/products`
+- `/categories`
+- `/login`
+- customer login
+- `/checkout`
+- `/orders`
+- `/profile`
+- `/admin`
+- admin login
+
+Pastikan tidak ada client-side exception.
+
+==================================================
+14. DATABASE TEST
+==================================================
+
+Pastikan setelah restart server:
+
+- user tetap ada
+- role tetap benar
+- session/auth tetap bekerja
+- product tetap ada
+- category tetap ada
+- order tetap ada
+
+Jangan reset database.
+
+Jangan menjalankan migration destructive.
+
+Jangan drop database.
+
+==================================================
+15. JIKA MENEMUKAN MASALAH
+==================================================
+
+Jangan langsung membuat ulang authentication.
+
+Cari akar masalah terlebih dahulu.
+
+Contoh kemungkinan:
+- frontend memakai endpoint berbeda
+- field `phone` vs `whatsapp`
+- format nomor tidak konsisten
+- password hash tidak cocok
+- password verification salah
+- Prisma tidak benar-benar digunakan
+- DATABASE_URL salah
+- session tidak tersimpan
+- cookie tidak terkirim
+- middleware salah
+- role tidak terbaca
+- user tidak ditemukan
+- endpoint login mengembalikan error yang disembunyikan frontend
+
+Perbaiki akar masalah yang ditemukan.
+
+==================================================
+16. VERIFIKASI AKHIR
+==================================================
+
+Berikan laporan dengan format:
+
+AUTH AUDIT
+- Frontend login: PASS/FAIL
+- Login API: PASS/FAIL
+- PostgreSQL: PASS/FAIL
+- Prisma: PASS/FAIL
+- Password verification: PASS/FAIL
+- Session: PASS/FAIL
+- Cookie: PASS/FAIL
+- Customer login: PASS/FAIL
+- Admin login: PASS/FAIL
+- Authorization admin: PASS/FAIL
+- Logout: PASS/FAIL
+
+DATABASE
+- Test customer: ditemukan/tidak
+- Test admin: ditemukan/tidak
+- Role customer: ...
+- Role admin: ...
+- Status akun: ...
+
+FILES CHANGED
+- file 1 — alasan
+- file 2 — alasan
+
+TESTS
+- typecheck: PASS/FAIL
+- build: PASS/FAIL
+- smoke test: PASS/FAIL
+
+Jangan menyatakan PASS jika belum benar-benar diuji.
+
+==================================================
+17. GIT
+==================================================
+
+Jika semua authentication test PASS:
+
+git status --short
+git diff --check
+
+Pastikan:
+- tidak ada `.env`
+- tidak ada secret
+- tidak ada credential
+- tidak ada build artifact
+- tidak ada file temporary
+
+Kemudian:
+
+git add <file yang memang berubah>
+git commit -m "fix(auth): repair customer and admin login"
+git push origin main
+
+Jangan force push.
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+
+Pastikan working tree bersih dan branch sinkron dengan origin/main.
+
+==================================================
+HASIL YANG WAJIB DICAPAI
+==================================================
+
+Jangan berhenti pada "kode sudah diperbaiki".
+
+Login harus benar-benar dibuktikan:
+
+CUSTOMER
+Login → session → customer page → refresh → tetap login → logout.
+
+ADMIN
+Login → session → `/admin` → dashboard → refresh → tetap login → logout.
+
+Jika salah satu masih gagal, cari dan perbaiki sampai akar masalahnya ditemukan.
 ```
 # Prompt: Order & Checkout End-to-End Audit + Fix
 ```
