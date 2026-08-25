@@ -154,7 +154,311 @@
 # 
 ```
 
+## START SERVER + END-TO-END LOGIN TEST
 
+Project: Digital Cell / toko-online
+
+Tujuan:
+Nyalakan server aplikasi yang sedang aktif, lalu lakukan pengujian login secara nyata dari sisi API dan browser/runtime. Jangan mengubah UI atau database kecuali memang ditemukan bug yang menyebabkan login gagal.
+
+Kredensial TEST yang sudah dibuat oleh audit sebelumnya:
+
+ADMIN:
+- WhatsApp: 6281234567890
+- Password: Test1234!
+- Role: ADMIN
+
+CUSTOMER:
+- Gunakan akun test CUSTOMER yang sudah ada di database.
+- Jangan membuat akun customer baru jika akun test existing masih tersedia.
+
+==================================================
+1. CEK KONDISI PROJECT
+==================================================
+
+Masuk ke:
+
+/root/toko-online
+
+Periksa:
+
+git status --short
+git log -1 --oneline
+
+Jangan reset, jangan checkout commit lain, dan jangan menghapus perubahan existing.
+
+Pastikan environment database tersedia tetapi JANGAN tampilkan secret/.env ke output.
+
+==================================================
+2. NYALAKAN SERVER
+==================================================
+
+Pastikan tidak ada server lama yang memakai port aplikasi.
+
+Gunakan cara start yang memang sesuai dengan project.
+
+Prioritaskan:
+
+npm run dev
+
+Jika project memang sudah menggunakan production server dan konfigurasi mendukung:
+
+npm run build
+npm run start
+
+Jangan mengubah next.config hanya untuk memaksa server hidup.
+
+Setelah server hidup, pastikan benar-benar listening pada port yang digunakan.
+
+Contoh verifikasi:
+
+curl -I http://127.0.0.1:3000
+
+atau endpoint health yang memang tersedia.
+
+Jangan hanya menyatakan server hidup karena proses Node berjalan.
+Pastikan HTTP response benar-benar diterima.
+
+==================================================
+3. TEST HALAMAN LOGIN
+==================================================
+
+Buka/test:
+
+/login
+
+Pastikan:
+- HTTP 200
+- halaman login berhasil dirender
+- tidak ada client-side exception
+- form nomor WhatsApp tampil
+- form password tampil
+- tombol Masuk berfungsi
+
+Jangan mengubah desain UI.
+
+==================================================
+4. TEST LOGIN CUSTOMER
+==================================================
+
+Gunakan akun CUSTOMER TEST yang sudah ada di database.
+
+Lakukan login secara nyata.
+
+Verifikasi:
+
+1. POST/request login berhasil.
+2. Password diverifikasi.
+3. User ditemukan.
+4. Session/token dibuat.
+5. Cookie/session diterima client.
+6. User diarahkan ke halaman customer.
+7. Setelah refresh, user masih authenticated.
+8. Endpoint customer yang membutuhkan auth dapat diakses.
+9. Logout berhasil.
+10. Setelah logout, halaman protected kembali membutuhkan login.
+
+Jangan hanya test HTTP 200.
+Pastikan session benar-benar aktif.
+
+==================================================
+5. TEST LOGIN ADMIN
+==================================================
+
+Gunakan:
+
+WhatsApp:
+6281234567890
+
+Password:
+Test1234!
+
+Verifikasi:
+
+1. Login berhasil.
+2. User ditemukan di database.
+3. Password verification PASS.
+4. Role terbaca sebagai ADMIN.
+5. Session/token dibuat.
+6. Cookie/session tersimpan.
+7. Redirect ke `/admin` berhasil.
+8. Dashboard admin dapat dibuka.
+9. Refresh `/admin` tetap authenticated.
+10. Logout berhasil.
+
+==================================================
+6. TEST AUTHORIZATION
+==================================================
+
+Wajib test:
+
+A. Guest → `/admin`
+Expected:
+401/403 atau redirect ke login sesuai arsitektur.
+
+B. Customer → `/admin`
+Expected:
+DITOLAK.
+
+C. Admin → `/admin`
+Expected:
+BERHASIL.
+
+D. Customer → halaman customer
+Expected:
+BERHASIL.
+
+E. Setelah logout → `/admin`
+Expected:
+DITOLAK.
+
+==================================================
+7. JIKA LOGIN GAGAL
+==================================================
+
+Jangan langsung mengubah database atau membuat akun baru.
+
+Cari akar masalah berdasarkan error aktual.
+
+Periksa:
+
+- endpoint login
+- payload
+- normalisasi nomor WhatsApp
+- query user Prisma
+- password verification
+- session creation
+- Set-Cookie
+- SameSite
+- Secure
+- HttpOnly
+- middleware
+- role authorization
+- redirect
+- credentials/include pada fetch
+
+Jika API login berhasil tetapi browser tetap guest, fokus pada session/cookie.
+
+Jika user tidak ditemukan, periksa normalisasi nomor.
+
+Jika password gagal, periksa hash dan algoritma password.
+
+Jika session dibuat tetapi `/admin` tetap 401, periksa middleware/session reader.
+
+Jangan log:
+- password plaintext
+- DATABASE_URL
+- secret
+- token
+- cookie sensitif
+
+==================================================
+8. DATABASE SAFETY
+==================================================
+
+Jangan:
+
+- drop database
+- reset database
+- migrate destructive
+- menghapus product
+- menghapus category
+- menghapus order
+- mengganti password production
+
+Gunakan data test yang sudah ada.
+
+==================================================
+9. REGRESSION TEST
+==================================================
+
+Setelah login berhasil jalankan:
+
+npm run typecheck
+npm run build
+
+Kemudian smoke test:
+
+/
+ /products
+ /categories
+ /login
+ /checkout
+ /orders
+ /profile
+ /admin
+
+Pastikan tidak ada client-side exception.
+
+==================================================
+10. HASIL AKHIR
+==================================================
+
+Tampilkan laporan singkat:
+
+SERVER
+- Server: PASS/FAIL
+- Port: ...
+- HTTP: PASS/FAIL
+
+CUSTOMER LOGIN
+- Login: PASS/FAIL
+- Session: PASS/FAIL
+- Refresh: PASS/FAIL
+- Protected route: PASS/FAIL
+- Logout: PASS/FAIL
+
+ADMIN LOGIN
+- Login: PASS/FAIL
+- Role ADMIN: PASS/FAIL
+- `/admin`: PASS/FAIL
+- Refresh: PASS/FAIL
+- Logout: PASS/FAIL
+
+AUTHORIZATION
+- Guest blocked: PASS/FAIL
+- Customer blocked from admin: PASS/FAIL
+- Admin allowed: PASS/FAIL
+
+BUILD
+- Typecheck: PASS/FAIL
+- Build: PASS/FAIL
+- Smoke test: PASS/FAIL
+
+Jika semuanya PASS, JANGAN melakukan perubahan kode tambahan.
+
+Jika ada bug, perbaiki hanya akar masalahnya, lalu ulangi test sampai PASS.
+
+==================================================
+11. GIT
+==================================================
+
+Jika ada perubahan kode karena perbaikan bug:
+
+git status --short
+git diff --check
+
+Pastikan tidak ada:
+- .env
+- secret
+- credential
+- build artifact
+- temporary file
+
+Commit dengan:
+
+fix(auth): verify end-to-end login
+
+Lalu:
+
+git push origin main
+
+Tanpa force push.
+
+Jika tidak ada perubahan kode, jangan membuat commit kosong.
+
+PENTING:
+Tujuan tugas ini adalah memastikan server hidup dan LOGIN CUSTOMER + ADMIN benar-benar bekerja dari browser/runtime, bukan hanya unit test.
 
 ```
 # Prompt: Audit & Perbaiki Authentication/Login Digital Cell
