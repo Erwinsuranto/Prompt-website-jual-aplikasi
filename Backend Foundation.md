@@ -135,6 +135,148 @@
 ```
 # 
 ```
+## Audit & Perbaiki Integrasi Backend Prisma
+
+Project: **Digital Cell / toko-online**
+
+Lakukan audit menyeluruh terhadap project yang sedang aktif. Jangan membuat ulang project dan jangan menghapus fitur yang sudah ada.
+
+Temuan awal:
+
+* Next.js 14.2.33
+* TypeScript
+* Prisma 5.22
+* Database migration sudah ada di `app/prisma/migrations/`
+* `npm run typecheck` berhasil
+* `npm run build` berhasil
+* `npm run start` gagal karena `next.config` menggunakan `output: "export"`
+* Pencarian `PrismaClient` di `src` tidak menemukan penggunaan Prisma.
+* Project memiliki service seperti `auth-service`, `banner-service`, `category-service`, `order-service`, `payment-service`, `product-service`, `user-service`, dll.
+
+Tugas:
+
+1. Audit seluruh struktur project terlebih dahulu.
+2. Tentukan apakah project memang membutuhkan Next.js server runtime untuk Prisma/database.
+3. Jika Prisma belum terintegrasi, implementasikan integrasi Prisma dengan benar.
+4. Jika `output: "export"` tidak sesuai dengan arsitektur aplikasi, perbaiki `next.config` agar aplikasi dapat berjalan menggunakan `npm run start`.
+5. Buat/revisi Prisma client singleton yang aman untuk development dan production.
+6. Hubungkan service yang memang membutuhkan database ke Prisma tanpa merusak UI/store yang sudah ada.
+7. Periksa authentication, user, product, category, banner, order, order item, payment, notification dan data settings agar siap menggunakan database sesuai schema Prisma yang sudah ada.
+8. Jangan membuat API route hanya untuk formalitas. Buat endpoint/server logic yang memang diperlukan oleh frontend.
+9. Jangan menyimpan `DATABASE_URL`, secret, atau `.env.local` ke Git.
+10. Jangan mengubah desain UI kecuali diperlukan untuk memperbaiki integrasi.
+11. Jangan menghapus migration yang sudah dibuat.
+12. Pastikan semua perubahan modular dan mudah dikembangkan.
+13. Jalankan:
+
+* `npm run typecheck`
+* `npm run build`
+* `npm run start` atau validasi production server dengan cara yang sesuai arsitektur.
+
+14. Jika ditemukan error, perbaiki sampai ketiga tahap tersebut valid.
+
+15. Setelah selesai, tampilkan ringkasan file yang diubah dan alasan setiap perubahan.
+
+16. Setelah seluruh verifikasi PASS, lakukan commit dan push ke `origin main`.
+
+17. Sebelum commit, jalankan `git status --short` dan `git diff --check`.
+
+18. Pastikan tidak ada `.env`, secret, credential, build artifact, atau file temporary yang ikut di-commit.
+
+19. Gunakan commit message yang jelas, misalnya `feat(backend): integrate Prisma database services`.
+
+20. Jalankan `git push origin main` tanpa force push.
+
+21. Setelah push, verifikasi `git status --short`, `git log -1 --oneline`, dan sinkronisasi dengan `origin/main`.
+
+22. Perbaiki akses dan navigasi Admin Panel yang saat ini belum terlihat dari UI meskipun route `/admin/dashboard` sudah pernah terverifikasi HTTP 200.
+
+23. Audit terlebih dahulu implementasi authentication/session dan role authorization. Pastikan akun dengan role `ADMIN` benar-benar dikenali sebagai admin dari session yang sedang aktif, bukan hanya berdasarkan tampilan profil.
+
+24. Untuk akun `ADMIN`, tambahkan akses navigasi yang jelas menuju **Admin Panel** tanpa mengubah navigasi customer yang sudah ada. Admin tetap boleh menggunakan seluruh fitur customer, tetapi harus mendapatkan tambahan menu/entry `Admin Panel`.
+
+25. Menu `Admin Panel` hanya boleh tampil untuk user dengan role `ADMIN`. Customer biasa tidak boleh melihat menu tersebut.
+
+26. Saat admin memilih `Admin Panel`, arahkan ke `/admin/dashboard`. Jangan membuat dashboard baru jika dashboard admin yang sudah ada masih dapat digunakan; hubungkan navigasi ke implementasi existing.
+
+27. Audit seluruh route `/admin/*` dan middleware/guard-nya. Semua route admin harus menolak customer/non-admin dengan mekanisme authorization yang benar. Jangan hanya menyembunyikan menu di frontend.
+
+28. Pastikan login admin dari UI menghasilkan session/cookie yang valid, kemudian `/admin/dashboard` dapat dibuka langsung, direfresh, dan tetap terautentikasi sebagai ADMIN.
+
+29. Pastikan login customer tetap bekerja dan customer tidak dapat mengakses `/admin/dashboard` maupun endpoint admin hanya dengan mengetik URL secara manual.
+
+30. Audit perbedaan nomor WhatsApp akun test yang pernah muncul (`6281234567890` dan `62812345678900`). Jangan membuat akun duplikat atau mengubah data production sembarangan. Identifikasi akun ADMIN yang benar dari database/source of truth dan gunakan akun tersebut untuk verifikasi.
+
+31. Jangan mengubah halaman profil customer/admin menjadi Admin Panel. Profil tetap halaman akun. Admin Panel harus menjadi area administrasi terpisah dengan route dan layout yang jelas.
+
+32. Verifikasi minimal end-to-end:
+
+* customer login → session PASS → `/orders` PASS;
+* customer → `/admin/dashboard` ditolak/redirect PASS;
+* admin login → session role `ADMIN` PASS;
+* admin → `/admin/dashboard` HTTP 200 PASS;
+* admin refresh dashboard minimal 5 kali PASS;
+* admin menu menampilkan `Admin Panel` PASS;
+* customer menu tidak menampilkan `Admin Panel` PASS;
+* seluruh route admin utama yang sudah ada tetap PASS.
+
+33. Jangan mengubah desain/UI customer yang sudah dinyatakan PASS, kecuali perubahan kecil yang diperlukan untuk menambahkan entry `Admin Panel` secara responsif.
+
+PENTING:
+
+* Jangan hanya menghilangkan `output: "export"` tanpa memastikan seluruh aplikasi tetap berfungsi.
+* Jangan mengganti database.
+* Jangan menggunakan mock data sebagai pengganti database production.
+* Jangan menghapus fitur existing.
+* Gunakan schema Prisma yang sudah tersedia sebagai sumber data utama.
+* Jika ada bagian yang ternyata memang sengaja static, pertahankan bagian tersebut dan integrasikan backend hanya pada fitur yang membutuhkan database.
+* Karena VPS berisiko mati, jangan berhenti setelah implementasi. Jika typecheck, build, dan production server verification sudah PASS, langsung commit dan push ke GitHub.
+* Jangan force push.
+* Jika ada error yang belum terselesaikan, jangan commit perubahan yang rusak; perbaiki terlebih dahulu jika aman, atau berhenti dan laporkan blocker.
+
+34. BLOCKER TERKINI — LOGIN ADMIN UI MASIH `INVALID_CREDENTIALS` MESKIPUN TEST SERVER PASS:
+
+* Browser UI saat ini menolak login admin dengan `INVALID_CREDENTIALS`.
+* Jangan menganggap hasil smoke test sebelumnya cukup. Reproduksi login melalui endpoint/API yang benar-benar dipakai form login UI.
+* Audit alur lengkap: input nomor WhatsApp → normalisasi nomor → request login → lookup database → verifikasi password/hash → pembuatan session cookie → redirect.
+* Gunakan akun ADMIN yang benar-benar ada di database dev yang sedang dipakai server. Jangan membuat akun baru, jangan reset/drop database, dan jangan mengubah akun production.
+* Audit khusus perbedaan nomor `6281234567890` dan `62812345678900`. Tentukan nomor canonical yang tersimpan di DB dan pastikan UI/API menggunakan format canonical yang sama.
+* Audit password test yang benar-benar tersimpan/di-seed. Jangan mengasumsikan password hanya berdasarkan catatan lama. Verifikasi hash secara aman dari server-side/test harness tanpa mencetak hash atau secret ke output.
+* Pastikan UI login tidak mengirim field yang salah, tidak melakukan transformasi nomor yang merusak, dan tidak memakai endpoint login lama/mock.
+* Pastikan frontend dan backend menggunakan database/environment yang sama dengan production server yang sedang dijalankan.
+* Tambahkan logging diagnosis server-side yang aman untuk membedakan: user tidak ditemukan, password salah, role salah, session gagal, atau request menuju endpoint yang salah. Jangan log password, hash, cookie value, atau secret.
+* Setelah akar masalah ditemukan, perbaiki sumber masalahnya secara minimal dan modular. Jangan menurunkan keamanan auth atau membuat bypass login.
+* Verifikasi ulang dari browser/public IP menggunakan akun ADMIN nyata: login PASS → session PASS → `/admin/dashboard` PASS → refresh minimal 5x PASS → Admin Panel terlihat.
+* Verifikasi customer tetap PASS dan customer tetap ditolak dari `/admin/dashboard`.
+* Setelah semua PASS, jalankan typecheck, build, smoke test, `git diff --check`, cek secret/env, commit dan push `origin main` tanpa force push.
+
+35. BLOCKER BARU — PORT 3000 / OAUTH CALLBACK CLIENT-SIDE EXCEPTION:
+
+* Public URL port 3000 saat membuka flow login sekarang menampilkan `Application error: a client-side exception has occurred` pada URL `/auth/login?callback...`.
+* Jangan menganggap ini masalah credential terlebih dahulu. Audit dan reproduksi error ini dari browser/public IP pada port 3000.
+* Tentukan arsitektur port 3000: apakah ini Next.js frontend/app server yang seharusnya melayani login, reverse proxy, atau service lain. Jangan menjalankan dua aplikasi berbeda pada port yang sama.
+* Audit route `/auth/login`, query `callback`, middleware, auth/session provider, client component login, server component, dan seluruh redirect chain sebelum/sesudah callback.
+* Periksa browser console dan server log untuk menemukan exception JavaScript/React/Next.js yang sebenarnya. Jangan hanya menyembunyikan error dengan fallback UI.
+* Pastikan URL callback/redirect tidak mengarah ke port yang salah, tidak menghasilkan URL malformed, dan konsisten dengan origin/public URL aplikasi yang sedang aktif.
+* Audit environment variable yang berhubungan dengan auth/base URL/origin/callback. Jangan mencetak secret ke log dan jangan commit `.env`.
+* Pastikan login password/WhatsApp tidak tanpa sengaja dialihkan ke OAuth callback handler atau endpoint yang berbeda.
+* Jika ada Google/Apple OAuth yang memang belum dikonfigurasi, jangan membuat login password ikut bergantung pada provider tersebut. Login WhatsApp/password harus tetap bisa berjalan secara independen.
+* Periksa hydration mismatch, penggunaan `window`/`document` pada server render, import client-only, penggunaan `localStorage`, dan error parsing response yang dapat menyebabkan client-side exception setelah redirect.
+* Pastikan callback yang gagal tidak meninggalkan session/cookie setengah jadi. Jika session invalid, tangani secara aman dan redirect kembali ke login dengan pesan error yang jelas, bukan crash.
+* Verifikasi dengan browser sungguhan/public IP:
+
+  1. buka `http://PUBLIC_IP:3000`;
+  2. buka login;
+  3. login customer dengan akun test nyata;
+  4. login admin dengan akun ADMIN nyata;
+  5. pastikan tidak ada `Application error`;
+  6. pastikan session cookie terbentuk;
+  7. admin diarahkan ke `/admin/dashboard`;
+  8. customer diarahkan ke area customer;
+  9. refresh masing-masing halaman minimal 5x;
+  10. customer tetap ditolak dari `/admin/dashboard`.
+* Jangan membuat bypass authentication, jangan menonaktifkan middleware, jangan menghapus authorization, dan jangan mengganti database hanya untuk membuat login terlihat berhasil.
+* Setelah akar masalah diperbaiki, verifikasi `npm run typecheck`, `npm run build`, production server, smoke/E2E auth, `git diff --check`, status Git, lalu commit dan push `origin main` tanpa force push.
 
 
 
