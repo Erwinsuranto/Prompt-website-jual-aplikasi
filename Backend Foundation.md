@@ -163,9 +163,638 @@
 
 
 ```
-# 
+# Prompt: Order & Checkout End-to-End Audit + Fix
 ```
+Project: Digital Cell / toko-online
 
+Sekarang fokus pada ALUR TRANSAKSI CUSTOMER END-TO-END.
+
+Admin Panel dan responsive UI sudah selesai dan PASS. Jangan mengulang pekerjaan tersebut.
+
+TUJUAN UTAMA:
+Memastikan customer dapat memilih satu produk, membeli, membuat order, memilih payment method, dan order tersebut tercatat dengan benar di database serta muncul di Admin Orders.
+
+Jangan membuat mock transaction sebagai pengganti flow nyata.
+
+==================================================
+1. AUDIT FLOW EXISTING TERLEBIH DAHULU
+==================================================
+
+Audit seluruh flow berikut:
+
+Customer:
+Home
+→ Product Detail
+→ Buy Now / Tambah ke Keranjang
+→ Checkout
+→ Informasi Pembeli
+→ Payment Method
+→ Buat Pesanan
+→ Order berhasil
+→ Order Detail / Status
+
+Admin:
+Admin Orders
+→ melihat order
+→ melihat item
+→ melihat customer
+→ melihat total
+→ melihat payment status
+→ melihat order status
+
+Jangan langsung mengubah kode sebelum memahami:
+- cart state
+- checkout state
+- order state
+- API request
+- database transaction
+- order item
+- payment record
+- authentication/session
+
+Cari sumber masalah sebenarnya.
+
+==================================================
+2. PERBAIKI MASALAH CART / CHECKOUT
+==================================================
+
+Sebelumnya ditemukan masalah:
+
+Jika customer sudah berada di halaman checkout kemudian kembali ke halaman utama dan membeli produk lain, checkout dapat menjadi:
+
+2 produk
+2 item
+
+Padahal transaksi baru seharusnya hanya berisi produk yang baru dipilih.
+
+Pastikan:
+
+A. Buy Now
+- membuat checkout session baru untuk produk tersebut
+- tidak membawa item dari transaksi/checkout sebelumnya
+- quantity default = 1
+- produk yang dipilih menjadi satu-satunya item
+
+B. Tambah ke Keranjang
+- memang boleh menambah item
+- quantity tetap benar
+- produk berbeda boleh berada dalam cart yang sama
+
+C. Checkout dari cart
+- menggunakan isi cart yang sebenarnya
+- tidak menggandakan item
+- tidak menggabungkan state checkout lama
+
+D. Kembali dari checkout
+- jangan meninggalkan stale checkout state
+- jangan menduplikasi item saat masuk kembali
+
+E. Membeli produk lain
+- checkout baru harus dimulai dari produk baru
+- jangan membawa produk transaksi sebelumnya
+
+F. Refresh halaman checkout
+- state harus tetap konsisten
+- jangan membuat duplicate item
+- jangan membuat duplicate order
+
+Gunakan satu sumber kebenaran untuk cart/checkout state.
+
+Jangan melakukan reset state secara sembarangan yang dapat menghilangkan cart valid.
+
+==================================================
+3. ORDER CREATION
+==================================================
+
+Audit endpoint/service yang membuat order.
+
+Pastikan server melakukan validasi:
+
+- user/customer valid
+- product valid
+- product aktif
+- category valid jika diperlukan
+- quantity > 0
+- stock mencukupi
+- harga diambil dari database/server
+- total dihitung ulang di server
+- client tidak boleh menentukan total final secara bebas
+
+Jangan percaya:
+price
+subtotal
+total
+
+yang dikirim dari browser.
+
+Server harus menghitung ulang:
+
+subtotal = database price × quantity
+
+total = subtotal + biaya lain jika memang ada
+
+Jika tidak ada biaya tambahan:
+
+total = subtotal
+
+==================================================
+4. DATABASE TRANSACTION
+==================================================
+
+Order creation harus atomic.
+
+Gunakan database transaction yang benar untuk:
+
+- create order
+- create order items
+- create payment record jika arsitektur memang mengharuskannya
+- update/reserve stock jika flow memang menggunakan reservation
+
+Jika salah satu proses gagal:
+- jangan meninggalkan order setengah jadi
+- jangan meninggalkan order item yatim
+- jangan mengurangi stock jika order gagal dibuat
+- jangan membuat payment record tanpa order valid
+
+Audit relasi:
+Order
+→ OrderItem
+→ Product
+→ User/Customer
+→ Payment
+
+Pastikan foreign key dan relation sesuai schema Prisma existing.
+
+JANGAN mengganti database.
+JANGAN menghapus migration.
+
+==================================================
+5. STOCK
+==================================================
+
+Pastikan stock aman.
+
+Contoh:
+
+Stock = 10
+Customer membeli quantity = 2
+Stock setelah transaksi = 8
+
+Tetapi jika order creation gagal:
+Stock harus tetap 10.
+
+Jika stock tidak mencukupi:
+return error yang jelas.
+
+Jangan mengizinkan:
+quantity <= 0
+quantity melebihi stock
+produk nonaktif dibeli
+
+Pastikan race condition diperhatikan jika memang diperlukan oleh arsitektur database.
+
+==================================================
+6. ORDER STATUS
+==================================================
+
+Pisahkan dengan jelas:
+
+Order Status:
+- PENDING
+- PROCESSING
+- COMPLETED
+- CANCELLED
+- FAILED
+
+Payment Status:
+- PENDING
+- PAID
+- FAILED
+- EXPIRED
+- REFUNDED
+
+Jangan mencampur kedua status.
+
+Perubahan payment status tidak boleh sembarangan mengubah order status tanpa aturan flow yang jelas.
+
+Pastikan status awal order konsisten.
+
+==================================================
+7. PAYMENT METHOD
+==================================================
+
+Gunakan payment settings yang sudah dibuat di Admin.
+
+Customer dapat melihat metode payment yang aktif.
+
+Contoh:
+- QRIS
+- Transfer Bank
+- E-Wallet
+
+Pastikan:
+
+- metode nonaktif tidak muncul di customer
+- metode aktif muncul
+- method ID/code konsisten
+- server melakukan validasi method
+- customer tidak bisa mengirim payment method yang tidak tersedia
+- payment settings berasal dari database/API yang benar
+
+Jangan mengaktifkan payment production provider/API eksternal pada tahap ini.
+
+Gunakan DEV/SANDBOX flow untuk verifikasi.
+
+==================================================
+8. CHECKOUT UI
+==================================================
+
+Jangan redesign customer UI.
+
+UI customer saat ini sudah dianggap stabil.
+
+Pertahankan:
+- Digital Cell header
+- product card
+- checkout layout
+- bottom navigation
+- responsive layout
+- typography
+- midnight/dark blue style
+
+Perbaiki hanya jika diperlukan untuk bug functional.
+
+Pastikan pada checkout:
+
+- nama customer benar
+- nomor WhatsApp benar
+- produk benar
+- quantity benar
+- harga benar
+- subtotal benar
+- total benar
+- payment method benar
+- tombol submit tidak double-submit
+
+Saat tombol "Lanjutkan Pembayaran" ditekan:
+
+- disable sementara
+- tampilkan loading
+- cegah double click
+- request hanya dikirim sekali
+- jika sukses → halaman/order state sukses
+- jika gagal → error yang jelas
+- tombol kembali aktif jika request gagal
+
+==================================================
+9. ERROR HANDLING
+==================================================
+
+Jangan tampilkan hanya:
+
+"Gagal Membuat Pesanan"
+
+tanpa alasan.
+
+Backend harus mengembalikan error yang aman dan bermakna.
+
+Contoh:
+
+PRODUCT_NOT_FOUND
+PRODUCT_INACTIVE
+INSUFFICIENT_STOCK
+INVALID_QUANTITY
+INVALID_PAYMENT_METHOD
+CHECKOUT_EXPIRED
+UNAUTHORIZED
+ORDER_CREATION_FAILED
+
+Customer boleh mendapat pesan user-friendly.
+
+Jangan membocorkan:
+- stack trace
+- DATABASE_URL
+- secret
+- internal Prisma error detail
+- credential
+
+Log internal boleh berisi detail teknis yang diperlukan untuk debugging.
+
+==================================================
+10. AUTHENTICATION
+==================================================
+
+Audit:
+
+Guest:
+- tidak boleh membuat order jika flow memang mensyaratkan login
+- redirect/login sesuai existing behavior
+
+Customer:
+- dapat membuat order
+- order terhubung dengan user/customer yang benar
+
+Admin:
+- dapat melihat order sesuai authorization
+
+Jangan merusak auth yang sebelumnya sudah PASS.
+
+==================================================
+11. ADMIN ORDERS
+==================================================
+
+Setelah customer berhasil membuat order:
+
+Order harus muncul di:
+
+/admin/orders
+
+Pastikan Admin dapat melihat:
+
+- order ID
+- customer
+- produk
+- quantity
+- subtotal
+- total
+- payment method
+- payment status
+- order status
+- tanggal dibuat
+
+Pastikan order item benar.
+
+Contoh:
+
+Customer membeli:
+Mobile Legends 500
+quantity 1
+
+Admin harus melihat:
+
+1 order
+1 order item
+quantity 1
+
+BUKAN:
+
+1 order
+2 order item
+
+dan bukan:
+
+2 order.
+
+==================================================
+12. TEST CASE WAJIB
+==================================================
+
+Buat/verifikasi test untuk skenario:
+
+TEST 1:
+Buy Now satu produk quantity 1
+Expected:
+1 order
+1 item
+quantity 1
+
+TEST 2:
+Tambah ke keranjang satu produk
+Checkout
+Expected:
+1 order
+1 item
+
+TEST 3:
+Tambah produk A + produk B
+Checkout
+Expected:
+1 order
+2 item
+masing-masing quantity benar
+
+TEST 4:
+Masuk checkout produk A
+kembali ke home
+Buy Now produk B
+Expected:
+checkout hanya produk B
+
+TEST 5:
+Refresh checkout
+Expected:
+tidak duplicate item
+
+TEST 6:
+Double click tombol pembayaran
+Expected:
+tidak membuat duplicate order
+
+TEST 7:
+Stock tidak cukup
+Expected:
+order ditolak
+stock tidak berubah
+
+TEST 8:
+Produk nonaktif
+Expected:
+order ditolak
+
+TEST 9:
+Payment method nonaktif
+Expected:
+order/payment request ditolak
+
+TEST 10:
+Order creation gagal di tengah transaction
+Expected:
+database rollback
+tidak ada order setengah jadi
+
+TEST 11:
+Customer membuat order
+Expected:
+order muncul di Admin Orders
+
+TEST 12:
+Guest mencoba membuat order
+Expected:
+authorization sesuai aturan existing
+
+==================================================
+13. DATABASE VERIFICATION
+==================================================
+
+Setelah test, query database development untuk memastikan:
+
+- jumlah order benar
+- jumlah order item benar
+- total benar
+- quantity benar
+- stock benar
+- payment record benar
+- relation user/order benar
+
+Jangan hanya percaya response HTTP.
+
+Verifikasi database langsung.
+
+Jika ada data test lama yang menyebabkan hasil ambigu, gunakan data test yang jelas dan terisolasi.
+
+Jangan reset database production.
+
+==================================================
+14. API REGRESSION
+==================================================
+
+Verifikasi route terkait:
+
+- product
+- checkout
+- order
+- payment
+- auth
+- admin orders
+
+Semua harus:
+- return status yang benar
+- tidak throw unhandled exception
+- tidak menghasilkan 500 untuk input normal
+- tidak membuat duplicate data
+
+==================================================
+15. RESPONSIVE REGRESSION
+==================================================
+
+Jangan mengubah UI customer kecuali bug langsung berasal dari perubahan functional.
+
+Tetap cek:
+
+360
+375
+390
+414
+768
+1280
+
+Pastikan checkout tetap:
+- tidak horizontal overflow
+- tombol tidak tertutup
+- form tidak keluar viewport
+- error toast tidak merusak layout
+- loading state terlihat
+
+==================================================
+16. TYPECHECK / BUILD / TEST
+==================================================
+
+Setelah perbaikan:
+
+npm run typecheck
+
+npm run build
+
+Jalankan test yang tersedia.
+
+Jalankan smoke test.
+
+Jika npm run test bermasalah karena konfigurasi Node/loader, jangan mengubah konfigurasi test secara besar-besaran hanya untuk memaksa PASS.
+
+Cari script/framework test yang memang digunakan project dan jalankan dengan cara yang sesuai.
+
+==================================================
+17. GIT SAFETY
+==================================================
+
+Sebelum commit:
+
+git status --short
+
+git diff --check
+
+Pastikan tidak ada:
+
+.env
+.env.local
+secret
+credential
+database dump
+temporary file
+build artifact
+
+Jangan force push.
+
+Jika perubahan valid:
+
+git add <file yang memang berubah>
+
+git commit -m "fix(order): stabilize checkout and transaction flow"
+
+git push origin main
+
+Setelah push:
+
+git status --short
+git log -1 --oneline
+
+Pastikan working tree bersih dan origin/main sinkron.
+
+==================================================
+18. BATASAN
+==================================================
+
+JANGAN:
+
+- redesign homepage
+- redesign product detail
+- redesign checkout
+- redesign admin panel
+- mengganti database
+- menghapus migration
+- membuat mock order sebagai solusi
+- bypass authentication
+- mempercayai harga dari client
+- mengaktifkan payment production
+- menghapus test existing
+- menghapus fitur existing
+- force push
+- mengubah customer UI yang sudah PASS tanpa alasan
+
+Fokus hanya pada:
+CART → CHECKOUT → ORDER → PAYMENT STATE → DATABASE → ADMIN ORDERS.
+
+==================================================
+19. HASIL AKHIR WAJIB
+==================================================
+
+Laporkan:
+
+1. Root cause masalah checkout sebelumnya.
+2. File yang diubah.
+3. Perubahan cart/checkout state.
+4. Perubahan order service/API.
+5. Perubahan database transaction jika ada.
+6. Hasil seluruh 12 test case.
+7. Verifikasi database.
+8. Typecheck.
+9. Build.
+10. Smoke test.
+11. Commit hash.
+12. Push status.
+13. Apakah masih ada blocker.
+
+JANGAN berhenti hanya karena typecheck/build PASS.
+
+Yang paling penting adalah membuktikan:
+
+BUY NOW satu produk
+→ CHECKOUT satu produk
+→ CREATE ORDER satu kali
+→ DATABASE satu order + satu item
+→ ADMIN ORDERS menampilkan order yang sama.
+
+Setelah semua PASS, langsung commit dan push ke origin/main tanpa force push.
 
 
 ```
