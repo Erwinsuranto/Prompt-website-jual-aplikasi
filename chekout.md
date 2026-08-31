@@ -173,7 +173,73 @@
 ```
 # 
 ```
+Lanjutkan project toko-online dari kondisi repository saat ini.
 
+FOKUS TASK:
+Audit dan sempurnakan flow REGISTRASI + AUTHENTIKASI CUSTOMER. Jangan mengubah atau mengulang fitur payment yang sudah selesai.
+
+ATURAN:
+1. Baca repository dan implementasi auth yang sudah ada terlebih dahulu.
+2. Jangan menebak struktur project.
+3. Pertahankan fitur yang sudah PASS.
+4. Jangan gunakan Apple Login.
+5. Google OAuth yang sudah ada jangan dihapus; audit dan perbaiki hanya jika ditemukan masalah nyata.
+6. Jangan membuat mock/fake authentication.
+7. Jangan menyimpan password plaintext.
+8. Jangan menambahkan dependency baru jika sebenarnya tidak diperlukan.
+
+YANG HARUS DIAUDIT:
+- Registrasi customer dengan email/password.
+- Validasi email.
+- Validasi password dan konfirmasi password.
+- Email yang sudah terdaftar harus ditolak dengan pesan yang jelas.
+- Login email/password.
+- Logout.
+- Session/cookie authentication tetap aman dan konsisten.
+- Customer yang belum login tidak boleh mengakses halaman/aksi yang membutuhkan akun.
+- Customer yang sudah login tidak perlu kembali ke halaman login secara tidak semestinya.
+- Google OAuth tetap berfungsi.
+- Callback Google harus membuat/menghubungkan akun customer dengan benar tanpa membuat akun duplikat.
+- Error authentication harus ditampilkan dengan jelas di frontend.
+- Redirect setelah login/register harus menuju halaman yang benar.
+- Refresh browser tidak boleh membuat session valid tiba-tiba hilang.
+- Pastikan route/API auth tidak menyebabkan redirect loop atau 500.
+- Pastikan customer dan admin tetap terpisah; jangan sampai auth customer membuka akses admin.
+
+UX:
+- Form mobile-first dan responsive.
+- Loading state pada submit.
+- Tombol submit tidak bisa diklik berkali-kali saat request berjalan.
+- Pesan error/sukses jelas.
+- Jangan menampilkan detail error internal/server kepada customer.
+- Tampilan harus konsisten dengan desain toko-online yang sekarang.
+
+VERIFIKASI WAJIB:
+- Jalankan typecheck.
+- Jalankan build.
+- Jalankan test yang relevan.
+- Lakukan browser E2E untuk:
+  1. Register customer baru.
+  2. Register dengan email yang sudah ada.
+  3. Login berhasil.
+  4. Login password salah.
+  5. Logout.
+  6. Protected route tanpa login.
+  7. Protected route setelah login.
+  8. Google OAuth jika environment credential tersedia.
+  9. Refresh setelah login.
+  10. Pastikan tidak ada redirect loop, hydration error, uncaught exception, atau API 500.
+
+DATA TEST:
+Gunakan data test yang aman dan jangan merusak data production.
+
+SETELAH SELESAI:
+- Perbaiki semua bug nyata yang ditemukan.
+- Jangan melakukan perubahan di luar scope auth kecuali benar-benar diperlukan untuk memperbaiki flow.
+- Simpan hasil audit/hasil kerja ke folder repository yang memang digunakan untuk hasil kerja AI agar pemeriksaan berikutnya tidak perlu screenshot.
+- Tulis ringkasan file yang diubah, hasil test, hasil E2E, blocker jika ada, dan pekerjaan lanjutan.
+- Jika semua PASS dan working tree bersih setelah commit, push ke origin/main.
+- Jangan membuat commit kosong.
 ```
 # 
 ```
